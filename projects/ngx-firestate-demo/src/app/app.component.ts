@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { DocPaths1, AppInstances, DocPaths3 } from './firestate-config';
+import { DocPaths1, FirestateInstances, DocPaths3 } from './firestate-config.module';
 
 @Component({
   selector: 'app-root',
@@ -8,7 +8,7 @@ import { DocPaths1, AppInstances, DocPaths3 } from './firestate-config';
   `
 })
 export class AppComponent {
-  constructor(private instances: AppInstances) {
+  constructor(private instances: FirestateInstances) {
     this.instances.app3.db.FromCollection(DocPaths3.Doc33);
   }
 }

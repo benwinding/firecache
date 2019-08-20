@@ -5,7 +5,7 @@ import { NgModule, InjectionToken } from '@angular/core';
 import { AppComponent } from './app.component';
 import { CommonModule } from '@angular/common';
 import { AppRoutingModule } from './app.routing';
-import { FireStateConfigModule } from './firestate-config';
+import { FireStateConfigModule } from './firestate-config.module';
 
 @NgModule({
   declarations: [AppComponent],

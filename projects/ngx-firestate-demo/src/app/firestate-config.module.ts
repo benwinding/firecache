@@ -23,7 +23,7 @@ const App3 = new InjectionToken<FirebaseClient<DocPaths3>>('App3');
 const firebaseConfig3 = {};
 
 @Injectable()
-export class AppInstances {
+export class FirestateInstances {
   constructor(
     @Inject(App1) public app1: FirebaseClient<DocPaths1>,
     @Inject(App2) public app2: FirebaseClient<DocPaths2>,
@@ -45,7 +45,7 @@ export class AppInstances {
       provide: App3,
       useValue: new FirebaseClient<DocPaths3>(firebaseConfig3)
     },
-    AppInstances
+    FirestateInstances
   ]
 })
 export class FireStateConfigModule {}
