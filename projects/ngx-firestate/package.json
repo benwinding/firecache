@@ -1,0 +1,12 @@
+{
+  "name": "ngx-firestate",
+  "version": "0.0.4",
+  "peerDependencies": {
+    "@angular/common": "^7.2.0",
+    "@angular/core": "^7.2.0"
+  },
+  "dependencies": {
+    "uuid": "^3.x",
+    "firebase": "^6.x"
+  }
+}

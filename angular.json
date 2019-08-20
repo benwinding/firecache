@@ -1,0 +1,143 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "ngx-firestate": {
+      "root": "projects/ngx-firestate",
+      "sourceRoot": "projects/ngx-firestate/src",
+      "projectType": "library",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/ngx-firestate/tsconfig.lib.json",
+            "project": "projects/ngx-firestate/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngx-firestate/src/test.ts",
+            "tsConfig": "projects/ngx-firestate/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-firestate/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ngx-firestate/tsconfig.lib.json",
+              "projects/ngx-firestate/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "ngx-firestate-demo": {
+      "root": "projects/ngx-firestate-demo/",
+      "sourceRoot": "projects/ngx-firestate-demo/src",
+      "projectType": "application",
+      "prefix": "app",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/ngx-firestate-demo",
+            "index": "projects/ngx-firestate-demo/src/index.html",
+            "main": "projects/ngx-firestate-demo/src/main.ts",
+            "polyfills": "projects/ngx-firestate-demo/src/polyfills.ts",
+            "tsConfig": "projects/ngx-firestate-demo/tsconfig.app.json",
+            "assets": [
+              "projects/ngx-firestate-demo/src/favicon.ico",
+              "projects/ngx-firestate-demo/src/assets"
+            ],
+            "styles": [
+              "projects/ngx-firestate-demo/src/styles.css"
+            ],
+            "scripts": [],
+            "es5BrowserSupport": true
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/ngx-firestate-demo/src/environments/environment.ts",
+                  "with": "projects/ngx-firestate-demo/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "ngx-firestate-demo:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "ngx-firestate-demo:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "ngx-firestate-demo:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngx-firestate-demo/src/test.ts",
+            "polyfills": "projects/ngx-firestate-demo/src/polyfills.ts",
+            "tsConfig": "projects/ngx-firestate-demo/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-firestate-demo/karma.conf.js",
+            "styles": [
+              "projects/ngx-firestate-demo/src/styles.css"
+            ],
+            "scripts": [],
+            "assets": [
+              "projects/ngx-firestate-demo/src/favicon.ico",
+              "projects/ngx-firestate-demo/src/assets"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ngx-firestate-demo/tsconfig.app.json",
+              "projects/ngx-firestate-demo/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "ngx-firestate-demo"
+}
