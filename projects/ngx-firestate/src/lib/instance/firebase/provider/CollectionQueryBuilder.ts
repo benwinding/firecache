@@ -1,6 +1,6 @@
 // tslint:disable: no-string-literal
-import { Observable, combineLatest } from 'rxjs';
-import { map, switchMap, take, tap } from 'rxjs/operators';
+import { Observable, combineLatest, of } from 'rxjs';
+import { map, switchMap, take, tap, catchError } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
 import { ICollectionQueryBuilder } from '../interfaces/ICollectionQueryBuilder';
 import { resolvePathVariables } from './PathResolver';
@@ -35,15 +35,14 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
       this.overridenState
     ).pipe(
       map(collectionPath => {
-        return this.app
-          .firestore()
-          .collection(collectionPath);
+        return this.app.firestore().collection(collectionPath);
       }),
       tap(collection =>
         this.log('GetAllDocs() collection', { path: collection.path })
       ),
       map(collection => {
         if (whereQuery) {
+          this.log('GetAllDocs() whereQuery', { whereQuery });
           return collection.where(
             whereQuery.fieldPath,
             whereQuery.opStr,
@@ -52,7 +51,16 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
         }
         return collection;
       }),
-      switchMap(collection => collection2Observable(collection)),
+      switchMap(collection =>
+        collection2Observable(collection).pipe(
+          catchError(error => {
+            console.error('GetAllDocs: error in switchMap(collection => ...', {
+              error
+            });
+            return of({ docs: [] as any });
+          })
+        )
+      ),
       tap(docSnap =>
         this.log('GetAllDocs() after snapshotChanges...', {
           'docSnap?': docSnap
@@ -78,9 +86,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
       this.overridenState
     ).pipe(
       map(collectionPath => {
-        return this.app
-          .firestore()
-          .collection(collectionPath);
+        return this.app.firestore().collection(collectionPath);
       }),
       tap(collection =>
         this.log('GetId() collection', { path: collection.path })
@@ -109,9 +115,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
       this.overridenState
     ).pipe(
       map(collectionPath => {
-        return this.app
-          .firestore()
-          .collection(collectionPath);
+        return this.app.firestore().collection(collectionPath);
       }),
       switchMap(collection =>
         combineLatest(ids.map(id => document2Observable(collection.doc(id))))
@@ -139,9 +143,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
     )
       .pipe(
         map(collectionPath => {
-          return this.app
-            .firestore()
-            .collection(collectionPath);
+          return this.app.firestore().collection(collectionPath);
         }),
         switchMap(collection => {
           const db = this.app.firestore();
@@ -167,9 +169,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
     )
       .pipe(
         map(collectionPath => {
-          return this.app
-            .firestore()
-            .collection(collectionPath);
+          return this.app.firestore().collection(collectionPath);
         }),
         switchMap(collection => {
           obj['updated_by'] = this.uid;
@@ -188,9 +188,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
     )
       .pipe(
         map(collectionPath => {
-          return this.app
-            .firestore()
-            .collection(collectionPath);
+          return this.app.firestore().collection(collectionPath);
         }),
         switchMap(collection => {
           obj['created_by'] = this.uid;
@@ -211,9 +209,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
     )
       .pipe(
         map(collectionPath => {
-          return this.app
-            .firestore()
-            .collection(collectionPath);
+          return this.app.firestore().collection(collectionPath);
         }),
         switchMap(collection => {
           const db = this.app.firestore();
@@ -241,9 +237,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
     )
       .pipe(
         map(collectionPath => {
-          return this.app
-            .firestore()
-            .collection(collectionPath);
+          return this.app.firestore().collection(collectionPath);
         }),
         switchMap(collection => collection.doc(id).delete())
       )
@@ -258,9 +252,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
     )
       .pipe(
         map(collectionPath => {
-          return this.app
-            .firestore()
-            .collection(collectionPath);
+          return this.app.firestore().collection(collectionPath);
         }),
         switchMap(collection => {
           const db = this.app.firestore();
@@ -285,9 +277,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
     )
       .pipe(
         map(collectionPath => {
-          return this.app
-            .firestore()
-            .collection(collectionPath);
+          return this.app.firestore().collection(collectionPath);
         })
       )
       .pipe(take(1));

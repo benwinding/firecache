@@ -1,9 +1,5 @@
 import { Component } from '@angular/core';
-import {
-  DocPaths1,
-  FirestateInstances,
-  DocPaths3
-} from './firestate-config.module';
+import { DocPaths1, FirestateFacade, DocPaths2 } from './firestate-config.module';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -12,17 +8,25 @@ import { Observable } from 'rxjs';
     <!--The content below is only a placeholder and can be replaced.-->
     <h1>Collection</h1>
     <pre>
-    {{ collection$ | async }}
+    {{ collection$ | async | json }}
+    </pre
+    >
+    <pre>
+    {{ collection2$ | async | json }}
     </pre
     >
   `
 })
 export class AppComponent {
   collection$: Observable<any>;
+  collection2$: Observable<any>;
 
-  constructor(private instances: FirestateInstances) {
+  constructor(private instances: FirestateFacade) {
     this.collection$ = this.instances.app1.db
-      .FromCollection(DocPaths1.Doc1)
+      .FromCollection(DocPaths1.Doc1, 'LOGGING')
+      .GetAllDocs();
+    this.collection2$ = this.instances.app2.db
+      .FromCollection(DocPaths2.UsersCollection, 'LOGGING')
       .GetAllDocs();
   }
 }

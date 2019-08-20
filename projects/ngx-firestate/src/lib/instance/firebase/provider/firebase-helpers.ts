@@ -1,17 +1,31 @@
 import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs';
 
-export function collection2Observable(collection: firebase.firestore.Query) {
+export function collection2Observable(
+  collection: firebase.firestore.Query
+): Observable<firebase.firestore.QuerySnapshot> {
+  const onError = (err: Error) => {
+    console.error('collection2Observable', { collection }, err);
+  };
+
   const observable: Observable<
     firebase.firestore.QuerySnapshot
-  > = Observable.create((observer: any) => collection.onSnapshot(observer));
+  > = Observable.create((observer: any) =>
+    collection.onSnapshot(observer, onError)
+  );
   return observable;
 }
 
-export function document2Observable(doc: firebase.firestore.DocumentReference) {
+export function document2Observable(
+  doc: firebase.firestore.DocumentReference
+): Observable<firebase.firestore.DocumentSnapshot> {
+  const onError = (err: Error) => {
+    console.error('document2Observable', { doc }, err);
+  };
+
   const observable: Observable<
     firebase.firestore.DocumentSnapshot
-  > = Observable.create((observer: any) => doc.onSnapshot(observer));
+  > = Observable.create((observer: any) => doc.onSnapshot(observer, onError));
   return observable;
 }
 
