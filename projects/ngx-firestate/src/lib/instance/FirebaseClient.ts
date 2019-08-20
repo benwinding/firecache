@@ -1,13 +1,14 @@
 import { FirebaseWrapper } from './firebase/FirebaseWrapper';
 import { FirebaseClientState } from './FirebaseClientState';
 import { FirestoreWrapper } from './firebase/provider/FirestoreWrapper';
+import { FirebaseConfigObject } from './firebase/provider/firebase-helpers';
 
 export class FirebaseClient<EnumDocType> {
   private firebaseWrapper: FirebaseWrapper<EnumDocType>;
   private clientState = new FirebaseClientState();
 
   constructor(
-    firebaseConfig: {},
+    firebaseConfig: FirebaseConfigObject,
   ) {
     this.InitFirebase(firebaseConfig);
   }
@@ -16,16 +17,15 @@ export class FirebaseClient<EnumDocType> {
     return this.firebaseWrapper.provider;
   }
 
-  private InitFirebase(firebaseConfig: {}): void {
-    console.log('firebase.provider: InitFirebase()...');
+  private InitFirebase(firebaseConfig: FirebaseConfigObject): void {
+    console.log('FirebaseClient.ts: InitFirebase()...');
     try {
       this.firebaseWrapper = new FirebaseWrapper<EnumDocType>(
-        'default',
         firebaseConfig,
         this.clientState
       );
     } catch (error) {
-      console.error('firebase.provider: InitAllProjects()', error);
+      console.error('FirebaseClient.ts: InitFirebase()', error);
     }
   }
 

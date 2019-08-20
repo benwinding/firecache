@@ -1,26 +1,26 @@
 import { InjectionToken, Injectable, Inject, NgModule } from '@angular/core';
 import { FirebaseClient } from 'projects/ngx-firestate/src/public-api';
+import { environment } from '../environments/environment';
 
 export enum DocPaths1 {
-  Doc1 = '/1ascasc/ascsss/acsccc',
-  Doc11 = '/1ascasc/ascsss/acsccc'
+  Doc1 = '/users',
 }
 const App1 = new InjectionToken<FirebaseClient<DocPaths1>>('App1');
-const firebaseConfig1 = {};
+const firebaseConfig1 = environment.firebaseConfig;
 
 export enum DocPaths2 {
   Doc2 = '/2ascasc/ascsss/acsccc',
   Doc22 = '/2ascasc/ascsss/acsccc'
 }
 const App2 = new InjectionToken<FirebaseClient<DocPaths2>>('App2');
-const firebaseConfig2 = {};
+const firebaseConfig2 = environment.firebaseConfig;
 
 export enum DocPaths3 {
   Doc3 = '/3ascasc/ascsss/acsccc',
   Doc33 = '/3ascasc/ascsss/acsccc'
 }
 const App3 = new InjectionToken<FirebaseClient<DocPaths3>>('App3');
-const firebaseConfig3 = {};
+const firebaseConfig3 = environment.firebaseConfig;
 
 @Injectable()
 export class FirestateInstances {

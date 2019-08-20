@@ -14,13 +14,15 @@ export class DocumentQueryBuilder implements IDocumentQueryBuilder {
   constructor(
     private appState$: FirebaseClientState,
     private documentPathTemplate: string,
-    private appName: string,
+    private app: firebase.app.App,
     private loggingEnabled: boolean
   ) {}
   private get uid(): string {
     return this.appState$.current_uid;
   }
-  OverrideProjectState(overridenState: FirebaseClientStateObject): IDocumentQueryBuilder {
+  OverrideProjectState(
+    overridenState: FirebaseClientStateObject
+  ): IDocumentQueryBuilder {
     this.overridenState = overridenState;
     return this;
   }
@@ -34,10 +36,7 @@ export class DocumentQueryBuilder implements IDocumentQueryBuilder {
         this.log('GetDoc() about to get path', { documentPath })
       ),
       map(documentPath => {
-        return firebase
-          .app(this.appName)
-          .firestore()
-          .doc(documentPath);
+        return this.app.firestore().doc(documentPath);
       }),
       switchMap(doc => document2Observable(doc)),
       map(snap => {
@@ -57,10 +56,7 @@ export class DocumentQueryBuilder implements IDocumentQueryBuilder {
     )
       .pipe(
         map(documentPath => {
-          return firebase
-            .app(this.appName)
-            .firestore()
-            .doc(documentPath);
+          return this.app.firestore().doc(documentPath);
         }),
         switchMap(doc => {
           obj['updated_by'] = this.uid;

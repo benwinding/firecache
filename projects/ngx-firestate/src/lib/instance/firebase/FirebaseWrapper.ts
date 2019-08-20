@@ -3,22 +3,19 @@ import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 import { FirebaseClientState } from '../FirebaseClientState';
+import { GetApp, FirebaseConfigObject } from './provider/firebase-helpers';
 
 export class FirebaseWrapper<EnumDocType> {
   public app: firebase.app.App;
   public provider: FirestoreWrapper<EnumDocType>;
 
   constructor(
-    public appName: string,
-    private firebaseConfig: {},
+    firebaseConfig: FirebaseConfigObject,
     private clientState: FirebaseClientState
   ) {
-    if (!firebase.apps.length) {
-      firebase.initializeApp(this.firebaseConfig, this.appName);
-    }
-    this.app = firebase.app(this.appName);
+    this.app = GetApp(firebaseConfig);
     this.provider = new FirestoreWrapper<EnumDocType>(
-      this.appName,
+      this.app,
       this.clientState
     );
   }

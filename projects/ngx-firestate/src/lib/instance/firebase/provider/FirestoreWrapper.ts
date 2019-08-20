@@ -3,7 +3,10 @@ import { DocumentQueryBuilder } from './DocumentQueryBuilder';
 import { FirebaseClientState } from '../../FirebaseClientState';
 
 export class FirestoreWrapper<T> {
-  constructor(private appName: string, private rootState: FirebaseClientState) {}
+  constructor(
+    private app: firebase.app.App,
+    private rootState: FirebaseClientState
+  ) {}
 
   public FromCollection(
     collectionPathTemplate: T,
@@ -11,8 +14,8 @@ export class FirestoreWrapper<T> {
   ): CollectionQueryBuilder {
     return new CollectionQueryBuilder(
       this.rootState,
-      collectionPathTemplate as any as string,
-      this.appName,
+      (collectionPathTemplate as any) as string,
+      this.app,
       logging === 'LOGGING'
     );
   }
@@ -23,8 +26,8 @@ export class FirestoreWrapper<T> {
   ): DocumentQueryBuilder {
     return new DocumentQueryBuilder(
       this.rootState,
-      documentPathTemplate as any as string,
-      this.appName,
+      (documentPathTemplate as any) as string,
+      this.app,
       logging === 'LOGGING'
     );
   }

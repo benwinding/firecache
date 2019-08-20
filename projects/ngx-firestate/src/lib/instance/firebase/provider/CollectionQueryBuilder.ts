@@ -15,7 +15,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
   constructor(
     private appState$: FirebaseClientState,
     private collectionPathTemplate: string,
-    private appName: string,
+    private app: firebase.app.App,
     private loggingEnabled: boolean
   ) {}
 
@@ -35,8 +35,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
       this.overridenState
     ).pipe(
       map(collectionPath => {
-        return firebase
-          .app(this.appName)
+        return this.app
           .firestore()
           .collection(collectionPath);
       }),
@@ -79,8 +78,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
       this.overridenState
     ).pipe(
       map(collectionPath => {
-        return firebase
-          .app(this.appName)
+        return this.app
           .firestore()
           .collection(collectionPath);
       }),
@@ -111,8 +109,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
       this.overridenState
     ).pipe(
       map(collectionPath => {
-        return firebase
-          .app(this.appName)
+        return this.app
           .firestore()
           .collection(collectionPath);
       }),
@@ -142,13 +139,12 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
     )
       .pipe(
         map(collectionPath => {
-          return firebase
-            .app(this.appName)
+          return this.app
             .firestore()
             .collection(collectionPath);
         }),
         switchMap(collection => {
-          const db = firebase.app(this.appName).firestore();
+          const db = this.app.firestore();
 
           const batch = db.batch();
           objs.map(obj => {
@@ -171,8 +167,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
     )
       .pipe(
         map(collectionPath => {
-          return firebase
-            .app(this.appName)
+          return this.app
             .firestore()
             .collection(collectionPath);
         }),
@@ -193,8 +188,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
     )
       .pipe(
         map(collectionPath => {
-          return firebase
-            .app(this.appName)
+          return this.app
             .firestore()
             .collection(collectionPath);
         }),
@@ -217,13 +211,12 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
     )
       .pipe(
         map(collectionPath => {
-          return firebase
-            .app(this.appName)
+          return this.app
             .firestore()
             .collection(collectionPath);
         }),
         switchMap(collection => {
-          const db = firebase.app(this.appName).firestore();
+          const db = this.app.firestore();
 
           const batch = db.batch();
           objs.map(obj => {
@@ -248,8 +241,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
     )
       .pipe(
         map(collectionPath => {
-          return firebase
-            .app(this.appName)
+          return this.app
             .firestore()
             .collection(collectionPath);
         }),
@@ -266,13 +258,12 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
     )
       .pipe(
         map(collectionPath => {
-          return firebase
-            .app(this.appName)
+          return this.app
             .firestore()
             .collection(collectionPath);
         }),
         switchMap(collection => {
-          const db = firebase.app(this.appName).firestore();
+          const db = this.app.firestore();
 
           const batch = db.batch();
 
@@ -294,8 +285,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
     )
       .pipe(
         map(collectionPath => {
-          return firebase
-            .app(this.appName)
+          return this.app
             .firestore()
             .collection(collectionPath);
         })
