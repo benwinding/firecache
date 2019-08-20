@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { DocPaths1, FirestateFacade, DocPaths2 } from './firestate-config.module';
 import { Observable } from 'rxjs';
+import { LogLevel } from 'projects/ngx-firestate/src/lib/instance/firebase/interfaces/LogLevel';
 
 @Component({
   selector: 'app-root',
@@ -23,10 +24,10 @@ export class AppComponent {
 
   constructor(private instances: FirestateFacade) {
     this.collection$ = this.instances.app1.db
-      .FromCollection(DocPaths1.Doc1, 'LOGGING')
+      .FromCollection(DocPaths1.Doc1, LogLevel.TRACE)
       .GetAllDocs();
     this.collection2$ = this.instances.app2.db
-      .FromCollection(DocPaths2.UsersCollection, 'LOGGING')
+      .FromCollection(DocPaths2.UsersCollection, LogLevel.NONE)
       .GetAllDocs();
   }
 }

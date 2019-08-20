@@ -1,6 +1,7 @@
 import { CollectionQueryBuilder } from './CollectionQueryBuilder';
 import { DocumentQueryBuilder } from './DocumentQueryBuilder';
 import { FirebaseClientState } from '../../FirebaseClientState';
+import { LogLevel } from '../interfaces/LogLevel';
 
 export class FirestoreWrapper<T> {
   constructor(
@@ -10,13 +11,13 @@ export class FirestoreWrapper<T> {
 
   public FromCollection(
     collectionPathTemplate: T,
-    logging?: 'LOGGING'
+    logLevel?: LogLevel
   ): CollectionQueryBuilder {
     return new CollectionQueryBuilder(
       this.rootState,
       (collectionPathTemplate as any) as string,
       this.app,
-      logging === 'LOGGING'
+      logLevel
     );
   }
 

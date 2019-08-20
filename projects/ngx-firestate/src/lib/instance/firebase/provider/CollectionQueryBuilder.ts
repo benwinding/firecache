@@ -8,6 +8,7 @@ import { QueryObj } from '../interfaces/QueryObj';
 import { collection2Observable, document2Observable } from './firebase-helpers';
 import { FirebaseClientState } from '../../FirebaseClientState';
 import { FirebaseClientStateObject } from '../../FirebaseClientStateObject';
+import { LogLevel } from '../interfaces/LogLevel';
 
 export class CollectionQueryBuilder implements ICollectionQueryBuilder {
   private overridenState: FirebaseClientStateObject;
@@ -16,7 +17,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
     private appState$: FirebaseClientState,
     private collectionPathTemplate: string,
     private app: firebase.app.App,
-    private loggingEnabled: boolean
+    private logLevel: LogLevel
   ) {}
 
   private get uid(): string {
@@ -34,15 +35,16 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
       this.collectionPathTemplate,
       this.overridenState
     ).pipe(
+      tap(collectionPath => this.logINFO('GetAllDocs() path', { collectionPath })),
       map(collectionPath => {
         return this.app.firestore().collection(collectionPath);
       }),
       tap(collection =>
-        this.log('GetAllDocs() collection', { path: collection.path })
+        this.logINFO('GetAllDocs() collection', { path: collection.path })
       ),
       map(collection => {
         if (whereQuery) {
-          this.log('GetAllDocs() whereQuery', { whereQuery });
+          this.logINFO('GetAllDocs() whereQuery', { whereQuery });
           return collection.where(
             whereQuery.fieldPath,
             whereQuery.opStr,
@@ -62,7 +64,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
         )
       ),
       tap(docSnap =>
-        this.log('GetAllDocs() after snapshotChanges...', {
+        this.logINFO('GetAllDocs() after snapshotChanges...', {
           'docSnap?': docSnap
         })
       ),
@@ -76,7 +78,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
           } as any) as T;
         })
       ),
-      tap(data => this.log('GetAllDocs() collection', { data }))
+      tap(data => this.logINFO('GetAllDocs() collection', { data }))
     );
   }
   GetId<T>(id: string): Observable<T> {
@@ -89,12 +91,12 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
         return this.app.firestore().collection(collectionPath);
       }),
       tap(collection =>
-        this.log('GetId() collection', { path: collection.path })
+        this.logINFO('GetId() collection', { path: collection.path })
       ),
       map(collection => collection.doc(id)),
       switchMap(doc => document2Observable(doc)),
       tap(docSnap =>
-        this.log('GetId() after fetching...', {
+        this.logINFO('GetId() after fetching...', {
           'pathExists?': docSnap.exists
         })
       ),
@@ -105,7 +107,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
           id: snap.id
         } as any) as T;
       }),
-      tap(data => this.log('GetAllDocs() data...', { data }))
+      tap(data => this.logINFO('GetAllDocs() data...', { data }))
     );
   }
   GetManyIds<T>(ids: string[]): Observable<T[]> {
@@ -282,9 +284,23 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
       )
       .pipe(take(1));
   }
-  private log(msg, obj) {
-    if (this.loggingEnabled) {
-      console.log('🔥 firestore.provider: ' + msg, obj);
+
+  private logINFO(msg: string, obj: any) {
+    return this.log(msg, obj, LogLevel.INFO);
+  }
+  private logDEBUG(msg: string, obj: any) {
+    return this.log(msg, obj, LogLevel.DEBUG);
+  }
+  private logTRACE(msg: string, obj: any) {
+    return this.log(msg, obj, LogLevel.TRACE);
+  }
+
+  private log(msg: string, obj: any, logLevel: LogLevel) {
+    if (logLevel > this.logLevel) {
+      return;
     }
+    const dashCount = +(logLevel);
+    const dashes = Array(dashCount).join('-');
+    console.log('🔥 ' + dashes + ' CollectionQueryBuilder: ' + msg, obj);
   }
 }
