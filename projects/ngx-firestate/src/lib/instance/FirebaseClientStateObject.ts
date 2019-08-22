@@ -1,4 +1,4 @@
 export interface FirebaseClientStateObject {
   uid?: string;
-  user: firebase.auth.UserCredential;
+  user: firebase.User;
 }

@@ -6,13 +6,13 @@ import { resolvePathVariables } from './PathResolver';
 import { document2Observable } from './firebase-helpers';
 import { IDocumentQueryBuilder } from '../interfaces/IDocumentQueryBuilder';
 import { FirebaseClientStateObject } from '../../FirebaseClientStateObject';
-import { FirebaseClientState } from '../../FirebaseClientState';
+import { FirebaseClientStateManager } from '../../FirebaseClientStateManager';
 
 export class DocumentQueryBuilder implements IDocumentQueryBuilder {
   private overridenState: FirebaseClientStateObject;
 
   constructor(
-    private appState$: FirebaseClientState,
+    private appState$: FirebaseClientStateManager,
     private documentPathTemplate: string,
     private app: firebase.app.App,
     private loggingEnabled: boolean

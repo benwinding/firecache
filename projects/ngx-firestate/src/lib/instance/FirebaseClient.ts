@@ -1,5 +1,5 @@
 import { FirebaseWrapper } from './firebase/FirebaseWrapper';
-import { FirebaseClientState } from './FirebaseClientState';
+import { FirebaseClientStateManager } from './FirebaseClientStateManager';
 import { FirestoreWrapper } from './firebase/provider/FirestoreWrapper';
 import { FirebaseConfigObject } from './firebase/provider/firebase-helpers';
 import { Observable } from 'rxjs';
@@ -7,40 +7,39 @@ import { map } from 'rxjs/operators';
 
 export class FirebaseClient<EnumDocType> {
   private firebaseWrapper: FirebaseWrapper<EnumDocType>;
-  private clientState = new FirebaseClientState();
+  private clientState = new FirebaseClientStateManager();
 
   constructor(
     firebaseConfig: FirebaseConfigObject,
   ) {
-    this.InitFirebase(firebaseConfig);
+    this.firebaseWrapper = new FirebaseWrapper<EnumDocType>(
+      firebaseConfig,
+      this.clientState
+    );
+  }
+
+  ReInitialize(firebaseConfig: FirebaseConfigObject) {
+    this.firebaseWrapper.reInitialize(firebaseConfig);
   }
 
   get db(): FirestoreWrapper<EnumDocType> {
     return this.firebaseWrapper.provider;
   }
 
-  private InitFirebase(firebaseConfig: FirebaseConfigObject): void {
-    console.log('FirebaseClient.ts: InitFirebase()...');
-    try {
-      this.firebaseWrapper = new FirebaseWrapper<EnumDocType>(
-        firebaseConfig,
-        this.clientState
-      );
-    } catch (error) {
-      console.error('FirebaseClient.ts: InitFirebase()', error);
-    }
-  }
-
   public $IsLoggedIn(): Observable<boolean> {
     return this.clientState.$user.pipe(map(u => !!u));
   }
 
-  public $CurrentUser(): Observable<firebase.auth.UserCredential> {
+  public $CurrentUser(): Observable<firebase.User> {
     return this.clientState.$user;
   }
 
-  public login(email: string, pass: string) {
-    return this.firebaseWrapper.login(email, pass);
+  public async login(email: string, pass: string) {
+    try {
+      await this.firebaseWrapper.login(email, pass);
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
   public logout() {

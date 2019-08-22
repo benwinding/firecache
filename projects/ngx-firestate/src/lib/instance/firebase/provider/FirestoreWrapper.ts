@@ -1,12 +1,12 @@
 import { CollectionQueryBuilder } from './CollectionQueryBuilder';
 import { DocumentQueryBuilder } from './DocumentQueryBuilder';
-import { FirebaseClientState } from '../../FirebaseClientState';
+import { FirebaseClientStateManager } from '../../FirebaseClientStateManager';
 import { LogLevel } from '../interfaces/LogLevel';
 
 export class FirestoreWrapper<T> {
   constructor(
     private app: firebase.app.App,
-    private rootState: FirebaseClientState
+    private rootState: FirebaseClientStateManager
   ) {}
 
   public FromCollection(

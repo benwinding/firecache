@@ -1,7 +1,7 @@
 import { Observable, combineLatest, BehaviorSubject } from 'rxjs';
 import { filter, map, distinctUntilChanged } from 'rxjs/operators';
 import { FirebaseClientStateObject } from '../../FirebaseClientStateObject';
-import { FirebaseClientState } from '../../FirebaseClientState';
+import { FirebaseClientStateManager } from '../../FirebaseClientStateManager';
 
 function blank$(overridenState: FirebaseClientStateObject) {
   return new BehaviorSubject(overridenState);
@@ -9,7 +9,7 @@ function blank$(overridenState: FirebaseClientStateObject) {
 
 // RESOLVES: projectId, accountId, userId, hostId
 export function resolvePathVariables(
-  appState: FirebaseClientState,
+  appState: FirebaseClientStateManager,
   pathTemplate: string,
   inputOverridenState?: FirebaseClientStateObject
 ): Observable<string> {

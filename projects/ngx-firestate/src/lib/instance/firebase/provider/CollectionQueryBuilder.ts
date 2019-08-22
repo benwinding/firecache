@@ -6,15 +6,19 @@ import { ICollectionQueryBuilder } from '../interfaces/ICollectionQueryBuilder';
 import { resolvePathVariables } from './PathResolver';
 import { QueryObj } from '../interfaces/QueryObj';
 import { collection2Observable, document2Observable } from './firebase-helpers';
-import { FirebaseClientState } from '../../FirebaseClientState';
+import { FirebaseClientStateManager } from '../../FirebaseClientStateManager';
 import { FirebaseClientStateObject } from '../../FirebaseClientStateObject';
 import { LogLevel } from '../interfaces/LogLevel';
+import * as uuidv4 from 'uuid/v4';
 
 export class CollectionQueryBuilder implements ICollectionQueryBuilder {
   private overridenState: FirebaseClientStateObject;
+  private queryId = uuidv4()
+    .toString()
+    .slice(0, 6);
 
   constructor(
-    private appState$: FirebaseClientState,
+    private appState$: FirebaseClientStateManager,
     private collectionPathTemplate: string,
     private app: firebase.app.App,
     private logLevel: LogLevel
@@ -35,7 +39,9 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
       this.collectionPathTemplate,
       this.overridenState
     ).pipe(
-      tap(collectionPath => this.logINFO('GetAllDocs() path', { collectionPath })),
+      tap(collectionPath =>
+        this.logINFO('GetAllDocs() path', { collectionPath })
+      ),
       map(collectionPath => {
         return this.app.firestore().collection(collectionPath);
       }),
@@ -56,9 +62,10 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
       switchMap(collection =>
         collection2Observable(collection).pipe(
           catchError(error => {
-            console.error('GetAllDocs: error in switchMap(collection => ...', {
+            this.logError(
+              'GetAllDocs: error in switchMap(collection => ...',
               error
-            });
+            );
             return of({ docs: [] as any });
           })
         )
@@ -294,13 +301,22 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
   private logTRACE(msg: string, obj: any) {
     return this.log(msg, obj, LogLevel.TRACE);
   }
+  private logError(msg: string, error: any) {
+    return this.log(msg, error, LogLevel.ERROR);
+  }
 
   private log(msg: string, obj: any, logLevel: LogLevel) {
     if (logLevel > this.logLevel) {
       return;
     }
-    const dashCount = +(logLevel);
+    const dashCount = +logLevel;
     const dashes = Array(dashCount).join('-');
-    console.log('🔥 ' + dashes + ' CollectionQueryBuilder: ' + msg, obj);
+    const logString =
+      '֍ ' + this.queryId + dashes + ' CollectionQueryBuilder: ' + msg;
+    if (logLevel === LogLevel.ERROR) {
+      console.error(logString, obj);
+    } else {
+      console.log(logString, obj);
+    }
   }
 }

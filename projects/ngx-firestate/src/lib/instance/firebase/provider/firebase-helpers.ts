@@ -1,5 +1,5 @@
 import * as firebase from 'firebase/app';
-import { Observable } from 'rxjs';
+import { Observable, ReplaySubject, Observer } from 'rxjs';
 
 export function collection2Observable(
   collection: firebase.firestore.Query
@@ -37,7 +37,6 @@ export interface FirebaseConfigObject {
 
 export function GetApp(firebaseConfig: FirebaseConfigObject): firebase.app.App {
   try {
-    console.log('firebase.helpers: GetApp()...');
     const appName = firebaseConfig.projectId;
     const f = firebase;
     if (AppExists(appName)) {
@@ -59,4 +58,17 @@ export function AppExists(appName: string): boolean {
   } catch (error) {
     return false;
   }
+}
+
+export function MakeAuthstateObservable(
+  auth: firebase.auth.Auth
+): Observable<firebase.User> {
+  const authState = Observable.create((observer: Observer<firebase.User>) => {
+    auth.onAuthStateChanged(
+      (user?: firebase.User) => observer.next(user),
+      (error: firebase.auth.Error) => observer.error(error),
+      () => observer.complete()
+    );
+  });
+  return authState;
 }
