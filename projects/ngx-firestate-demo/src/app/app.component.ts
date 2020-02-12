@@ -2,14 +2,18 @@ import { Component, OnInit } from "@angular/core";
 import { FirestateFacade, CollectionPaths } from "./firestate-config.module";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { LogLevel } from 'projects/ngx-firestate/src/lib/instance/firebase/interfaces/LogLevel';
+import { LogLevel } from "projects/ngx-firestate/src/lib/instance/firebase/interfaces/LogLevel";
 
 @Component({
   selector: "app-root",
   template: `
-    <button>
-      {{ loggedInStatus$ | async }}
+    <button (click)="login()">
+      Login
     </button>
+    <button (click)="logout()">
+      Logout
+    </button>
+    Status: {{ loggedInStatus$ | async }}
 
     <h1>Collection</h1>
     <pre *ngIf="collection$">
@@ -20,7 +24,7 @@ import { LogLevel } from 'projects/ngx-firestate/src/lib/instance/firebase/inter
     {{ collection2$ | async | json }}
     </pre
     >
-    {{text}}
+    {{ text }}
   `
 })
 export class AppComponent implements OnInit {
@@ -28,7 +32,7 @@ export class AppComponent implements OnInit {
   collection2$: Observable<any[]>;
 
   loggedInStatus$: Observable<string>;
-  text = ''
+  text = "";
 
   constructor(private instances: FirestateFacade) {}
 
@@ -45,18 +49,21 @@ export class AppComponent implements OnInit {
       .FromCollection(CollectionPaths.Doc1, LogLevel.TRACE)
       .GetAllDocs();
     this.collection2$ = this.instances.fire
-      .FromCollection(CollectionPaths.Doc2)
+      .FromCollection(CollectionPaths.Doc2, LogLevel.TRACE)
       .GetAllDocs();
 
     setTimeout(() => {
-      this.text = 'asdasd';
-    }, 1000)
+      this.text = "asdasd";
+    }, 1000);
   }
 
   login() {
-    // return this.instances.app1.login(
-    //   "hello@benwinding.com",
-    //   "hello@benwinding.com"
-    // );
+    return this.instances.app1.login(
+      "hello@benwinding.com",
+      "hello@benwinding.com"
+    );
+  }
+  logout() {
+    return this.instances.app1.logout();
   }
 }

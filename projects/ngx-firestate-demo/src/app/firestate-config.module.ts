@@ -7,7 +7,7 @@ export enum DocumentPaths {
 }
 export enum CollectionPaths {
   Doc1 = '/hosts',
-  Doc2 = "/hosts"
+  Doc2 = "/accounts"
 }
 const App1 = new InjectionToken<FirebaseClient<CollectionPaths, DocumentPaths>>('App1');
 const firebaseConfig1 = environment.firebaseConfig;

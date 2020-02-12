@@ -37,7 +37,7 @@ export class FirebaseWrapper<
     try {
       await this.initUserFromBrowser();
     } catch (error) {
-      this.log("user could not be initialized from cache");
+      console.error(error)
     }
     this.clientState.InitializationDone();
   }
@@ -47,9 +47,10 @@ export class FirebaseWrapper<
     const authState$ = MakeAuthstateObservable(this.app.auth());
     const user = await authState$.pipe(take(1)).toPromise();
     if (!user) {
+      this.log("initUserFromBrowser() could not log user in...", { user });
       throw new Error("User is not previously logged in");
     }
-    this.log("initUserFromBrowser() done", { user });
+    this.log("initUserFromBrowser() user logged in from cache!", { user });
     this.clientState.PatchRootState({ user });
   }
 

@@ -1,11 +1,11 @@
 import * as firebase from 'firebase/app';
-import { Observable, ReplaySubject, Observer } from 'rxjs';
+import { Observable, ReplaySubject, Observer, throwError } from 'rxjs';
 
 export function collection2Observable(
   collection: firebase.firestore.Query
 ): Observable<firebase.firestore.QuerySnapshot> {
   const onError = (err: Error) => {
-    console.error('collection2Observable', { collection }, err);
+    return throwError(err);
   };
 
   const observable: Observable<
@@ -21,6 +21,7 @@ export function document2Observable(
 ): Observable<firebase.firestore.DocumentSnapshot> {
   const onError = (err: Error) => {
     console.error('document2Observable', { doc }, err);
+    return throwError(err);
   };
 
   const observable: Observable<

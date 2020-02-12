@@ -1,7 +1,7 @@
-import { Observable, combineLatest, BehaviorSubject } from 'rxjs';
-import { filter, map, distinctUntilChanged } from 'rxjs/operators';
-import { FirebaseClientStateObject } from '../../FirebaseClientStateObject';
-import { FirebaseClientStateManager } from '../../FirebaseClientStateManager';
+import { Observable, combineLatest, BehaviorSubject } from "rxjs";
+import { map, tap } from "rxjs/operators";
+import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
+import { FirebaseClientStateManager } from "../../FirebaseClientStateManager";
 
 function blank$(overridenState: FirebaseClientStateObject) {
   return new BehaviorSubject(overridenState);
@@ -14,33 +14,33 @@ export function resolvePathVariables(
   inputOverridenState?: FirebaseClientStateObject
 ): Observable<string> {
   if (!pathTemplate) {
-    console.error('pathTemplate was not found: ', {
+    console.error("pathTemplate was not found: ", {
       pathTemplate
     });
-    throw new Error('pathTemplate was not found: ' + pathTemplate);
+    throw new Error("pathTemplate was not found: " + pathTemplate);
   }
-
-  const overridenState = inputOverridenState || {} as any;
-  // Default variables are assigned blank observables
-  let $rootState: Observable<FirebaseClientStateObject> = blank$(overridenState);
-  // Check if variables exist in path, then add the Observable to resolve them.
-  const hasAnyVariablesInPath = pathTemplate.includes('${');
-  if (hasAnyVariablesInPath && !overridenState) {
-    $rootState = appState.$all.pipe(
-      filter(a => !!a),
-      distinctUntilChanged()
-    );
+  let $rootState: Observable<FirebaseClientStateObject>;
+  if (inputOverridenState) {
+    // Default variables are assigned blank observables
+    $rootState = blank$(inputOverridenState);
+  }
+  if (!inputOverridenState) {
+    $rootState = appState.$all;
   }
 
   return combineLatest([$rootState]).pipe(
     map(([rootState]) => {
-      const evalTemplate = '`' + pathTemplate + '`';
+      const evalTemplate = "`" + pathTemplate + "`";
       let rootStateDeclarations: string;
       let pathResolved: string;
+      console.log("resolvePathVariables() :: appState.$all.pipe()", {
+        rootState,
+        evalTemplate
+      });
       try {
         rootStateDeclarations = object2constStatements(rootState);
         // tslint:disable-next-line: no-eval
-        pathResolved = eval(rootStateDeclarations + ';' + evalTemplate);
+        pathResolved = eval(rootStateDeclarations + ";" + evalTemplate);
         return pathResolved;
       } catch (error) {
         console.error(
@@ -58,14 +58,14 @@ export function resolvePathVariables(
 }
 
 function object2constStatements(rootState: {}) {
-  const constStatements = Object.keys(rootState)
-    .filter(k => typeof rootState[k] === 'string')
+  const constStatements = Object.keys(rootState || {})
+    .filter(k => typeof rootState[k] === "string")
     .map(k => {
       const value = rootState[k];
       return `var ${k} = "${value}";`;
     })
     .reduce((prev, cur) => {
       return prev + cur;
-    }, '');
+    }, "");
   return constStatements;
 }
