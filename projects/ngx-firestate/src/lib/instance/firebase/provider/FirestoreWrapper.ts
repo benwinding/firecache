@@ -3,14 +3,14 @@ import { DocumentQueryBuilder } from './DocumentQueryBuilder';
 import { FirebaseClientStateManager } from '../../FirebaseClientStateManager';
 import { LogLevel } from '../interfaces/LogLevel';
 
-export class FirestoreWrapper<T> {
+export class FirestoreWrapper<EnumPathTemplatesCollections, EnumPathTemplatesDocuments> {
   constructor(
     private app: firebase.app.App,
     private rootState: FirebaseClientStateManager
   ) {}
 
   public FromCollection(
-    collectionPathTemplate: T,
+    collectionPathTemplate: EnumPathTemplatesCollections,
     logLevel?: LogLevel
   ): CollectionQueryBuilder {
     return new CollectionQueryBuilder(
@@ -22,7 +22,7 @@ export class FirestoreWrapper<T> {
   }
 
   public FromDocument(
-    documentPathTemplate: T,
+    documentPathTemplate: EnumPathTemplatesDocuments,
     logging?: 'LOGGING'
   ): DocumentQueryBuilder {
     return new DocumentQueryBuilder(

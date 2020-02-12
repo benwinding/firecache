@@ -1,28 +1,31 @@
 // tslint:disable: no-string-literal
-import { Observable, combineLatest, of } from 'rxjs';
-import { map, switchMap, take, tap, catchError } from 'rxjs/operators';
-import * as firebase from 'firebase/app';
-import { ICollectionQueryBuilder } from '../interfaces/ICollectionQueryBuilder';
-import { resolvePathVariables } from './PathResolver';
-import { QueryObj } from '../interfaces/QueryObj';
-import { collection2Observable, document2Observable } from './firebase-helpers';
-import { FirebaseClientStateManager } from '../../FirebaseClientStateManager';
-import { FirebaseClientStateObject } from '../../FirebaseClientStateObject';
-import { LogLevel } from '../interfaces/LogLevel';
-import * as uuidv4 from 'uuid/v4';
+import { Observable, combineLatest, of } from "rxjs";
+import { map, switchMap, take, tap, catchError } from "rxjs/operators";
+import * as firebase from "firebase/app";
+import {
+  ICollectionQueryBuilder,
+  QueryFn
+} from "../interfaces/ICollectionQueryBuilder";
+import { resolvePathVariables } from "./PathResolver";
+import { collection2Observable, document2Observable } from "./firebase-helpers";
+import { FirebaseClientStateManager } from "../../FirebaseClientStateManager";
+import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
+import { LogLevel } from "../interfaces/LogLevel";
+import { LevelLogger } from "./LevelLogger";
+import { chunkify } from './chunkify';
 
 export class CollectionQueryBuilder implements ICollectionQueryBuilder {
   private overridenState: FirebaseClientStateObject;
-  private queryId = uuidv4()
-    .toString()
-    .slice(0, 6);
+  private logger: LevelLogger;
 
   constructor(
     private appState$: FirebaseClientStateManager,
     private collectionPathTemplate: string,
     private app: firebase.app.App,
     private logLevel: LogLevel
-  ) {}
+  ) {
+    this.logger = new LevelLogger(this.logLevel);
+  }
 
   private get uid(): string {
     return this.appState$.current_uid;
@@ -33,37 +36,35 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
     return this;
   }
 
-  GetAllDocs<T>(whereQuery?: QueryObj): Observable<T[]> {
+  GetAllDocs<T>(whereQuery?: QueryFn): Observable<T[]> {
     return resolvePathVariables(
       this.appState$,
       this.collectionPathTemplate,
       this.overridenState
     ).pipe(
       tap(collectionPath =>
-        this.logINFO('GetAllDocs() path', { collectionPath })
+        this.logger.logINFO("GetAllDocs() path", { collectionPath })
       ),
       map(collectionPath => {
         return this.app.firestore().collection(collectionPath);
       }),
       tap(collection =>
-        this.logINFO('GetAllDocs() collection', { path: collection.path })
+        this.logger.logINFO("GetAllDocs() collection", {
+          path: collection.path
+        })
       ),
       map(collection => {
         if (whereQuery) {
-          this.logINFO('GetAllDocs() whereQuery', { whereQuery });
-          return collection.where(
-            whereQuery.fieldPath,
-            whereQuery.opStr,
-            whereQuery.value
-          );
+          this.logger.logINFO("GetAllDocs() whereQuery", { whereQuery });
+          return whereQuery(collection);
         }
         return collection;
       }),
       switchMap(collection =>
         collection2Observable(collection).pipe(
           catchError(error => {
-            this.logError(
-              'GetAllDocs: error in switchMap(collection => ...',
+            this.logger.logERROR(
+              "GetAllDocs: error in switchMap(collection => ...",
               error
             );
             return of({ docs: [] as any });
@@ -71,8 +72,8 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
         )
       ),
       tap(docSnap =>
-        this.logINFO('GetAllDocs() after snapshotChanges...', {
-          'docSnap?': docSnap
+        this.logger.logINFO("GetAllDocs() after snapshotChanges...", {
+          "docSnap?": docSnap
         })
       ),
       map(docChanges => docChanges.docs),
@@ -85,7 +86,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
           } as any) as T;
         })
       ),
-      tap(data => this.logINFO('GetAllDocs() collection', { data }))
+      tap(data => this.logger.logINFO("GetAllDocs() collection", { data }))
     );
   }
   GetId<T>(id: string): Observable<T> {
@@ -98,13 +99,13 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
         return this.app.firestore().collection(collectionPath);
       }),
       tap(collection =>
-        this.logINFO('GetId() collection', { path: collection.path })
+        this.logger.logINFO("GetId() collection", { path: collection.path })
       ),
       map(collection => collection.doc(id)),
       switchMap(doc => document2Observable(doc)),
       tap(docSnap =>
-        this.logINFO('GetId() after fetching...', {
-          'pathExists?': docSnap.exists
+        this.logger.logINFO("GetId() after fetching...", {
+          "pathExists?": docSnap.exists
         })
       ),
       map(snap => {
@@ -114,7 +115,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
           id: snap.id
         } as any) as T;
       }),
-      tap(data => this.logINFO('GetAllDocs() data...', { data }))
+      tap(data => this.logger.logINFO("GetAllDocs() data...", { data }))
     );
   }
   GetManyIds<T>(ids: string[]): Observable<T[]> {
@@ -143,8 +144,10 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
   UpdateMany(
     objs: {
       id: string;
-    }[]
-  ): Promise<void> {
+    }[],
+    isMerged?: boolean
+  ) {
+    const uid = this.uid;
     return resolvePathVariables(
       this.appState$,
       this.collectionPathTemplate,
@@ -156,15 +159,18 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
         }),
         switchMap(collection => {
           const db = this.app.firestore();
-
-          const batch = db.batch();
-          objs.map(obj => {
-            const docRef = collection.doc(obj.id);
-            obj['updated_by'] = this.uid;
-            obj['updated_at'] = new Date();
-            batch.set(docRef, obj, { merge: true });
-          });
-          return batch.commit();
+          const objs500Groups = chunkify(objs, 500);
+          return Promise.all(
+            objs500Groups.map(async objs500 => {
+              const batch = db.batch();
+              objs500.map(obj => {
+                this.setUpdatedProps(obj, uid);
+                const docRef = collection.doc(obj.id);
+                batch.set(docRef, obj, { merge: isMerged });
+              });
+              return batch.commit();
+            })
+          );
         })
       )
       .pipe(take(1))
@@ -181,8 +187,8 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
           return this.app.firestore().collection(collectionPath);
         }),
         switchMap(collection => {
-          obj['updated_by'] = this.uid;
-          obj['updated_at'] = new Date();
+          obj["updated_by"] = this.uid;
+          obj["updated_at"] = new Date();
           return collection.doc(id).set(obj, { merge });
         })
       )
@@ -190,6 +196,9 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
       .toPromise();
   }
   Add<T>(obj: T): Promise<firebase.firestore.DocumentReference> {
+    const uid = this.uid;
+    this.setCreatedProps(obj, uid);
+    this.setUpdatedProps(obj, uid);
     return resolvePathVariables(
       this.appState$,
       this.collectionPathTemplate,
@@ -199,18 +208,21 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
         map(collectionPath => {
           return this.app.firestore().collection(collectionPath);
         }),
-        switchMap(collection => {
-          obj['created_by'] = this.uid;
-          obj['created_at'] = new Date();
-          obj['updated_by'] = this.uid;
-          obj['updated_at'] = new Date();
-          return collection.add(obj);
+        switchMap(async collection => {
+          try {
+            const result = await collection.add(obj);
+            return result;
+          } catch (error) {
+            this.logger.logERROR('error in Update()', error, { obj, collection });
+            throw new Error(error);
+          }
         })
       )
       .pipe(take(1))
       .toPromise();
   }
   AddMany(objs: {}[]) {
+    const uid = this.uid;
     return resolvePathVariables(
       this.appState$,
       this.collectionPathTemplate,
@@ -220,19 +232,22 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
         map(collectionPath => {
           return this.app.firestore().collection(collectionPath);
         }),
-        switchMap(collection => {
+        switchMap(async collection => {
           const db = this.app.firestore();
-
-          const batch = db.batch();
-          objs.map(obj => {
-            const docRef = collection.doc();
-            obj['created_by'] = this.uid;
-            obj['created_at'] = new Date();
-            obj['updated_by'] = this.uid;
-            obj['updated_at'] = new Date();
-            batch.set(docRef, obj, { merge: true });
-          });
-          return batch.commit();
+          const objs500Groups = chunkify(objs, 500);
+          await Promise.all(
+            objs500Groups.map(async objs500 => {
+              const batch = db.batch();
+              objs500.map(obj => {
+                this.setCreatedProps(obj, uid);
+                this.setUpdatedProps(obj, uid);
+                const newId = db.doc('').id;
+                const docRef = collection.doc(newId);
+                batch.set(docRef, obj, { merge: true });
+              });
+              return batch.commit();
+            })
+          );
         })
       )
       .pipe(take(1))
@@ -278,6 +293,14 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
       .pipe(take(1))
       .toPromise();
   }
+  private setUpdatedProps(obj, updatedUid) {
+    obj['updated_by'] = updatedUid;
+    obj['updated_at'] = new Date();
+  }
+  private setCreatedProps(obj, updatedUid) {
+    obj['created_by'] = updatedUid;
+    obj['created_at'] = new Date();
+  }
   ref() {
     return resolvePathVariables(
       this.appState$,
@@ -290,33 +313,5 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
         })
       )
       .pipe(take(1));
-  }
-
-  private logINFO(msg: string, obj: any) {
-    return this.log(msg, obj, LogLevel.INFO);
-  }
-  private logDEBUG(msg: string, obj: any) {
-    return this.log(msg, obj, LogLevel.DEBUG);
-  }
-  private logTRACE(msg: string, obj: any) {
-    return this.log(msg, obj, LogLevel.TRACE);
-  }
-  private logError(msg: string, error: any) {
-    return this.log(msg, error, LogLevel.ERROR);
-  }
-
-  private log(msg: string, obj: any, logLevel: LogLevel) {
-    if (logLevel > this.logLevel) {
-      return;
-    }
-    const dashCount = +logLevel;
-    const dashes = Array(dashCount).join('-');
-    const logString =
-      '֍ ' + this.queryId + dashes + ' CollectionQueryBuilder: ' + msg;
-    if (logLevel === LogLevel.ERROR) {
-      console.error(logString, obj);
-    } else {
-      console.log(logString, obj);
-    }
   }
 }

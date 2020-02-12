@@ -5,14 +5,14 @@ import { FirebaseConfigObject } from './firebase/provider/firebase-helpers';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-export class FirebaseClient<EnumDocType> {
-  private firebaseWrapper: FirebaseWrapper<EnumDocType>;
+export class FirebaseClient<EnumPathTemplatesCollections, EnumPathTemplatesDocuments> {
+  private firebaseWrapper: FirebaseWrapper<EnumPathTemplatesCollections, EnumPathTemplatesDocuments>;
   private clientState = new FirebaseClientStateManager();
 
   constructor(
     firebaseConfig: FirebaseConfigObject,
   ) {
-    this.firebaseWrapper = new FirebaseWrapper<EnumDocType>(
+    this.firebaseWrapper = new FirebaseWrapper<EnumPathTemplatesCollections, EnumPathTemplatesDocuments>(
       firebaseConfig,
       this.clientState
     );
@@ -22,7 +22,7 @@ export class FirebaseClient<EnumDocType> {
     this.firebaseWrapper.reInitialize(firebaseConfig);
   }
 
-  get db(): FirestoreWrapper<EnumDocType> {
+  get db(): FirestoreWrapper<EnumPathTemplatesCollections, EnumPathTemplatesDocuments> {
     return this.firebaseWrapper.provider;
   }
 
