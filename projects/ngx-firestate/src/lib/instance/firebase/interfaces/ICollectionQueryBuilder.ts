@@ -6,7 +6,7 @@ export type QueryFn = (
 ) => firebase.firestore.CollectionReference;
 
 export interface ICollectionQueryBuilder {
-  OverrideAppState(overridenState: FirebaseClientStateObject);
+  OverrideAppState(overridenState: FirebaseClientStateObject): ICollectionQueryBuilder;
   GetAllDocs<T>(whereQuery?: QueryFn): Observable<T[]>;
   GetManyIds<T>(ids: string[]): Observable<T[]>;
   UpdateMany(
