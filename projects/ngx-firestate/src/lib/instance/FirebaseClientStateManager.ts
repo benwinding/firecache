@@ -1,5 +1,5 @@
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
-import { filter, map, tap } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { FirebaseClientStateObject } from './FirebaseClientStateObject';
 
 export class FirebaseClientStateManager {
