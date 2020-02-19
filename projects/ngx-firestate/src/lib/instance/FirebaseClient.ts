@@ -56,7 +56,8 @@ export class FirebaseClient<
 
   public async login(email: string, pass: string) {
     try {
-      await this.firebaseWrapper.login(email, pass);
+      const userRecord = await this.firebaseWrapper.login(email, pass);
+      return userRecord;
     } catch (error) {
       throw new Error(error);
     }
