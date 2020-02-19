@@ -17,6 +17,7 @@ export class FirebaseClient<
     TState
   >;
   private clientState = new FirebaseClientStateManager<TState>();
+  public appSDK: firebase.app.App;
 
   constructor(firebaseConfig: FirebaseConfigObject) {
     this.firebaseWrapper = new FirebaseWrapper<
@@ -24,6 +25,7 @@ export class FirebaseClient<
       EnumPathTemplatesDocuments,
       TState
     >(firebaseConfig, this.clientState);
+    this.appSDK = this.firebaseWrapper.app;
   }
 
   ReInitialize(firebaseConfig: FirebaseConfigObject) {
