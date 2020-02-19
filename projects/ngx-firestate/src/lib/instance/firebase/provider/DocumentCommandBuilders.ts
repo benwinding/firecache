@@ -1,8 +1,9 @@
 import { resolvePathVariables } from './PathResolver';
 import { map, switchMap, take } from 'rxjs/operators';
 import { QueryState } from './QueryState';
+import { FirebaseClientStateObject } from '../../FirebaseClientStateObject';
 
-export function DocumentCommandUpdate(q: QueryState, obj: {}): Promise<any> {
+export function DocumentCommandUpdate(q: QueryState<FirebaseClientStateObject>, obj: {}): Promise<any> {
   return resolvePathVariables(
     q.appState$,
     q.pathTemplate,

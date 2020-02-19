@@ -2,9 +2,10 @@ import { QueryState } from "./QueryState";
 import { resolvePathVariables } from "./PathResolver";
 import { map, switchMap, take } from "rxjs/operators";
 import { chunkify } from "./chunkify";
+import { FirebaseClientStateObject } from '../../FirebaseClientStateObject';
 
 export function CollectionCommandUpdate<T>(
-  q: QueryState,
+  q: QueryState<FirebaseClientStateObject>,
   id: string,
   obj: T,
   isMerged?: boolean
@@ -29,7 +30,7 @@ export function CollectionCommandUpdate<T>(
 }
 
 export function CollectionCommandUpdateMany(
-  q: QueryState,
+  q: QueryState<FirebaseClientStateObject>,
   objs: {
     id: string;
   }[],
@@ -66,7 +67,7 @@ export function CollectionCommandUpdateMany(
 }
 
 export function CollectionCommandAdd<T>(
-  q: QueryState,
+  q: QueryState<FirebaseClientStateObject>,
   obj: T
 ): Promise<firebase.firestore.DocumentReference> {
   const uid = q.uid;
@@ -99,7 +100,7 @@ export function CollectionCommandAdd<T>(
 }
 
 export function CollectionCommandAddMany(
-  q: QueryState,
+  q: QueryState<FirebaseClientStateObject>,
   objs: {}[]
 ): Promise<void> {
   const uid = q.uid;
@@ -135,7 +136,7 @@ export function CollectionCommandAddMany(
 }
 
 export function CollectionCommandDeleteId(
-  q: QueryState,
+  q: QueryState<FirebaseClientStateObject>,
   id: string
 ): Promise<void> {
   return resolvePathVariables(
@@ -154,7 +155,7 @@ export function CollectionCommandDeleteId(
 }
 
 export function CollectionCommandDeleteIds(
-  q: QueryState,
+  q: QueryState<FirebaseClientStateObject>,
   ids: string[]
 ): Promise<any> {
   return resolvePathVariables(

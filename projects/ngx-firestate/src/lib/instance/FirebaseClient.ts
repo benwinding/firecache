@@ -1,28 +1,44 @@
-import { FirebaseWrapper } from './firebase/FirebaseWrapper';
-import { FirebaseClientStateManager } from './FirebaseClientStateManager';
-import { FirestoreWrapper } from './firebase/provider/FirestoreWrapper';
-import { FirebaseConfigObject } from './firebase/provider/firebase-helpers';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { FirebaseWrapper } from "./firebase/FirebaseWrapper";
+import { FirebaseClientStateManager } from "./FirebaseClientStateManager";
+import { FirestoreWrapper } from "./firebase/provider/FirestoreWrapper";
+import { FirebaseConfigObject } from "./firebase/provider/firebase-helpers";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+import { FirebaseClientStateObject } from "./FirebaseClientStateObject";
 
-export class FirebaseClient<EnumPathTemplatesCollections, EnumPathTemplatesDocuments> {
-  private firebaseWrapper: FirebaseWrapper<EnumPathTemplatesCollections, EnumPathTemplatesDocuments>;
-  private clientState = new FirebaseClientStateManager();
+export class FirebaseClient<
+  EnumPathTemplatesCollections,
+  EnumPathTemplatesDocuments,
+  TState extends FirebaseClientStateObject
+> {
+  private firebaseWrapper: FirebaseWrapper<
+    EnumPathTemplatesCollections,
+    EnumPathTemplatesDocuments,
+    TState
+  >;
+  private clientState = new FirebaseClientStateManager<TState>();
 
-  constructor(
-    firebaseConfig: FirebaseConfigObject,
-  ) {
-    this.firebaseWrapper = new FirebaseWrapper<EnumPathTemplatesCollections, EnumPathTemplatesDocuments>(
-      firebaseConfig,
-      this.clientState
-    );
+  constructor(firebaseConfig: FirebaseConfigObject) {
+    this.firebaseWrapper = new FirebaseWrapper<
+      EnumPathTemplatesCollections,
+      EnumPathTemplatesDocuments,
+      TState
+    >(firebaseConfig, this.clientState);
   }
 
   ReInitialize(firebaseConfig: FirebaseConfigObject) {
     this.firebaseWrapper.reInitialize(firebaseConfig);
   }
 
-  get db(): FirestoreWrapper<EnumPathTemplatesCollections, EnumPathTemplatesDocuments> {
+  public PatchRootState(rootState: TState) {
+    this.clientState.PatchRootState(rootState);
+  }
+
+  get db(): FirestoreWrapper<
+    EnumPathTemplatesCollections,
+    EnumPathTemplatesDocuments,
+    TState
+  > {
     return this.firebaseWrapper.provider;
   }
 

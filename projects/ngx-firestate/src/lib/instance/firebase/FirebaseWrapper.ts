@@ -9,25 +9,29 @@ import {
   MakeAuthstateObservable
 } from "./provider/firebase-helpers";
 import { take } from "rxjs/operators";
+import { FirebaseClientStateObject } from '../FirebaseClientStateObject';
 
 export class FirebaseWrapper<
   EnumPathTemplatesCollections,
-  EnumPathTemplatesDocuments
+  EnumPathTemplatesDocuments,
+  TState extends FirebaseClientStateObject
 > {
   public app: firebase.app.App;
   public provider: FirestoreWrapper<
     EnumPathTemplatesCollections,
-    EnumPathTemplatesDocuments
+    EnumPathTemplatesDocuments,
+    TState 
   >;
 
   constructor(
     firebaseConfig: FirebaseConfigObject,
-    private clientState: FirebaseClientStateManager
+    private clientState: FirebaseClientStateManager<TState>
   ) {
     this.app = GetApp(firebaseConfig);
     this.provider = new FirestoreWrapper<
       EnumPathTemplatesCollections,
-      EnumPathTemplatesDocuments
+      EnumPathTemplatesDocuments,
+      TState
     >(this.app, this.clientState);
     this.initFirebaseFromCache().catch(e => console.error(e));
   }
@@ -51,7 +55,7 @@ export class FirebaseWrapper<
       throw new Error("User is not previously logged in");
     }
     this.log("initUserFromBrowser() user logged in from cache!", { user });
-    this.clientState.PatchRootState({ user });
+    this.clientState.PatchRootState({ user: user } as TState);
   }
 
   async login(email: string, password: string): Promise<firebase.User> {
@@ -65,7 +69,7 @@ export class FirebaseWrapper<
       });
       const authState$ = MakeAuthstateObservable(this.app.auth());
       const user = await authState$.pipe(take(1)).toPromise();
-      this.clientState.PatchRootState({ user });
+      this.clientState.PatchRootState({ user: user } as TState);
       return authUser.user;
     } catch (e) {
       this.log("Login() invalid credentials...", {
@@ -86,7 +90,8 @@ export class FirebaseWrapper<
     this.app = GetApp(firebaseConfig);
     this.provider = new FirestoreWrapper<
       EnumPathTemplatesCollections,
-      EnumPathTemplatesDocuments
+      EnumPathTemplatesDocuments,
+      TState
     >(this.app, this.clientState);
   }
 

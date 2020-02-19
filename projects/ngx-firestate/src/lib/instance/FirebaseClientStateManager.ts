@@ -2,9 +2,9 @@ import { BehaviorSubject, combineLatest, Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { FirebaseClientStateObject } from './FirebaseClientStateObject';
 
-export class FirebaseClientStateManager {
+export class FirebaseClientStateManager<TState extends FirebaseClientStateObject> {
   // Base data
-  private _root = new BehaviorSubject<FirebaseClientStateObject>(null);
+  private _root = new BehaviorSubject<TState>(null);
   private _hasBeenInitialized = new BehaviorSubject<boolean>(null);
 
   constructor() {}
@@ -18,7 +18,7 @@ export class FirebaseClientStateManager {
     return this._hasBeenInitialized.pipe(filter(i => !!i));
   }
 
-  get $all(): Observable<FirebaseClientStateObject> {
+  get $all(): Observable<TState> {
     return combineLatest([this._root, this.$HasDefinitelyInitialized]).pipe(
       map(([root]) => root)
     );
@@ -40,13 +40,13 @@ export class FirebaseClientStateManager {
     return currentRoot.uid;
   }
 
-  public PatchRootState(newStateObj: FirebaseClientStateObject) {
+  public PatchRootState(newStateObj: TState | FirebaseClientStateObject) {
     const currentState = this._root.value;
     this.log('updating client state', { currentState, newStateObj });
     const newState = {
-      ...currentState,
-      ...newStateObj
-    };
+      ...getSafeObj(currentState),
+      ...getSafeObj(newStateObj)
+    } as TState;
     this._root.next(newState);
   }
 
@@ -60,4 +60,11 @@ export class FirebaseClientStateManager {
     }
     return console.log('🔥(FirebaseClientStateManager) ', msg);
   }
+}
+
+function getSafeObj(input: any): {} {
+  if (!!input && typeof input === 'object') {
+    return input;
+  }
+  return {};
 }

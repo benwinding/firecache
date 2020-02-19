@@ -4,14 +4,16 @@ import { map, take } from "rxjs/operators";
 import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 import { LogLevel } from "../interfaces/LogLevel";
 import { resolvePathVariables } from "./PathResolver";
-import { Observable } from 'rxjs';
+import { Observable } from "rxjs";
 
-export class QueryState {
+export class QueryState<
+  TState extends FirebaseClientStateObject
+> {
   public overridenState: FirebaseClientStateObject;
   public logger: LevelLogger;
 
   constructor(
-    public appState$: FirebaseClientStateManager,
+    public appState$: FirebaseClientStateManager<TState>,
     public pathTemplate: string,
     public app: firebase.app.App,
     public logLevel: LogLevel
@@ -23,7 +25,7 @@ export class QueryState {
     return this.appState$.current_uid;
   }
 
-  public OverrideAppState(overridenState: FirebaseClientStateObject) {
+  public OverrideAppState(overridenState: TState) {
     this.overridenState = overridenState;
     return this;
   }

@@ -1,10 +1,13 @@
-import { Observable } from 'rxjs';
-import { resolvePathVariables } from './PathResolver';
-import { tap, map, switchMap } from 'rxjs/operators';
-import { document2Observable } from './firebase-helpers';
-import { QueryState } from './QueryState';
+import { Observable } from "rxjs";
+import { resolvePathVariables } from "./PathResolver";
+import { tap, map, switchMap } from "rxjs/operators";
+import { document2Observable } from "./firebase-helpers";
+import { QueryState } from "./QueryState";
+import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 
-export function DocumentQueryGetDoc<T>(q: QueryState): Observable<T> {
+export function DocumentQueryGetDoc<T>(
+  q: QueryState<FirebaseClientStateObject>
+): Observable<T> {
   return resolvePathVariables(
     q.appState$,
     q.pathTemplate,

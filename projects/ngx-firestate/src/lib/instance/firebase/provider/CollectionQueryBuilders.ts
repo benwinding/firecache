@@ -4,9 +4,10 @@ import { collection2Observable, document2Observable } from "./firebase-helpers";
 import { of, Observable, combineLatest } from "rxjs";
 import { QueryFn } from "../interfaces/ICollectionQueryBuilder";
 import { QueryState } from "./QueryState";
+import { FirebaseClientStateObject } from '../../FirebaseClientStateObject';
 
 export function CollectionQueryGetAllDocs<T>(
-  q: QueryState,
+  q: QueryState<FirebaseClientStateObject>,
   whereQuery?: QueryFn
 ): Observable<T[]> {
   return resolvePathVariables(
@@ -63,7 +64,7 @@ export function CollectionQueryGetAllDocs<T>(
 }
 
 export function CollectionQueryGetId<T>(
-  q: QueryState,
+  q: QueryState<FirebaseClientStateObject>,
   id: string
 ): Observable<T> {
   return resolvePathVariables(
@@ -95,7 +96,7 @@ export function CollectionQueryGetId<T>(
   );
 }
 
-export function CollectionQueryGetManyIds<T>(q: QueryState, ids: string[]): Observable<T[]> {
+export function CollectionQueryGetManyIds<T>(q: QueryState<FirebaseClientStateObject>, ids: string[]): Observable<T[]> {
   return resolvePathVariables(
     q.appState$,
     q.pathTemplate,

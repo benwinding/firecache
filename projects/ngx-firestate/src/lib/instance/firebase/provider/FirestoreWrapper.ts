@@ -4,20 +4,22 @@ import { FirebaseClientStateManager } from "../../FirebaseClientStateManager";
 import { LogLevel } from "../interfaces/LogLevel";
 import { QueryState } from "./QueryState";
 import * as firebase from "firebase/app";
+import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 
 export class FirestoreWrapper<
   EnumPathTemplatesCollections,
-  EnumPathTemplatesDocuments
+  EnumPathTemplatesDocuments,
+  TState extends FirebaseClientStateObject
 > {
   constructor(
     private app: firebase.app.App,
-    private rootState: FirebaseClientStateManager
+    private rootState: FirebaseClientStateManager<TState>
   ) {}
 
   public FromCollection(
     collectionPathTemplate: EnumPathTemplatesCollections,
     logLevel?: LogLevel
-  ): CollectionQueryBuilder {
+  ): CollectionQueryBuilder<TState> {
     const queryState = new QueryState(
       this.rootState,
       (collectionPathTemplate as any) as string,
@@ -30,7 +32,7 @@ export class FirestoreWrapper<
   public FromDocument(
     documentPathTemplate: EnumPathTemplatesDocuments,
     logLevel?: LogLevel
-  ): DocumentQueryBuilder {
+  ): DocumentQueryBuilder<TState> {
     const queryState = new QueryState(
       this.rootState,
       (documentPathTemplate as any) as string,

@@ -9,7 +9,7 @@ function blank$(overridenState: FirebaseClientStateObject) {
 
 // RESOLVES: projectId, accountId, userId, hostId
 export function resolvePathVariables(
-  appState: FirebaseClientStateManager,
+  appState: FirebaseClientStateManager<FirebaseClientStateObject>,
   pathTemplate: string,
   inputOverridenState?: FirebaseClientStateObject
 ): Observable<string> {

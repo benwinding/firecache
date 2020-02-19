@@ -5,8 +5,10 @@ import { QueryState } from "./QueryState";
 import { DocumentQueryGetDoc } from './DocumentQueryBuilders';
 import { DocumentCommandUpdate } from './DocumentCommandBuilders';
 
-export class DocumentQueryBuilder implements IDocumentQueryBuilder {
-  constructor(private queryState: QueryState) {}
+export class DocumentQueryBuilder<
+TState extends FirebaseClientStateObject
+> implements IDocumentQueryBuilder {
+  constructor(private queryState: QueryState<TState>) {}
 
   GetDoc<T>(): Observable<T> {
     return DocumentQueryGetDoc<T>(this.queryState);
@@ -14,7 +16,7 @@ export class DocumentQueryBuilder implements IDocumentQueryBuilder {
   Update(obj: {}): Promise<void> {
     return DocumentCommandUpdate(this.queryState, obj);
   }
-  OverrideAppState(overridenState: FirebaseClientStateObject) {
+  OverrideAppState(overridenState: TState) {
     this.queryState.OverrideAppState(overridenState);
     return this;
   }

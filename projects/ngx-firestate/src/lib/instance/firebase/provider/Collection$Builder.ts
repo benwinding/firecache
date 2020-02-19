@@ -20,8 +20,10 @@ import {
 import { DocWithId } from "../interfaces/DocWithId";
 import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 
-export class CollectionQueryBuilder implements ICollectionQueryBuilder {
-  constructor(private queryState: QueryState) {}
+export class CollectionQueryBuilder<
+TState extends FirebaseClientStateObject
+> implements ICollectionQueryBuilder {
+  constructor(private queryState: QueryState<TState>) {}
 
   GetAllDocs<T>(whereQuery?: QueryFn): Observable<T[]> {
     return CollectionQueryGetAllDocs<T>(this.queryState, whereQuery);
@@ -50,7 +52,7 @@ export class CollectionQueryBuilder implements ICollectionQueryBuilder {
   DeleteIds(ids: string[]) {
     return CollectionCommandDeleteIds(this.queryState, ids);
   }
-  OverrideAppState(overridenState: FirebaseClientStateObject) {
+  OverrideAppState(overridenState: TState) {
     this.queryState.OverrideAppState(overridenState);
     return this;
   }
