@@ -41,4 +41,21 @@ export class FirestoreWrapper<
     );
     return new DocumentQueryBuilder(queryState);
   }
+
+  public UNSAFEFromCollection(
+    collectionPathTemplate: string,
+    logLevel?: LogLevel
+  ): CollectionQueryBuilder<TState> {
+    const queryState = new QueryState(
+      this.rootState,
+      (collectionPathTemplate as any) as string,
+      this.app,
+      logLevel
+    );
+    return new CollectionQueryBuilder(queryState);
+  }
+
+  public GetRandomDocId(): string {
+    return this.app.firestore().collection('collections').doc().id;
+  }
 }

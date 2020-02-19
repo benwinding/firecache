@@ -57,6 +57,6 @@ TState extends FirebaseClientStateObject
     return this;
   }
   ref(): Observable<firebase.firestore.CollectionReference> {
-    return this.queryState.ref();
+    return this.queryState.refCollection();
   }
 }

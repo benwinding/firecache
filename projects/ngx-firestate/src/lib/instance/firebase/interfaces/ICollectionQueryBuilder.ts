@@ -3,7 +3,7 @@ import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 
 export type QueryFn = (
   ref: firebase.firestore.CollectionReference
-) => firebase.firestore.CollectionReference;
+) => firebase.firestore.Query;
 
 export interface ICollectionQueryBuilder {
   OverrideAppState(overridenState: FirebaseClientStateObject): ICollectionQueryBuilder;

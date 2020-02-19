@@ -1,14 +1,12 @@
 import { LevelLogger } from "./LevelLogger";
 import { FirebaseClientStateManager } from "../../FirebaseClientStateManager";
-import { map, take } from "rxjs/operators";
+import { map, take, tap } from "rxjs/operators";
 import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 import { LogLevel } from "../interfaces/LogLevel";
 import { resolvePathVariables } from "./PathResolver";
 import { Observable } from "rxjs";
 
-export class QueryState<
-  TState extends FirebaseClientStateObject
-> {
+export class QueryState<TState extends FirebaseClientStateObject> {
   public overridenState: FirebaseClientStateObject;
   public logger: LevelLogger;
 
@@ -39,16 +37,27 @@ export class QueryState<
     obj["created_at"] = new Date();
   }
 
-  public ref(): Observable<firebase.firestore.CollectionReference> {
+  public refCollection(): Observable<firebase.firestore.CollectionReference> {
     return resolvePathVariables(
       this.appState$,
       this.pathTemplate,
       this.overridenState
     )
       .pipe(
-        map(collectionPath => {
-          return this.app.firestore().collection(collectionPath);
-        })
+        map(collectionPath => this.app.firestore().collection(collectionPath)),
+        map(c => c as firebase.firestore.CollectionReference)
+      )
+      .pipe(take(1));
+  }
+  public refDocument(): Observable<firebase.firestore.DocumentReference> {
+    return resolvePathVariables(
+      this.appState$,
+      this.pathTemplate,
+      this.overridenState
+    )
+      .pipe(
+        map(collectionPath => this.app.firestore().doc(collectionPath)),
+        map(c => c as firebase.firestore.DocumentReference)
       )
       .pipe(take(1));
   }

@@ -5,4 +5,5 @@ export interface IDocumentQueryBuilder {
   OverrideAppState(overridenState: FirebaseClientStateObject): IDocumentQueryBuilder;
   GetDoc<T>(): Observable<T>;
   Update(obj: {}): Promise<void>;
+  ref(): Observable<firebase.firestore.DocumentReference>;
 }

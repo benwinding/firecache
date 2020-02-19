@@ -13,11 +13,14 @@ TState extends FirebaseClientStateObject
   GetDoc<T>(): Observable<T> {
     return DocumentQueryGetDoc<T>(this.queryState);
   }
-  Update(obj: {}): Promise<void> {
-    return DocumentCommandUpdate(this.queryState, obj);
+  Update(obj: {}, isMerged?: boolean): Promise<void> {
+    return DocumentCommandUpdate(this.queryState, obj, !!isMerged);
   }
   OverrideAppState(overridenState: TState) {
     this.queryState.OverrideAppState(overridenState);
     return this;
+  }
+  ref(): Observable<firebase.firestore.DocumentReference> {
+    return this.queryState.refDocument();
   }
 }

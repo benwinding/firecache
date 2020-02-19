@@ -1,14 +1,14 @@
-import { resolvePathVariables } from './PathResolver';
-import { map, switchMap, take } from 'rxjs/operators';
-import { QueryState } from './QueryState';
-import { FirebaseClientStateObject } from '../../FirebaseClientStateObject';
+import { resolvePathVariables } from "./PathResolver";
+import { map, switchMap, take } from "rxjs/operators";
+import { QueryState } from "./QueryState";
+import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 
-export function DocumentCommandUpdate(q: QueryState<FirebaseClientStateObject>, obj: {}): Promise<any> {
-  return resolvePathVariables(
-    q.appState$,
-    q.pathTemplate,
-    q.overridenState
-  )
+export function DocumentCommandUpdate(
+  q: QueryState<FirebaseClientStateObject>,
+  obj: {},
+  isMerged: boolean
+): Promise<any> {
+  return resolvePathVariables(q.appState$, q.pathTemplate, q.overridenState)
     .pipe(
       map(documentPath => {
         return q.app.firestore().doc(documentPath);
@@ -16,10 +16,9 @@ export function DocumentCommandUpdate(q: QueryState<FirebaseClientStateObject>, 
       switchMap(doc => {
         obj["updated_by"] = q.uid;
         obj["updated_at"] = new Date();
-        return doc.set(obj);
+        return doc.set(obj, { merge: isMerged });
       })
     )
     .pipe(take(1))
     .toPromise();
-
 }
