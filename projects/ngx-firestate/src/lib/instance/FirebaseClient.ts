@@ -50,6 +50,10 @@ export class FirebaseClient<
     return this.clientState.$user;
   }
 
+  public $GetRootState(): Observable<TState> {
+    return this.clientState.$all;
+  }
+
   public async login(email: string, pass: string) {
     try {
       await this.firebaseWrapper.login(email, pass);

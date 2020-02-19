@@ -1,7 +1,7 @@
 import { Observable } from "rxjs";
 import { resolvePathVariables } from "./PathResolver";
 import { tap, map, switchMap } from "rxjs/operators";
-import { document2Observable } from "./firebase-helpers";
+import { documentSnap2Observable } from "./firebase-helpers";
 import { QueryState } from "./QueryState";
 import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 
@@ -19,7 +19,7 @@ export function DocumentQueryGetDoc<T>(
     map(documentPath => {
       return q.app.firestore().doc(documentPath);
     }),
-    switchMap(doc => document2Observable(doc)),
+    switchMap(doc => documentSnap2Observable(doc)),
     map(snap => {
       const data = snap.data() || {};
       return ({

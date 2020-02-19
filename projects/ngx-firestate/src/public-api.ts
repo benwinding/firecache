@@ -7,3 +7,4 @@ export * from './lib/instance/firebase/FirebaseWrapper';
 export * from './lib/instance/firebase/provider/FirestoreWrapper';
 export * from './lib/instance/FirebaseClientStateManager';
 export * from './lib/instance/FirebaseClientStateObject';
+export * from './lib/instance/firebase/interfaces/ICollectionQueryBuilder';

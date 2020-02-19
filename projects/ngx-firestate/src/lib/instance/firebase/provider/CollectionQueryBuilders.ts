@@ -1,6 +1,6 @@
 import { resolvePathVariables } from "./PathResolver";
 import { tap, map, switchMap, catchError } from "rxjs/operators";
-import { collection2Observable, document2Observable } from "./firebase-helpers";
+import { collectionSnap2Observable, documentSnap2Observable } from "./firebase-helpers";
 import { of, Observable, combineLatest } from "rxjs";
 import { QueryFn } from "../interfaces/ICollectionQueryBuilder";
 import { QueryState } from "./QueryState";
@@ -34,7 +34,7 @@ export function CollectionQueryGetAllDocs<T>(
       return collection;
     }),
     switchMap(collection =>
-      collection2Observable(collection).pipe(
+      collectionSnap2Observable(collection).pipe(
         catchError(error => {
           q.logger.logERROR(
             "GetAllDocs: error in switchMap(collection => ...",
@@ -79,7 +79,7 @@ export function CollectionQueryGetId<T>(
       q.logger.logINFO("GetId() collection", { path: collection.path })
     ),
     map(collection => collection.doc(id)),
-    switchMap(doc => document2Observable(doc)),
+    switchMap(doc => documentSnap2Observable(doc)),
     tap(docSnap =>
       q.logger.logINFO("GetId() after fetching...", {
         "pathExists?": docSnap.exists
@@ -106,7 +106,7 @@ export function CollectionQueryGetManyIds<T>(q: QueryState<FirebaseClientStateOb
       return q.app.firestore().collection(collectionPath);
     }),
     switchMap(collection =>
-      combineLatest(ids.map(id => document2Observable(collection.doc(id))))
+      combineLatest(ids.map(id => documentSnap2Observable(collection.doc(id))))
     ),
     map(docSnaps =>
       docSnaps.map(snap => {
@@ -117,5 +117,38 @@ export function CollectionQueryGetManyIds<T>(q: QueryState<FirebaseClientStateOb
         } as any) as T;
       })
     )
+  );
+}
+
+export function CollectionQueryGetIdSnap<T>(
+  q: QueryState<FirebaseClientStateObject>,
+  id: string
+): Observable<T> {
+  return resolvePathVariables(
+    q.appState$,
+    q.pathTemplate,
+    q.overridenState
+  ).pipe(
+    map(collectionPath => {
+      return q.app.firestore().collection(collectionPath);
+    }),
+    tap(collection =>
+      q.logger.logINFO("GetId() collection", { path: collection.path })
+    ),
+    map(collection => collection.doc(id)),
+    switchMap(doc => documentSnap2Observable(doc)),
+    tap(docSnap =>
+      q.logger.logINFO("GetId() after fetching...", {
+        "pathExists?": docSnap.exists
+      })
+    ),
+    map(snap => {
+      const data = snap.data() || {};
+      return ({
+        ...data,
+        id: snap.id
+      } as any) as T;
+    }),
+    tap(data => q.logger.logINFO("GetAllDocs() data...", { data }))
   );
 }
