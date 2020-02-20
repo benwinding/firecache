@@ -38,11 +38,11 @@ export class FirebaseClientStateManager<
 
   get current_uid(): string {
     const currentRoot = this._root.getValue();
-    if (!currentRoot) {
+    if (!currentRoot || !currentRoot.user) {
       this.logger.logINFO("no current user", { currentRoot });
       throw new Error("Not logged in yet, couldnt get user");
     }
-    return currentRoot.uid;
+    return currentRoot.user.uid;
   }
 
   public PatchRootState(addedStateObj: TState | FirebaseClientStateObject) {
@@ -51,9 +51,7 @@ export class FirebaseClientStateManager<
       ...getSafeObj(currentState),
       ...getSafeObj(addedStateObj)
     } as TState;
-    this.logger.logINFO("updating client state", {
-      currentState,
-      addedStateObj,
+    this.logger.logINFO("state patched", {
       newState
     });
     this._root.next(newState);

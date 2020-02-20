@@ -29,7 +29,7 @@ export class FirebaseClient<
       EnumPathTemplatesCollections,
       EnumPathTemplatesDocuments,
       TState
-    >(firebaseConfig, this.clientState);
+    >(firebaseConfig, this.clientState, logLevel);
     this.appSDK = this.firebaseWrapper.app;
   }
 
@@ -38,6 +38,9 @@ export class FirebaseClient<
   }
 
   public PatchRootState(rootState: TState) {
+    this.logger.logINFO("updating state from Client", {
+      rootState
+    });
     this.clientState.PatchRootState(rootState);
   }
 

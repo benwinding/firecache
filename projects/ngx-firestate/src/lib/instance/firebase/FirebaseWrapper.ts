@@ -2,6 +2,7 @@ import { FirestoreWrapper } from "./provider/FirestoreWrapper";
 import * as firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
+import "firebase/storage";
 import { FirebaseClientStateManager } from "../FirebaseClientStateManager";
 import {
   GetApp,
@@ -10,6 +11,7 @@ import {
 } from "./provider/firebase-helpers";
 import { take } from "rxjs/operators";
 import { FirebaseClientStateObject } from '../FirebaseClientStateObject';
+import { LevelLogger } from './provider/LevelLogger';
 
 export class FirebaseWrapper<
   EnumPathTemplatesCollections,
@@ -22,11 +24,14 @@ export class FirebaseWrapper<
     EnumPathTemplatesDocuments,
     TState 
   >;
+  private logger: LevelLogger;
 
   constructor(
     firebaseConfig: FirebaseConfigObject,
-    private clientState: FirebaseClientStateManager<TState>
+    private clientState: FirebaseClientStateManager<TState>,
+    logLevel: number
   ) {
+    this.logger = new LevelLogger('FirebaseWrapper', logLevel)
     this.app = GetApp(firebaseConfig);
     this.provider = new FirestoreWrapper<
       EnumPathTemplatesCollections,
@@ -37,7 +42,7 @@ export class FirebaseWrapper<
   }
 
   private async initFirebaseFromCache() {
-    this.log("initFirebase()...");
+    this.logger.logINFO("initFirebase()...");
     try {
       await this.initUserFromBrowser();
     } catch (error) {
@@ -47,24 +52,24 @@ export class FirebaseWrapper<
   }
 
   private async initUserFromBrowser() {
-    this.log("initUserFromBrowser() starting");
+    this.logger.logINFO("initUserFromBrowser() starting");
     const authState$ = MakeAuthstateObservable(this.app.auth());
     const user = await authState$.pipe(take(1)).toPromise();
     if (!user) {
-      this.log("initUserFromBrowser() could not log user in...", { user });
+      this.logger.logINFO("initUserFromBrowser() could not log user in...", { user });
       throw new Error("User is not previously logged in");
     }
-    this.log("initUserFromBrowser() user logged in from cache!", { user });
+    this.logger.logINFO("initUserFromBrowser() user logged in from cache!", { user });
     this.clientState.PatchRootState({ user: user } as TState);
   }
 
   async login(email: string, password: string): Promise<firebase.User> {
-    this.log("logging in...");
+    this.logger.logINFO("logging in...");
     try {
       const authUser = await this.app
         .auth()
         .signInWithEmailAndPassword(email, password);
-      this.log("user successfully logged in", {
+      this.logger.logINFO("user successfully logged in", {
         user: authUser
       });
       const authState$ = MakeAuthstateObservable(this.app.auth());
@@ -72,7 +77,7 @@ export class FirebaseWrapper<
       this.clientState.PatchRootState({ user: user } as TState);
       return authUser.user;
     } catch (e) {
-      this.log("Login() invalid credentials...", {
+      this.logger.logINFO("Login() invalid credentials...", {
         email,
         password
       });
@@ -81,7 +86,7 @@ export class FirebaseWrapper<
   }
 
   logout() {
-    this.log("logging user out...");
+    this.logger.logINFO("logging user out...");
     this.clientState.ClearState();
     return this.app.auth().signOut();
   }
@@ -93,12 +98,5 @@ export class FirebaseWrapper<
       EnumPathTemplatesDocuments,
       TState
     >(this.app, this.clientState);
-  }
-
-  private log(msg, obj?) {
-    if (obj) {
-      return console.log("🌟(FirebaseWrapper) ", msg, obj);
-    }
-    return console.log("🌟(FirebaseWrapper) ", msg);
   }
 }

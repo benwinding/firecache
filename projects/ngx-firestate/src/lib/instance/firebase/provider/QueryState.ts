@@ -28,11 +28,11 @@ export class QueryState<TState extends FirebaseClientStateObject> {
     return this;
   }
 
-  public setUpdatedProps(obj, updatedUid) {
+  public setUpdatedProps(obj: any, updatedUid: string) {
     obj["updated_by"] = updatedUid;
     obj["updated_at"] = new Date();
   }
-  public setCreatedProps(obj, updatedUid) {
+  public setCreatedProps(obj: any, updatedUid: string) {
     obj["created_by"] = updatedUid;
     obj["created_at"] = new Date();
   }
