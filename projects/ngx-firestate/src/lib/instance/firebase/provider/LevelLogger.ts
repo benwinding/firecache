@@ -3,12 +3,12 @@ const blankLogger = (...any) => {};
 export class LevelLogger {
   private loggerID = Math.random()
     .toString(32)
-    .slice(0, 4);
+    .slice(2, 6);
 
-  constructor(private level: number = 0) {}
+  constructor(private prefix: string, private level: number = 0) {}
 
   private getLogString(msg: string) {
-    return `֍ ngx-firestate:: [${this.loggerID}][${msg}]`;
+    return `֍ ngx-firestate:: ${this.prefix} [${this.loggerID}][${msg}]`;
   }
 
   public get logINFO() {

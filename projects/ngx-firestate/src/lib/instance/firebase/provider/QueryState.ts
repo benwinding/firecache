@@ -16,7 +16,7 @@ export class QueryState<TState extends FirebaseClientStateObject> {
     public app: firebase.app.App,
     public logLevel: LogLevel
   ) {
-    this.logger = new LevelLogger(this.logLevel);
+    this.logger = new LevelLogger('Query', this.logLevel);
   }
 
   public get uid(): string {

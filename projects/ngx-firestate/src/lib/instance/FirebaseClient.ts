@@ -5,6 +5,7 @@ import { FirebaseConfigObject } from "./firebase/provider/firebase-helpers";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { FirebaseClientStateObject } from "./FirebaseClientStateObject";
+import { LevelLogger } from './firebase/provider/LevelLogger';
 
 export class FirebaseClient<
   EnumPathTemplatesCollections,
@@ -16,10 +17,14 @@ export class FirebaseClient<
     EnumPathTemplatesDocuments,
     TState
   >;
-  private clientState = new FirebaseClientStateManager<TState>();
+  private clientState: FirebaseClientStateManager<TState>;
   public appSDK: firebase.app.App;
+  private logger: LevelLogger;
 
-  constructor(firebaseConfig: FirebaseConfigObject) {
+  constructor(firebaseConfig: FirebaseConfigObject, logLevel: number) {
+    this.logger = new LevelLogger('FirebaseClient', logLevel);
+    this.logger.logINFO("instance created...");
+    this.clientState = new FirebaseClientStateManager<TState>(logLevel)
     this.firebaseWrapper = new FirebaseWrapper<
       EnumPathTemplatesCollections,
       EnumPathTemplatesDocuments,
@@ -46,6 +51,10 @@ export class FirebaseClient<
 
   public $IsLoggedIn(): Observable<boolean> {
     return this.clientState.$user.pipe(map(u => !!u));
+  }
+
+  public $IsFinishedInitialization(): Observable<boolean> {
+    return this.clientState.$HasDefinitelyInitialized();
   }
 
   public $CurrentUser(): Observable<firebase.User> {

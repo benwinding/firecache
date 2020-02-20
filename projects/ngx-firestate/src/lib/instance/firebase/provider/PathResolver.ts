@@ -1,5 +1,5 @@
-import { Observable, combineLatest, BehaviorSubject } from "rxjs";
-import { map, tap } from "rxjs/operators";
+import { Observable, combineLatest, BehaviorSubject, Subject } from "rxjs";
+import { map, tap, filter, catchError, takeUntil } from "rxjs/operators";
 import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 import { FirebaseClientStateManager } from "../../FirebaseClientStateManager";
 
@@ -28,32 +28,33 @@ export function resolvePathVariables(
     $rootState = appState.$all;
   }
 
+  const stopSignal$ = new Subject();
+
   return combineLatest([$rootState]).pipe(
     map(([rootState]) => {
       const evalTemplate = "`" + pathTemplate + "`";
       let rootStateDeclarations: string;
       let pathResolved: string;
-      console.log("resolvePathVariables() :: appState.$all.pipe()", {
-        rootState,
-        evalTemplate
-      });
       try {
         rootStateDeclarations = object2constStatements(rootState);
         // tslint:disable-next-line: no-eval
         pathResolved = eval(rootStateDeclarations + ";" + evalTemplate);
         return pathResolved;
       } catch (error) {
-        console.error(
+        console.warn(
           `Error trying to resolve path template, error while executing: eval("${evalTemplate}"): `,
           {
             rootState,
             pathTemplate,
-            evalString: evalTemplate
+            evalTemplate,
+            rootStateDeclarations
           },
           error
         );
+        stopSignal$.next();
       }
-    })
+    }),
+    takeUntil(stopSignal$)
   );
 }
 
