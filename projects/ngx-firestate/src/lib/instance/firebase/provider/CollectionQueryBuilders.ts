@@ -1,10 +1,13 @@
 import { resolvePathVariables } from "./PathResolver";
 import { tap, map, switchMap, catchError } from "rxjs/operators";
-import { collectionSnap2Observable, documentSnap2Observable } from "./firebase-helpers";
+import {
+  collectionSnap2Observable,
+  documentSnap2Observable
+} from "./firebase-helpers";
 import { of, Observable, combineLatest } from "rxjs";
 import { QueryFn } from "../interfaces/ICollectionQueryBuilder";
 import { QueryState } from "./QueryState";
-import { FirebaseClientStateObject } from '../../FirebaseClientStateObject';
+import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 
 export function CollectionQueryGetAllDocs<T>(
   q: QueryState<FirebaseClientStateObject>,
@@ -63,6 +66,63 @@ export function CollectionQueryGetAllDocs<T>(
   );
 }
 
+export function CollectionQueryGetAllDocsForce<T>(
+  q: QueryState<FirebaseClientStateObject>,
+  whereQuery?: QueryFn
+): Observable<T[]> {
+  return resolvePathVariables(
+    q.appState$,
+    q.pathTemplate,
+    q.overridenState
+  ).pipe(
+    tap(collectionPath =>
+      q.logger.logINFO("GetAllDocsForce() path", { collectionPath })
+    ),
+    map(collectionPath => {
+      return q.app.firestore().collection(collectionPath);
+    }),
+    tap(collection =>
+      q.logger.logINFO("GetAllDocsForce() collection", {
+        path: collection.path
+      })
+    ),
+    map(collection => {
+      if (whereQuery) {
+        q.logger.logINFO("GetAllDocsForce() whereQuery", { whereQuery });
+        return whereQuery(collection);
+      }
+      return collection;
+    }),
+    switchMap(async collection => {
+      try {
+        const res = await collection.get();
+        return res.docs;
+      } catch (error) {
+        q.logger.logERROR(
+          "GetAllDocsForce: error in switchMap(collection => ...",
+          error
+        );
+        return [];
+      }
+    }),
+    tap(docSnap =>
+      q.logger.logINFO("GetAllDocsForce() after snapshotChanges...", {
+        "docSnap?": docSnap
+      })
+    ),
+    map(docs =>
+      docs.map(doc => {
+        const data = doc.data() || {};
+        return ({
+          ...data,
+          id: doc.id
+        } as any) as T;
+      })
+    ),
+    tap(data => q.logger.logINFO("GetAllDocsForce() collection", { data }))
+  );
+}
+
 export function CollectionQueryGetId<T>(
   q: QueryState<FirebaseClientStateObject>,
   id: string
@@ -96,7 +156,10 @@ export function CollectionQueryGetId<T>(
   );
 }
 
-export function CollectionQueryGetManyIds<T>(q: QueryState<FirebaseClientStateObject>, ids: string[]): Observable<T[]> {
+export function CollectionQueryGetManyIds<T>(
+  q: QueryState<FirebaseClientStateObject>,
+  ids: string[]
+): Observable<T[]> {
   return resolvePathVariables(
     q.appState$,
     q.pathTemplate,

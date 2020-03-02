@@ -15,18 +15,21 @@ import {
 import {
   CollectionQueryGetAllDocs,
   CollectionQueryGetId,
-  CollectionQueryGetManyIds
+  CollectionQueryGetManyIds,
+  CollectionQueryGetAllDocsForce
 } from "./CollectionQueryBuilders";
 import { DocWithId } from "../interfaces/DocWithId";
 import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 
-export class CollectionQueryBuilder<
-TState extends FirebaseClientStateObject
-> implements ICollectionQueryBuilder {
+export class CollectionQueryBuilder<TState extends FirebaseClientStateObject>
+  implements ICollectionQueryBuilder {
   constructor(private queryState: QueryState<TState>) {}
 
   GetAllDocs<T>(whereQuery?: QueryFn): Observable<T[]> {
     return CollectionQueryGetAllDocs<T>(this.queryState, whereQuery);
+  }
+  GetAllDocsForce<T>(whereQuery?: QueryFn): Observable<T[]> {
+    return CollectionQueryGetAllDocsForce<T>(this.queryState, whereQuery);
   }
   GetId<T>(id: string): Observable<T> {
     return CollectionQueryGetId<T>(this.queryState, id);
