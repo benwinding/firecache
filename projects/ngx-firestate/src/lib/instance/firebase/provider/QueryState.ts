@@ -9,13 +9,9 @@ import { IQueryState } from "../interfaces/IQueryState";
 
 export class QueryState<TState extends FirebaseClientStateObject>
   implements IQueryState {
-  inputOverridenState: FirebaseClientStateObject;
-  subcollection: SubCollectionState;
-
   public overridenState: FirebaseClientStateObject;
-  public logger: LevelLogger;
-
   public subcollectionState: SubCollectionState;
+  public logger: LevelLogger;
 
   constructor(
     public appState$: FirebaseClientStateManager<TState>,

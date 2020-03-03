@@ -16,8 +16,10 @@ function blank$(overridenState: FirebaseClientStateObject) {
 export function resolvePathVariables(q: IQueryState): Observable<string> {
   const appState = q.appState$;
   const pathTemplate = q.pathTemplate;
-  const inputOverridenState = q.inputOverridenState;
-  const subcollection = q.subcollection;
+  const inputOverridenState = q.overridenState;
+  const subcollection = q.subcollectionState;
+
+  q.logger.logINFO("resolvePathVariables() query state", { q });
 
   if (!pathTemplate) {
     console.error("pathTemplate was not found: ", {
@@ -25,14 +27,15 @@ export function resolvePathVariables(q: IQueryState): Observable<string> {
     });
     throw new Error("pathTemplate was not found: " + pathTemplate);
   }
-  let $rootState: Observable<FirebaseClientStateObject>;
-  if (inputOverridenState) {
-    // Default variables are assigned blank observables
-    $rootState = blank$(inputOverridenState);
-  }
-  if (!inputOverridenState) {
-    $rootState = appState.$all;
-  }
+  const $overridenState = blank$(inputOverridenState || {});
+  const $rootState = combineLatest([$overridenState, appState.$all]).pipe(
+    map(([overriden, all]) => {
+      return {
+        ...all,
+        ...overriden
+      } as FirebaseClientStateObject;
+    })
+  );
 
   const stopSignal$ = new Subject();
 
