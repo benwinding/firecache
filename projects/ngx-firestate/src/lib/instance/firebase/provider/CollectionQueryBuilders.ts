@@ -13,11 +13,7 @@ export function CollectionQueryGetAllDocs<T>(
   q: QueryState<FirebaseClientStateObject>,
   whereQuery?: QueryFn
 ): Observable<T[]> {
-  return resolvePathVariables(
-    q.appState$,
-    q.pathTemplate,
-    q.overridenState
-  ).pipe(
+  return resolvePathVariables(q).pipe(
     tap(collectionPath =>
       q.logger.logINFO("GetAllDocs() path", { collectionPath })
     ),
@@ -70,11 +66,7 @@ export function CollectionQueryGetAllDocsForce<T>(
   q: QueryState<FirebaseClientStateObject>,
   whereQuery?: QueryFn
 ): Observable<T[]> {
-  return resolvePathVariables(
-    q.appState$,
-    q.pathTemplate,
-    q.overridenState
-  ).pipe(
+  return resolvePathVariables(q).pipe(
     tap(collectionPath =>
       q.logger.logINFO("GetAllDocsForce() path", { collectionPath })
     ),
@@ -127,11 +119,7 @@ export function CollectionQueryGetId<T>(
   q: QueryState<FirebaseClientStateObject>,
   id: string
 ): Observable<T> {
-  return resolvePathVariables(
-    q.appState$,
-    q.pathTemplate,
-    q.overridenState
-  ).pipe(
+  return resolvePathVariables(q).pipe(
     map(collectionPath => {
       return q.app.firestore().collection(collectionPath);
     }),
@@ -160,11 +148,7 @@ export function CollectionQueryGetManyIds<T>(
   q: QueryState<FirebaseClientStateObject>,
   ids: string[]
 ): Observable<T[]> {
-  return resolvePathVariables(
-    q.appState$,
-    q.pathTemplate,
-    q.overridenState
-  ).pipe(
+  return resolvePathVariables(q).pipe(
     map(collectionPath => {
       return q.app.firestore().collection(collectionPath);
     }),
@@ -187,11 +171,7 @@ export function CollectionQueryGetIdSnap<T>(
   q: QueryState<FirebaseClientStateObject>,
   id: string
 ): Observable<T> {
-  return resolvePathVariables(
-    q.appState$,
-    q.pathTemplate,
-    q.overridenState
-  ).pipe(
+  return resolvePathVariables(q).pipe(
     map(collectionPath => {
       return q.app.firestore().collection(collectionPath);
     }),

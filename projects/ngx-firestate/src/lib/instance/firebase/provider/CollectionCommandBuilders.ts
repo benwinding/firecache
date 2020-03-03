@@ -2,7 +2,7 @@ import { QueryState } from "./QueryState";
 import { resolvePathVariables } from "./PathResolver";
 import { map, switchMap, take } from "rxjs/operators";
 import { chunkify } from "./chunkify";
-import { FirebaseClientStateObject } from '../../FirebaseClientStateObject';
+import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 
 export function CollectionCommandUpdate<T>(
   q: QueryState<FirebaseClientStateObject>,
@@ -10,11 +10,7 @@ export function CollectionCommandUpdate<T>(
   obj: T,
   isMerged?: boolean
 ): Promise<any> {
-  return resolvePathVariables(
-    q.appState$,
-    q.pathTemplate,
-    q.overridenState
-  )
+  return resolvePathVariables(q)
     .pipe(
       map(collectionPath => {
         return q.app.firestore().collection(collectionPath);
@@ -37,11 +33,7 @@ export function CollectionCommandUpdateMany(
   isMerged?: boolean
 ): Promise<any> {
   const uid = q.uid;
-  return resolvePathVariables(
-    q.appState$,
-    q.pathTemplate,
-    q.overridenState
-  )
+  return resolvePathVariables(q)
     .pipe(
       map(collectionPath => {
         return q.app.firestore().collection(collectionPath);
@@ -73,11 +65,7 @@ export function CollectionCommandAdd<T>(
   const uid = q.uid;
   q.setCreatedProps(obj, uid);
   q.setUpdatedProps(obj, uid);
-  return resolvePathVariables(
-    q.appState$,
-    q.pathTemplate,
-    q.overridenState
-  )
+  return resolvePathVariables(q)
     .pipe(
       map(collectionPath => {
         return q.app.firestore().collection(collectionPath);
@@ -104,11 +92,7 @@ export function CollectionCommandAddMany(
   objs: {}[]
 ): Promise<void> {
   const uid = q.uid;
-  return resolvePathVariables(
-    q.appState$,
-    q.pathTemplate,
-    q.overridenState
-  )
+  return resolvePathVariables(q)
     .pipe(
       map(collectionPath => {
         return q.app.firestore().collection(collectionPath);
@@ -139,11 +123,7 @@ export function CollectionCommandDeleteId(
   q: QueryState<FirebaseClientStateObject>,
   id: string
 ): Promise<void> {
-  return resolvePathVariables(
-    q.appState$,
-    q.pathTemplate,
-    q.overridenState
-  )
+  return resolvePathVariables(q)
     .pipe(
       map(collectionPath => {
         return q.app.firestore().collection(collectionPath);
@@ -158,11 +138,7 @@ export function CollectionCommandDeleteIds(
   q: QueryState<FirebaseClientStateObject>,
   ids: string[]
 ): Promise<any> {
-  return resolvePathVariables(
-    q.appState$,
-    q.pathTemplate,
-    q.overridenState
-  )
+  return resolvePathVariables(q)
     .pipe(
       map(collectionPath => {
         return q.app.firestore().collection(collectionPath);

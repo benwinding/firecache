@@ -19,7 +19,7 @@ export class FirestoreWrapper<
   public FromCollection(
     collectionPathTemplate: EnumPathTemplatesCollections,
     logLevel?: LogLevel
-  ): CollectionQueryBuilder<TState> {
+  ): CollectionQueryBuilder<TState, EnumPathTemplatesCollections, EnumPathTemplatesDocuments> {
     const queryState = new QueryState(
       this.rootState,
       (collectionPathTemplate as any) as string,
@@ -32,7 +32,7 @@ export class FirestoreWrapper<
   public FromDocument(
     documentPathTemplate: EnumPathTemplatesDocuments,
     logLevel?: LogLevel
-  ): DocumentQueryBuilder<TState> {
+  ): DocumentQueryBuilder<TState, EnumPathTemplatesCollections, EnumPathTemplatesDocuments> {
     const queryState = new QueryState(
       this.rootState,
       (documentPathTemplate as any) as string,
@@ -45,7 +45,7 @@ export class FirestoreWrapper<
   public UNSAFEFromCollection(
     collectionPathTemplate: string,
     logLevel?: LogLevel
-  ): CollectionQueryBuilder<TState> {
+  ): CollectionQueryBuilder<TState, EnumPathTemplatesCollections, EnumPathTemplatesDocuments> {
     const queryState = new QueryState(
       this.rootState,
       (collectionPathTemplate as any) as string,

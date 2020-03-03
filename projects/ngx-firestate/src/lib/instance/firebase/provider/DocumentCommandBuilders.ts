@@ -8,7 +8,7 @@ export function DocumentCommandUpdate(
   obj: {},
   isMerged: boolean
 ): Promise<any> {
-  return resolvePathVariables(q.appState$, q.pathTemplate, q.overridenState)
+  return resolvePathVariables(q)
     .pipe(
       map(documentPath => {
         return q.app.firestore().doc(documentPath);

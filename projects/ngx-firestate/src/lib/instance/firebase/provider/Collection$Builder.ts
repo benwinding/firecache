@@ -20,9 +20,15 @@ import {
 } from "./CollectionQueryBuilders";
 import { DocWithId } from "../interfaces/DocWithId";
 import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
+import { ActionFunction } from "../interfaces/Actions";
 
-export class CollectionQueryBuilder<TState extends FirebaseClientStateObject>
-  implements ICollectionQueryBuilder {
+export class CollectionQueryBuilder<
+  TState extends FirebaseClientStateObject,
+  Colls,
+  Docs
+> implements ICollectionQueryBuilder<TState, Colls, Docs> {
+  private callbacks: ActionFunction<Colls, Docs>[] = [];
+
   constructor(private queryState: QueryState<TState>) {}
 
   GetAllDocs<T>(whereQuery?: QueryFn): Observable<T[]> {
@@ -55,7 +61,22 @@ export class CollectionQueryBuilder<TState extends FirebaseClientStateObject>
   DeleteIds(ids: string[]) {
     return CollectionCommandDeleteIds(this.queryState, ids);
   }
-  OverrideAppState(overridenState: TState) {
+  FromSubCollection<T>(
+    id: string,
+    subcollection: string
+  ): ICollectionQueryBuilder<TState, Colls, Docs> {
+    this.queryState.SetSubCollection(id, subcollection);
+    return this;
+  }
+  AfterActionCall(
+    callback: ActionFunction<Colls, Docs>
+  ): ICollectionQueryBuilder<TState, Colls, Docs> {
+    this.callbacks.push(callback);
+    return this;
+  }
+  OverrideAppState(
+    overridenState: TState
+  ): ICollectionQueryBuilder<TState, Colls, Docs> {
     this.queryState.OverrideAppState(overridenState);
     return this;
   }

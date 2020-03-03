@@ -8,11 +8,7 @@ import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 export function DocumentQueryGetDoc<T>(
   q: QueryState<FirebaseClientStateObject>
 ): Observable<T> {
-  return resolvePathVariables(
-    q.appState$,
-    q.pathTemplate,
-    q.overridenState
-  ).pipe(
+  return resolvePathVariables(q).pipe(
     tap(documentPath =>
       q.logger.logINFO("GetDoc() about to get path", { documentPath })
     ),

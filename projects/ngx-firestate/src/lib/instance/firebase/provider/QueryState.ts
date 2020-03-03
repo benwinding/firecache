@@ -3,12 +3,19 @@ import { FirebaseClientStateManager } from "../../FirebaseClientStateManager";
 import { map, take, tap } from "rxjs/operators";
 import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 import { LogLevel } from "../interfaces/LogLevel";
-import { resolvePathVariables } from "./PathResolver";
+import { resolvePathVariables, SubCollectionState } from "./PathResolver";
 import { Observable } from "rxjs";
+import { IQueryState } from "../interfaces/IQueryState";
 
-export class QueryState<TState extends FirebaseClientStateObject> {
+export class QueryState<TState extends FirebaseClientStateObject>
+  implements IQueryState {
+  inputOverridenState: FirebaseClientStateObject;
+  subcollection: SubCollectionState;
+
   public overridenState: FirebaseClientStateObject;
   public logger: LevelLogger;
+
+  public subcollectionState: SubCollectionState;
 
   constructor(
     public appState$: FirebaseClientStateManager<TState>,
@@ -16,7 +23,7 @@ export class QueryState<TState extends FirebaseClientStateObject> {
     public app: firebase.app.App,
     public logLevel: LogLevel
   ) {
-    this.logger = new LevelLogger('Query', this.logLevel);
+    this.logger = new LevelLogger("Query", this.logLevel);
   }
 
   public get uid(): string {
@@ -26,6 +33,12 @@ export class QueryState<TState extends FirebaseClientStateObject> {
   public OverrideAppState(overridenState: TState) {
     this.overridenState = overridenState;
     return this;
+  }
+  public SetSubCollection(id: string, subcollection: string) {
+    this.subcollectionState = {
+      id: id,
+      subcollection: subcollection
+    };
   }
 
   public setUpdatedProps(obj: any, updatedUid: string) {
@@ -38,11 +51,7 @@ export class QueryState<TState extends FirebaseClientStateObject> {
   }
 
   public refCollection(): Observable<firebase.firestore.CollectionReference> {
-    return resolvePathVariables(
-      this.appState$,
-      this.pathTemplate,
-      this.overridenState
-    )
+    return resolvePathVariables(this)
       .pipe(
         map(collectionPath => this.app.firestore().collection(collectionPath)),
         map(c => c as firebase.firestore.CollectionReference)
@@ -50,11 +59,7 @@ export class QueryState<TState extends FirebaseClientStateObject> {
       .pipe(take(1));
   }
   public refDocument(): Observable<firebase.firestore.DocumentReference> {
-    return resolvePathVariables(
-      this.appState$,
-      this.pathTemplate,
-      this.overridenState
-    )
+    return resolvePathVariables(this)
       .pipe(
         map(collectionPath => this.app.firestore().doc(collectionPath)),
         map(c => c as firebase.firestore.DocumentReference)

@@ -1,18 +1,24 @@
 import { Observable, combineLatest, BehaviorSubject, Subject } from "rxjs";
-import { map, tap, filter, catchError, takeUntil } from "rxjs/operators";
+import { map, takeUntil } from "rxjs/operators";
 import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
-import { FirebaseClientStateManager } from "../../FirebaseClientStateManager";
+import { IQueryState } from "../interfaces/IQueryState";
+
+export interface SubCollectionState {
+  id: string;
+  subcollection: string;
+}
 
 function blank$(overridenState: FirebaseClientStateObject) {
   return new BehaviorSubject(overridenState);
 }
 
 // RESOLVES: projectId, accountId, userId, hostId
-export function resolvePathVariables(
-  appState: FirebaseClientStateManager<FirebaseClientStateObject>,
-  pathTemplate: string,
-  inputOverridenState?: FirebaseClientStateObject
-): Observable<string> {
+export function resolvePathVariables(q: IQueryState): Observable<string> {
+  const appState = q.appState$;
+  const pathTemplate = q.pathTemplate;
+  const inputOverridenState = q.inputOverridenState;
+  const subcollection = q.subcollection;
+
   if (!pathTemplate) {
     console.error("pathTemplate was not found: ", {
       pathTemplate
@@ -53,6 +59,12 @@ export function resolvePathVariables(
         );
         stopSignal$.next();
       }
+    }),
+    map(collectionPath => {
+      if (subcollection) {
+        return `${collectionPath}/${subcollection.id}/${subcollection.subcollection}`;
+      }
+      return collectionPath;
     }),
     takeUntil(stopSignal$)
   );
