@@ -24,9 +24,12 @@ export interface ICollectionQueryBuilder<
   ): ICollectionQueryBuilder<TState, Colls, Docs>;
 
   // Queries
+  //   get once
   GetId<T>(id: string): Observable<T>;
-  GetIdSnap<T>(id: string): Observable<T>;
+  GetManyIds<T>(ids: string[]): Observable<T[]>;
   GetAllDocs<T>(whereQuery?: QueryFn): Observable<T[]>;
+  //   recieve snapshot updates
+  GetIdSnap<T>(id: string): Observable<T>;
   GetAllDocsSnap<T>(whereQuery?: QueryFn): Observable<T[]>;
   GetManyIdsSnap<T>(ids: string[]): Observable<T[]>;
 
