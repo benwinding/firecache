@@ -27,7 +27,6 @@ export class CollectionQueryBuilder<
   Colls,
   Docs
 > implements ICollectionQueryBuilder<TState, Colls, Docs> {
-  private callbacks: ActionFunction<Colls, Docs>[] = [];
 
   constructor(private queryState: QueryState<TState>) {}
 
@@ -61,17 +60,17 @@ export class CollectionQueryBuilder<
   DeleteIds(ids: string[]) {
     return CollectionCommandDeleteIds(this.queryState, ids);
   }
-  FromSubCollection<T>(
+  FromSubCollection(
     id: string,
     subcollection: string
   ): ICollectionQueryBuilder<TState, Colls, Docs> {
     this.queryState.SetSubCollection(id, subcollection);
     return this;
   }
-  AfterActionCall(
+  OnFinishedHook(
     callback: ActionFunction<Colls, Docs>
   ): ICollectionQueryBuilder<TState, Colls, Docs> {
-    this.callbacks.push(callback);
+    this.queryState.addRunAfter(callback);
     return this;
   }
   OverrideAppState(

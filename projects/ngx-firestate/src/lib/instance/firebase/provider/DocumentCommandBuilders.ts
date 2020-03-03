@@ -1,18 +1,16 @@
-import { resolvePathVariables } from "./PathResolver";
-import { map, switchMap, take } from "rxjs/operators";
+import { switchMap, take, tap } from "rxjs/operators";
 import { QueryState } from "./QueryState";
 import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
+import { RunAfterDoc } from './RunAfters';
 
 export function DocumentCommandUpdate(
   q: QueryState<FirebaseClientStateObject>,
   obj: {},
   isMerged: boolean
 ): Promise<any> {
-  return resolvePathVariables(q)
+  return q.refDocument()
     .pipe(
-      map(documentPath => {
-        return q.app.firestore().doc(documentPath);
-      }),
+      tap(RunAfterDoc(q, "edited")),
       switchMap(doc => {
         obj["updated_by"] = q.uid;
         obj["updated_at"] = new Date();

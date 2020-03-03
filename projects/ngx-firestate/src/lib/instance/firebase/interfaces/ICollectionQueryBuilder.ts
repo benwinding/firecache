@@ -12,7 +12,7 @@ export interface ICollectionQueryBuilder<
   Docs
 > {
   // Meta
-  AfterActionCall(
+  OnFinishedHook(
     callback: ActionFunction<Colls, Docs>
   ): ICollectionQueryBuilder<TState, Colls, Docs>;
   OverrideAppState(

@@ -3,11 +3,6 @@ import { map, takeUntil } from "rxjs/operators";
 import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 import { IQueryState } from "../interfaces/IQueryState";
 
-export interface SubCollectionState {
-  id: string;
-  subcollection: string;
-}
-
 function blank$(overridenState: FirebaseClientStateObject) {
   return new BehaviorSubject(overridenState);
 }
@@ -17,7 +12,6 @@ export function resolvePathVariables(q: IQueryState): Observable<string> {
   const appState = q.appState$;
   const pathTemplate = q.pathTemplate;
   const inputOverridenState = q.overridenState;
-  const subcollection = q.subcollectionState;
 
   q.logger.logINFO("resolvePathVariables() query state", { q });
 
@@ -62,12 +56,6 @@ export function resolvePathVariables(q: IQueryState): Observable<string> {
         );
         stopSignal$.next();
       }
-    }),
-    map(collectionPath => {
-      if (subcollection) {
-        return `${collectionPath}/${subcollection.id}/${subcollection.subcollection}`;
-      }
-      return collectionPath;
     }),
     takeUntil(stopSignal$)
   );

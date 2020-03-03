@@ -17,7 +17,7 @@ export interface ActionFunctionArguments<CollectionPath, DocumentPath> {
 
   resource_path_collection_resolved: string;
   action: ActionType;
-  resource_ids: string[];
+  resource_ids?: string[];
 }
 
 export type ActionFunction<CollectionPath, DocumentPath> = (

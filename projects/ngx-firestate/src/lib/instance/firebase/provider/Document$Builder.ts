@@ -11,8 +11,6 @@ export class DocumentQueryBuilder<
   Colls,
   Docs
 > implements IDocumentQueryBuilder<TState, Colls, Docs> {
-  private callbacks: ActionFunction<Colls, Docs>[] = [];
-
   constructor(private queryState: QueryState<TState>) {}
 
   GetDoc<T>(): Observable<T> {
@@ -27,10 +25,10 @@ export class DocumentQueryBuilder<
     this.queryState.OverrideAppState(overridenState);
     return this;
   }
-  AfterActionCall(
+  OnFinishedHook(
     callback: ActionFunction<Colls, Docs>
   ): IDocumentQueryBuilder<TState, Colls, Docs> {
-    this.callbacks.push(callback);
+    this.queryState.addRunAfter(callback)
     return this;
   }
   ref(): Observable<firebase.firestore.DocumentReference> {

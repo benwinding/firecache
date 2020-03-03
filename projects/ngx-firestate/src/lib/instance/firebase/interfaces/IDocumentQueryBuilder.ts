@@ -3,7 +3,7 @@ import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 import { ActionFunction } from "./Actions";
 
 export interface IDocumentQueryBuilder<TState extends FirebaseClientStateObject, Colls, Docs> {
-  AfterActionCall(
+  OnFinishedHook(
     callback: ActionFunction<Colls, Docs>
   ): IDocumentQueryBuilder<TState, Colls, Docs>;
   OverrideAppState(

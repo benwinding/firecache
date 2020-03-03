@@ -1,4 +1,3 @@
-import { resolvePathVariables } from "./PathResolver";
 import { tap, map, switchMap, catchError } from "rxjs/operators";
 import {
   collectionSnap2Observable,
@@ -13,13 +12,7 @@ export function CollectionQueryGetAllDocs<T>(
   q: QueryState<FirebaseClientStateObject>,
   whereQuery?: QueryFn
 ): Observable<T[]> {
-  return resolvePathVariables(q).pipe(
-    tap(collectionPath =>
-      q.logger.logINFO("GetAllDocs() path", { collectionPath })
-    ),
-    map(collectionPath => {
-      return q.app.firestore().collection(collectionPath);
-    }),
+  return q.refCollection().pipe(
     tap(collection =>
       q.logger.logINFO("GetAllDocs() collection", {
         path: collection.path
@@ -66,13 +59,7 @@ export function CollectionQueryGetAllDocsForce<T>(
   q: QueryState<FirebaseClientStateObject>,
   whereQuery?: QueryFn
 ): Observable<T[]> {
-  return resolvePathVariables(q).pipe(
-    tap(collectionPath =>
-      q.logger.logINFO("GetAllDocsForce() path", { collectionPath })
-    ),
-    map(collectionPath => {
-      return q.app.firestore().collection(collectionPath);
-    }),
+  return q.refCollection().pipe(
     tap(collection =>
       q.logger.logINFO("GetAllDocsForce() collection", {
         path: collection.path
@@ -119,10 +106,7 @@ export function CollectionQueryGetId<T>(
   q: QueryState<FirebaseClientStateObject>,
   id: string
 ): Observable<T> {
-  return resolvePathVariables(q).pipe(
-    map(collectionPath => {
-      return q.app.firestore().collection(collectionPath);
-    }),
+  return q.refCollection().pipe(
     tap(collection =>
       q.logger.logINFO("GetId() collection", { path: collection.path })
     ),
@@ -148,10 +132,7 @@ export function CollectionQueryGetManyIds<T>(
   q: QueryState<FirebaseClientStateObject>,
   ids: string[]
 ): Observable<T[]> {
-  return resolvePathVariables(q).pipe(
-    map(collectionPath => {
-      return q.app.firestore().collection(collectionPath);
-    }),
+  return q.refCollection().pipe(
     switchMap(collection =>
       combineLatest(ids.map(id => documentSnap2Observable(collection.doc(id))))
     ),
@@ -171,10 +152,7 @@ export function CollectionQueryGetIdSnap<T>(
   q: QueryState<FirebaseClientStateObject>,
   id: string
 ): Observable<T> {
-  return resolvePathVariables(q).pipe(
-    map(collectionPath => {
-      return q.app.firestore().collection(collectionPath);
-    }),
+  return q.refCollection().pipe(
     tap(collection =>
       q.logger.logINFO("GetId() collection", { path: collection.path })
     ),

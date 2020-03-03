@@ -1,8 +1,8 @@
 import { QueryState } from "./QueryState";
-import { resolvePathVariables } from "./PathResolver";
-import { map, switchMap, take } from "rxjs/operators";
+import { switchMap, take, tap } from "rxjs/operators";
 import { chunkify } from "./chunkify";
 import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
+import { RunAfterCollection } from "./RunAfters";
 
 export function CollectionCommandUpdate<T>(
   q: QueryState<FirebaseClientStateObject>,
@@ -10,11 +10,10 @@ export function CollectionCommandUpdate<T>(
   obj: T,
   isMerged?: boolean
 ): Promise<any> {
-  return resolvePathVariables(q)
+  return q
+    .refCollection()
     .pipe(
-      map(collectionPath => {
-        return q.app.firestore().collection(collectionPath);
-      }),
+      tap(RunAfterCollection(q, "edited", [id])),
       switchMap(collection => {
         obj["updated_by"] = q.uid;
         obj["updated_at"] = new Date();
@@ -33,11 +32,11 @@ export function CollectionCommandUpdateMany(
   isMerged?: boolean
 ): Promise<any> {
   const uid = q.uid;
-  return resolvePathVariables(q)
+  const ids = objs.map(o => o.id);
+  return q
+    .refCollection()
     .pipe(
-      map(collectionPath => {
-        return q.app.firestore().collection(collectionPath);
-      }),
+      tap(RunAfterCollection(q, "edited some", ids)),
       switchMap(collection => {
         const db = q.app.firestore();
         const objs500Groups = chunkify(objs, 500);
@@ -65,11 +64,10 @@ export function CollectionCommandAdd<T>(
   const uid = q.uid;
   q.setCreatedProps(obj, uid);
   q.setUpdatedProps(obj, uid);
-  return resolvePathVariables(q)
+  return q
+    .refCollection()
     .pipe(
-      map(collectionPath => {
-        return q.app.firestore().collection(collectionPath);
-      }),
+      tap(RunAfterCollection(q, "added")),
       switchMap(async collection => {
         try {
           const result = await collection.add(obj);
@@ -92,11 +90,10 @@ export function CollectionCommandAddMany(
   objs: {}[]
 ): Promise<void> {
   const uid = q.uid;
-  return resolvePathVariables(q)
+  return q
+    .refCollection()
     .pipe(
-      map(collectionPath => {
-        return q.app.firestore().collection(collectionPath);
-      }),
+      tap(RunAfterCollection(q, "added some")),
       switchMap(async collection => {
         const db = q.app.firestore();
         const objs500Groups = chunkify(objs, 500);
@@ -123,11 +120,10 @@ export function CollectionCommandDeleteId(
   q: QueryState<FirebaseClientStateObject>,
   id: string
 ): Promise<void> {
-  return resolvePathVariables(q)
+  return q
+    .refCollection()
     .pipe(
-      map(collectionPath => {
-        return q.app.firestore().collection(collectionPath);
-      }),
+      tap(RunAfterCollection(q, "removed", [id])),
       switchMap(collection => collection.doc(id).delete())
     )
     .pipe(take(1))
@@ -138,11 +134,10 @@ export function CollectionCommandDeleteIds(
   q: QueryState<FirebaseClientStateObject>,
   ids: string[]
 ): Promise<any> {
-  return resolvePathVariables(q)
+  return q
+    .refCollection()
     .pipe(
-      map(collectionPath => {
-        return q.app.firestore().collection(collectionPath);
-      }),
+      tap(RunAfterCollection(q, "removed some", ids)),
       switchMap(collection => {
         const db = q.app.firestore();
 
