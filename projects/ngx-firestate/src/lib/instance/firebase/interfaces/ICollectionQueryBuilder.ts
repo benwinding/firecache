@@ -25,9 +25,10 @@ export interface ICollectionQueryBuilder<
 
   // Queries
   GetId<T>(id: string): Observable<T>;
+  GetIdSnap<T>(id: string): Observable<T>;
   GetAllDocs<T>(whereQuery?: QueryFn): Observable<T[]>;
-  GetAllDocsForce<T>(whereQuery?: QueryFn): Observable<T[]>;
-  GetManyIds<T>(ids: string[]): Observable<T[]>;
+  GetAllDocsSnap<T>(whereQuery?: QueryFn): Observable<T[]>;
+  GetManyIdsSnap<T>(ids: string[]): Observable<T[]>;
 
   // Commands
   UpdateMany(

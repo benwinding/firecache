@@ -8,7 +8,7 @@ import { QueryFn } from "../interfaces/ICollectionQueryBuilder";
 import { QueryState } from "./QueryState";
 import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 
-export function CollectionQueryGetAllDocs<T>(
+export function CollectionQueryGetAllDocsSnap<T>(
   q: QueryState<FirebaseClientStateObject>,
   whereQuery?: QueryFn
 ): Observable<T[]> {
@@ -55,7 +55,7 @@ export function CollectionQueryGetAllDocs<T>(
   );
 }
 
-export function CollectionQueryGetAllDocsForce<T>(
+export function CollectionQueryGetAllDocs<T>(
   q: QueryState<FirebaseClientStateObject>,
   whereQuery?: QueryFn
 ): Observable<T[]> {
@@ -111,7 +111,7 @@ export function CollectionQueryGetId<T>(
       q.logger.logINFO("GetId() collection", { path: collection.path })
     ),
     map(collection => collection.doc(id)),
-    switchMap(doc => documentSnap2Observable(doc)),
+    switchMap(doc => doc.get()),
     tap(docSnap =>
       q.logger.logINFO("GetId() after fetching...", {
         "pathExists?": docSnap.exists
@@ -125,26 +125,6 @@ export function CollectionQueryGetId<T>(
       } as any) as T;
     }),
     tap(data => q.logger.logINFO("GetAllDocs() data...", { data }))
-  );
-}
-
-export function CollectionQueryGetManyIds<T>(
-  q: QueryState<FirebaseClientStateObject>,
-  ids: string[]
-): Observable<T[]> {
-  return q.refCollection().pipe(
-    switchMap(collection =>
-      combineLatest(ids.map(id => documentSnap2Observable(collection.doc(id))))
-    ),
-    map(docSnaps =>
-      docSnaps.map(snap => {
-        const data = snap.data() || {};
-        return ({
-          ...data,
-          id: snap.id
-        } as any) as T;
-      })
-    )
   );
 }
 
@@ -170,6 +150,47 @@ export function CollectionQueryGetIdSnap<T>(
         id: snap.id
       } as any) as T;
     }),
+    tap(data => q.logger.logINFO("GetAllDocs() data...", { data }))
+  );
+}
+
+export function CollectionQueryGetManyIds<T>(
+  q: QueryState<FirebaseClientStateObject>,
+  ids: string[]
+): Observable<T[]> {
+  return q.refCollection().pipe(
+    switchMap(collection =>
+      combineLatest(ids.map(id => collection.doc(id).get()))
+    ),
+    map(docSnaps =>
+      docSnaps.map(snap => {
+        const data = snap.data() || {};
+        return ({
+          ...data,
+          id: snap.id
+        } as any) as T;
+      })
+    )
+  );
+}
+
+export function CollectionQueryGetManyIdsSnap<T>(
+  q: QueryState<FirebaseClientStateObject>,
+  ids: string[]
+): Observable<T[]> {
+  return q.refCollection().pipe(
+    switchMap(collection =>
+      combineLatest(ids.map(id => documentSnap2Observable(collection.doc(id))))
+    ),
+    map(docSnaps =>
+      docSnaps.map(snap => {
+        const data = snap.data() || {};
+        return ({
+          ...data,
+          id: snap.id
+        } as any) as T;
+      })
+    ),
     tap(data => q.logger.logINFO("GetAllDocs() data...", { data }))
   );
 }

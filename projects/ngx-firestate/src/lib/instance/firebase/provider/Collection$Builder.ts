@@ -13,10 +13,12 @@ import {
   CollectionCommandUpdateMany
 } from "./CollectionCommandBuilders";
 import {
-  CollectionQueryGetAllDocs,
   CollectionQueryGetId,
+  CollectionQueryGetIdSnap,
+  CollectionQueryGetAllDocs,
+  CollectionQueryGetAllDocsSnap,
   CollectionQueryGetManyIds,
-  CollectionQueryGetAllDocsForce
+  CollectionQueryGetManyIdsSnap
 } from "./CollectionQueryBuilders";
 import { DocWithId } from "../interfaces/DocWithId";
 import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
@@ -27,20 +29,25 @@ export class CollectionQueryBuilder<
   Colls,
   Docs
 > implements ICollectionQueryBuilder<TState, Colls, Docs> {
-
   constructor(private queryState: QueryState<TState>) {}
 
-  GetAllDocs<T>(whereQuery?: QueryFn): Observable<T[]> {
-    return CollectionQueryGetAllDocs<T>(this.queryState, whereQuery);
-  }
-  GetAllDocsForce<T>(whereQuery?: QueryFn): Observable<T[]> {
-    return CollectionQueryGetAllDocsForce<T>(this.queryState, whereQuery);
-  }
   GetId<T>(id: string): Observable<T> {
     return CollectionQueryGetId<T>(this.queryState, id);
   }
+  GetAllDocs<T>(whereQuery?: QueryFn): Observable<T[]> {
+    return CollectionQueryGetAllDocs<T>(this.queryState, whereQuery);
+  }
   GetManyIds<T>(ids: string[]): Observable<T[]> {
     return CollectionQueryGetManyIds<T>(this.queryState, ids);
+  }
+  GetIdSnap<T>(id: string): Observable<T> {
+    return CollectionQueryGetIdSnap<T>(this.queryState, id);
+  }
+  GetAllDocsSnap<T>(whereQuery?: QueryFn): Observable<T[]> {
+    return CollectionQueryGetAllDocsSnap<T>(this.queryState, whereQuery);
+  }
+  GetManyIdsSnap<T>(ids: string[]): Observable<T[]> {
+    return CollectionQueryGetManyIdsSnap<T>(this.queryState, ids);
   }
   UpdateMany(objs: DocWithId[], isMerged?: boolean) {
     return CollectionCommandUpdateMany(this.queryState, objs, isMerged);

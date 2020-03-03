@@ -10,6 +10,7 @@ export interface IDocumentQueryBuilder<TState extends FirebaseClientStateObject,
     overridenState: TState
   ): IDocumentQueryBuilder<TState, Colls, Docs>;
   GetDoc<T>(): Observable<T>;
+  GetDocSnap<T>(): Observable<T>;
   Update(obj: {}, isMerged?: boolean): Promise<void>;
   ref(): Observable<firebase.firestore.DocumentReference>;
 }

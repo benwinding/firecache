@@ -2,7 +2,10 @@ import { Observable } from "rxjs";
 import { IDocumentQueryBuilder } from "../interfaces/IDocumentQueryBuilder";
 import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 import { QueryState } from "./QueryState";
-import { DocumentQueryGetDoc } from "./DocumentQueryBuilders";
+import {
+  DocumentQueryGetDoc,
+  DocumentQueryGetDocSnap
+} from "./DocumentQueryBuilders";
 import { DocumentCommandUpdate } from "./DocumentCommandBuilders";
 import { ActionFunction } from "../interfaces/Actions";
 
@@ -16,6 +19,9 @@ export class DocumentQueryBuilder<
   GetDoc<T>(): Observable<T> {
     return DocumentQueryGetDoc<T>(this.queryState);
   }
+  GetDocSnap<T>(): Observable<T> {
+    return DocumentQueryGetDocSnap<T>(this.queryState);
+  }
   Update(obj: {}, isMerged?: boolean): Promise<void> {
     return DocumentCommandUpdate(this.queryState, obj, !!isMerged);
   }
@@ -28,7 +34,7 @@ export class DocumentQueryBuilder<
   OnFinishedHook(
     callback: ActionFunction<Colls, Docs>
   ): IDocumentQueryBuilder<TState, Colls, Docs> {
-    this.queryState.addRunAfter(callback)
+    this.queryState.addRunAfter(callback);
     return this;
   }
   ref(): Observable<firebase.firestore.DocumentReference> {
