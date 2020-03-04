@@ -1,10 +1,10 @@
 {
   "name": "ngx-firestate",
-  "version": "0.2.6",
+  "version": "0.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --port 4555",
-    "build": "ng build --project=ngx-firestate",
+    "build": "ng build --project=ngx-firestate && ./README.md ./dist/ngx-firestate",
     "watch-lib": "ng build --project=ngx-firestate --watch",
     "build-demo": "ng build --project=ngx-firestate-demo",
     "test": "echo not implemented yet!",
