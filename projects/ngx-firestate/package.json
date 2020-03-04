@@ -1,6 +1,7 @@
 {
   "name": "ngx-firestate",
   "version": "1.0.1",
+  "private": false,
   "license": "MIT",
   "repository": "https://github.com/benwinding/ngx-firestate",
   "homepage": "https://github.com/benwinding/ngx-firestate",
