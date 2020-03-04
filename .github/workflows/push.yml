@@ -19,7 +19,7 @@ jobs:
       run: npm test
     - name: Publish
       if: github.ref == 'refs/heads/master'
-      uses: benwinding/merge-release@sdvsdvsdvsdv
+      uses: benwinding/merge-release@debug
       env:
         DEPLOY_DIR: dist/ngx-firestate
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
