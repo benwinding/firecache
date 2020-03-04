@@ -12,9 +12,11 @@ jobs:
       with:
         path: node_modules
         key: ${{ runner.OS }}-build-${{ hashFiles('package.json') }}
-    - name: Build
+    - name: Install Dependencies
       if: steps.cache-modules.outputs.cache-hit != 'true'
       run: npm install
+    - name: Build
+      run: npm build
     - name: Test
       run: npm test
     - name: Publish
