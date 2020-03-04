@@ -9,13 +9,7 @@ export function DocumentQueryGetDoc<T>(
 ): Observable<T> {
   return q.refDocument().pipe(
     switchMap(doc => doc.get()),
-    map(snap => {
-      const data = snap.data() || {};
-      return ({
-        ...data,
-        id: snap.id
-      } as any) as T;
-    })
+    map(doc => q.doc2Data<T>(doc))
   );
 }
 
@@ -24,12 +18,6 @@ export function DocumentQueryGetDocSnap<T>(
 ): Observable<T> {
   return q.refDocument().pipe(
     switchMap(doc => documentSnap2Observable(doc)),
-    map(snap => {
-      const data = snap.data() || {};
-      return ({
-        ...data,
-        id: snap.id
-      } as any) as T;
-    })
+    map(doc => q.doc2Data<T>(doc))
   );
 }

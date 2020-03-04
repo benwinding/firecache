@@ -37,6 +37,14 @@ export class DocumentQueryBuilder<
     this.queryState.addRunAfter(callback);
     return this;
   }
+  DisableUpdateFields(): IDocumentQueryBuilder<TState, Colls, Docs> {
+    this.queryState.disableUpdateFields();
+    return this;
+  }
+  DisableIdInclusion(): IDocumentQueryBuilder<TState, Colls, Docs> {
+    this.queryState.disableIdInclusion();
+    return this;
+  }
   ref(): Observable<firebase.firestore.DocumentReference> {
     return this.queryState.refDocument();
   }

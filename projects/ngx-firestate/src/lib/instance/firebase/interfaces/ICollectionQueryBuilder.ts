@@ -18,6 +18,8 @@ export interface ICollectionQueryBuilder<
   OverrideAppState(
     overridenState: TState
   ): ICollectionQueryBuilder<TState, Colls, Docs>;
+  DisableUpdateFields(): ICollectionQueryBuilder<TState, Colls, Docs>;
+  DisableIdInclusion(): ICollectionQueryBuilder<TState, Colls, Docs>;
   FromSubCollection<T>(
     id: string,
     subcollection: string

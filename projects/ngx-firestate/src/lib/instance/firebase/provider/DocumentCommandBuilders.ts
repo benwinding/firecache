@@ -12,8 +12,7 @@ export function DocumentCommandUpdate(
     .pipe(
       tap(RunAfterDoc(q, "edited")),
       switchMap(doc => {
-        obj["updated_by"] = q.uid;
-        obj["updated_at"] = new Date();
+        q.setUpdatedProps(obj, q.uid);
         return doc.set(obj, { merge: isMerged });
       })
     )

@@ -15,8 +15,7 @@ export function CollectionCommandUpdate<T>(
     .pipe(
       tap(RunAfterCollection(q, "edited", [id])),
       switchMap(collection => {
-        obj["updated_by"] = q.uid;
-        obj["updated_at"] = new Date();
+        q.setUpdatedProps(obj, q.uid);
         return collection.doc(id).set(obj, { merge: isMerged });
       })
     )

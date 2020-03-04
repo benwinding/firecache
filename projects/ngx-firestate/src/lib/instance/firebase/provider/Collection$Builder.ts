@@ -86,6 +86,14 @@ export class CollectionQueryBuilder<
     this.queryState.OverrideAppState(overridenState);
     return this;
   }
+  DisableUpdateFields(): ICollectionQueryBuilder<TState, Colls, Docs> {
+    this.queryState.disableUpdateFields();
+    return this;
+  }
+  DisableIdInclusion(): ICollectionQueryBuilder<TState, Colls, Docs> {
+    this.queryState.disableIdInclusion();
+    return this;
+  }
   ref(): Observable<firebase.firestore.CollectionReference> {
     return this.queryState.refCollection();
   }

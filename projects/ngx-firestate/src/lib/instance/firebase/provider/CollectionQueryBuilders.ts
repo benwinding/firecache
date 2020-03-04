@@ -42,15 +42,7 @@ export function CollectionQueryGetAllDocsSnap<T>(
       })
     ),
     map(docChanges => docChanges.docs),
-    map(docs =>
-      docs.map(doc => {
-        const data = doc.data() || {};
-        return ({
-          ...data,
-          id: doc.id
-        } as any) as T;
-      })
-    ),
+    map(docs => docs.map(doc => q.doc2Data<T>(doc)) as T[]),
     tap(data => q.logger.logINFO("GetAllDocs() collection", { data }))
   );
 }
@@ -89,15 +81,7 @@ export function CollectionQueryGetAllDocs<T>(
         "docSnap?": docSnap
       })
     ),
-    map(docs =>
-      docs.map(doc => {
-        const data = doc.data() || {};
-        return ({
-          ...data,
-          id: doc.id
-        } as any) as T;
-      })
-    ),
+    map(docs => q.docArray2Data<T>(docs)),
     tap(data => q.logger.logINFO("GetAllDocsForce() collection", { data }))
   );
 }
@@ -117,13 +101,7 @@ export function CollectionQueryGetId<T>(
         "pathExists?": docSnap.exists
       })
     ),
-    map(snap => {
-      const data = snap.data() || {};
-      return ({
-        ...data,
-        id: snap.id
-      } as any) as T;
-    }),
+    map(doc => q.doc2Data<T>(doc)),
     tap(data => q.logger.logINFO("GetAllDocs() data...", { data }))
   );
 }
@@ -143,13 +121,7 @@ export function CollectionQueryGetIdSnap<T>(
         "pathExists?": docSnap.exists
       })
     ),
-    map(snap => {
-      const data = snap.data() || {};
-      return ({
-        ...data,
-        id: snap.id
-      } as any) as T;
-    }),
+    map(doc => q.doc2Data<T>(doc)),
     tap(data => q.logger.logINFO("GetAllDocs() data...", { data }))
   );
 }
@@ -162,15 +134,7 @@ export function CollectionQueryGetManyIds<T>(
     switchMap(collection =>
       combineLatest(ids.map(id => collection.doc(id).get()))
     ),
-    map(docSnaps =>
-      docSnaps.map(snap => {
-        const data = snap.data() || {};
-        return ({
-          ...data,
-          id: snap.id
-        } as any) as T;
-      })
-    )
+    map(docs => q.docArray2Data<T>(docs))
   );
 }
 
@@ -182,15 +146,7 @@ export function CollectionQueryGetManyIdsSnap<T>(
     switchMap(collection =>
       combineLatest(ids.map(id => documentSnap2Observable(collection.doc(id))))
     ),
-    map(docSnaps =>
-      docSnaps.map(snap => {
-        const data = snap.data() || {};
-        return ({
-          ...data,
-          id: snap.id
-        } as any) as T;
-      })
-    ),
+    map(docs => q.docArray2Data<T>(docs)),
     tap(data => q.logger.logINFO("GetAllDocs() data...", { data }))
   );
 }

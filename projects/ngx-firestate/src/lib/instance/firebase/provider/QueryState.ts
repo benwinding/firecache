@@ -17,9 +17,11 @@ export class QueryState<TState extends FirebaseClientStateObject>
   implements IQueryState {
   public overridenState: FirebaseClientStateObject;
   public logger: LevelLogger;
-  
+
   private subcollectionState: SubCollectionState;
   private callbacks: ActionFunction<any, any>[] = [];
+  private _disableIdInclusion: boolean;
+  private _disableUpdateFields: boolean;
 
   constructor(
     public appState$: FirebaseClientStateManager<TState>,
@@ -58,13 +60,35 @@ export class QueryState<TState extends FirebaseClientStateObject>
   }
 
   public setUpdatedProps(obj: any, updatedUid: string) {
+    if (this._disableUpdateFields) {
+      return;
+    }
     obj["updated_by"] = updatedUid;
     obj["updated_at"] = new Date();
   }
 
   public setCreatedProps(obj: any, updatedUid: string) {
+    if (this._disableUpdateFields) {
+      return;
+    }
     obj["created_by"] = updatedUid;
     obj["created_at"] = new Date();
+  }
+
+  doc2Data<T>(doc: firebase.firestore.DocumentData): T {
+    const dataSafe = doc.data() || {};
+    if (this._disableIdInclusion) {
+      return dataSafe; 
+    }
+    const data = ({
+      ...dataSafe,
+      id: doc.id
+    } as any) as T;
+    return data;
+  }
+
+  docArray2Data<T>(docs: firebase.firestore.DocumentData[]): T[] {
+    return docs.map(doc => this.doc2Data<T>(doc)) as T[];
   }
 
   public refCollection(): Observable<firebase.firestore.CollectionReference> {
@@ -100,5 +124,11 @@ export class QueryState<TState extends FirebaseClientStateObject>
   }
   public getRunAfters(): ActionFunction<any, any>[] {
     return this.callbacks;
+  }
+  public disableIdInclusion(): void {
+    this._disableIdInclusion = true;
+  }
+  public disableUpdateFields(): void {
+    this._disableUpdateFields = true;
   }
 }
