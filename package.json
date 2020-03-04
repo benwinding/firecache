@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --port 4555",
-    "build": "ng build --project=ngx-firestate && ./README.md ./dist/ngx-firestate",
+    "build": "ng build --project=ngx-firestate && cp ./README.md ./dist/ngx-firestate",
     "watch-lib": "ng build --project=ngx-firestate --watch",
     "build-demo": "ng build --project=ngx-firestate-demo",
     "test": "echo not implemented yet!",
