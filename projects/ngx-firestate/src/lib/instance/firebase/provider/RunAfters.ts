@@ -12,7 +12,7 @@ export function RunAfterDoc(
   return (ref: RefDoc) => {
     const docPath = ref.path;
     const docId = ref.id;
-    runAfters(q, action, docPath, [docId]);
+    runAfters(q, action, docPath, [docId], 'DOC');
   };
 }
 
@@ -31,16 +31,19 @@ async function runAfters(
   q: QueryState<FirebaseClientStateObject>,
   action: ActionType,
   collectionPath: string,
-  ids: string[]
+  ids: string[],
+  type?: 'DOC'
 ): Promise<any> {
+  const isDoc = type === 'DOC';
   const callbacks = q.getRunAfters();
   const u = await q.user();
   try {
     const actionArg = {
       user_id: u.uid,
       user_email: u.email,
-      resource_collection_template: collectionPath,
-      resource_path_collection_resolved: q.pathTemplate,
+      resource_type: isDoc ? 'Document' : 'Collection',
+      resource_path_template: q.pathTemplate,
+      resource_path_resolved: collectionPath,
       action: action,
       resource_ids: ids
     } as ActionFunctionArguments<any, any>;

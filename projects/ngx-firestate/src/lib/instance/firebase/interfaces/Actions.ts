@@ -12,10 +12,10 @@ export interface ActionFunctionArguments<CollectionPath, DocumentPath> {
   user_id?: string;
   user_email?: string;
 
-  resource_collection_template: CollectionPath;
-  resource_document_template: DocumentPath;
+  resource_type: 'Document' | 'Collection';
+  resource_path_template: CollectionPath | DocumentPath;
+  resource_path_resolved: string;
 
-  resource_path_collection_resolved: string;
   action: ActionType;
   resource_ids?: string[];
 }
