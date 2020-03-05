@@ -7,6 +7,6 @@
   "repository": "https://github.com/benwinding/ngx-firestate",
   "homepage": "https://github.com/benwinding/ngx-firestate",
   "peerDependencies": {
-    "firebase": "7.8.x"
+    "firebase": "7.x"
   }
 } 
