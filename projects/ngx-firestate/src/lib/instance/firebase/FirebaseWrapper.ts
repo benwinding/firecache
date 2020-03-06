@@ -46,7 +46,7 @@ export class FirebaseWrapper<
     try {
       await this.initUserFromBrowser();
     } catch (error) {
-      console.error(error)
+      console.warn(error)
     }
     this.clientState.InitializationDone();
   }
