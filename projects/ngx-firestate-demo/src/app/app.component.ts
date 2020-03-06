@@ -15,6 +15,8 @@ import { LogLevel } from "projects/ngx-firestate/src/lib/instance/firebase/inter
     </button>
     Status: {{ loggedInStatus$ | async }}
 
+    <test-observables></test-observables>
+
     <h1>Collection</h1>
     <pre *ngIf="collection$">
     {{ collection$ | async | json }}

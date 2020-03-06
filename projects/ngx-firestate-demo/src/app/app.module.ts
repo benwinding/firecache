@@ -6,9 +6,10 @@ import { AppComponent } from './app.component';
 import { CommonModule } from '@angular/common';
 import { AppRoutingModule } from './app.routing';
 import { FireStateConfigModule } from './firestate-config.module';
+import { TestObservablesComponent } from './test-observables';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, TestObservablesComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

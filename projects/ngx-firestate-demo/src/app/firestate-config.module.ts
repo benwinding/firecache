@@ -10,7 +10,7 @@ export enum CollectionPaths {
   Doc2 = "/accounts"
 }
 export interface MyState extends FirebaseClientStateObject {
-
+  x: number;
 }
 const App1 = new InjectionToken<FirebaseClient<CollectionPaths, DocumentPaths, MyState>>('App1');
 const firebaseConfig1 = environment.firebaseConfig;
@@ -30,11 +30,11 @@ export class FirestateFacade {
   providers: [
     {
       provide: App1,
-      useValue: new FirebaseClient<CollectionPaths, DocumentPaths, MyState>(firebaseConfig1)
+      useValue: new FirebaseClient<CollectionPaths, DocumentPaths, MyState>(firebaseConfig1, 2)
     },
     FirestateFacade
   ]
 })
 export class FireStateConfigModule {
-  
+
 }
