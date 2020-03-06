@@ -24,7 +24,6 @@ export function resolvePathVariables(q: IQueryState): Observable<string> {
   const overridenState = inputOverridenState || {};
   const $rootStateOverriden = $rootState.pipe(
     map(rootState => {
-      console.log("state updated", { rootState });
       return {
         ...rootState,
         ...overridenState
