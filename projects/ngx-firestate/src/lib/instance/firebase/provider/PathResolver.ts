@@ -13,9 +13,6 @@ export function resolvePathVariables(q: IQueryState): Observable<string> {
   const pathTemplate = q.pathTemplate;
   const inputOverridenState = q.overridenState;
 
-  $rootState.subscribe(state => {
-  });
-
   q.logger.logINFO("resolvePathVariables() query state", { q });
 
   if (!pathTemplate) {
