@@ -23,6 +23,7 @@ export class FirestateFacade {
     @Inject(App1) public app1: FirebaseClient<CollectionPaths, DocumentPaths, MyState>,
   ) {
     this.fire = this.app1.db;
+    this.app1.PatchRootState({x: 1});
   }
 }
 

@@ -1,5 +1,5 @@
 import { Observable } from "rxjs";
-import { map, switchMap } from "rxjs/operators";
+import { map, switchMap, take } from "rxjs/operators";
 import { documentSnap2Observable } from "./firebase-helpers";
 import { QueryState } from "./QueryState";
 import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
@@ -8,6 +8,7 @@ export function DocumentQueryGetDoc<T>(
   q: QueryState<FirebaseClientStateObject>
 ): Observable<T> {
   return q.refDocument().pipe(
+    take(1),
     switchMap(doc => doc.get()),
     map(doc => q.doc2Data<T>(doc))
   );

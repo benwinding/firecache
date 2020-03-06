@@ -1,4 +1,4 @@
-import { tap, map, switchMap, catchError } from "rxjs/operators";
+import { tap, map, switchMap, catchError, take } from "rxjs/operators";
 import {
   collectionSnap2Observable,
   documentSnap2Observable
@@ -52,6 +52,7 @@ export function CollectionQueryGetAllDocs<T>(
   whereQuery?: QueryFn
 ): Observable<T[]> {
   return q.refCollection().pipe(
+    take(1),
     tap(collection =>
       q.logger.logINFO("GetAllDocsForce() collection", {
         path: collection.path
@@ -91,6 +92,7 @@ export function CollectionQueryGetId<T>(
   id: string
 ): Observable<T> {
   return q.refCollection().pipe(
+    take(1),
     tap(collection =>
       q.logger.logINFO("GetId() collection", { path: collection.path })
     ),
@@ -131,6 +133,7 @@ export function CollectionQueryGetManyIds<T>(
   ids: string[]
 ): Observable<T[]> {
   return q.refCollection().pipe(
+    take(1),
     switchMap(collection =>
       combineLatest(ids.map(id => collection.doc(id).get()))
     ),

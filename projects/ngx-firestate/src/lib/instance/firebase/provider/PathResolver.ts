@@ -9,9 +9,12 @@ function blank$(overridenState: FirebaseClientStateObject) {
 
 // RESOLVES: projectId, accountId, userId, hostId
 export function resolvePathVariables(q: IQueryState): Observable<string> {
-  const appState = q.appState$;
+  const $rootState = q.appState$.$all;
   const pathTemplate = q.pathTemplate;
   const inputOverridenState = q.overridenState;
+
+  $rootState.subscribe(state => {
+  });
 
   q.logger.logINFO("resolvePathVariables() query state", { q });
 
@@ -21,20 +24,21 @@ export function resolvePathVariables(q: IQueryState): Observable<string> {
     });
     throw new Error("pathTemplate was not found: " + pathTemplate);
   }
-  const $overridenState = blank$(inputOverridenState || {});
-  const $rootState = combineLatest([$overridenState, appState.$all]).pipe(
-    map(([overriden, all]) => {
+  const overridenState = inputOverridenState || {};
+  const $rootStateOverriden = $rootState.pipe(
+    map(rootState => {
+      console.log("state updated", { rootState });
       return {
-        ...all,
-        ...overriden
+        ...rootState,
+        ...overridenState
       } as FirebaseClientStateObject;
     })
   );
 
   const stopSignal$ = new Subject();
 
-  return combineLatest([$rootState]).pipe(
-    map(([rootState]) => {
+  return $rootStateOverriden.pipe(
+    map(rootState => {
       const evalTemplate = "`" + pathTemplate + "`";
       let rootStateDeclarations: string;
       let pathResolved: string;
@@ -63,7 +67,7 @@ export function resolvePathVariables(q: IQueryState): Observable<string> {
 
 function object2constStatements(rootState: {}) {
   const constStatements = Object.keys(rootState || {})
-    .filter(k => typeof rootState[k] === "string")
+    .filter(k => typeof rootState[k] !== "object")
     .map(k => {
       const value = rootState[k];
       return `var ${k} = "${value}";`;

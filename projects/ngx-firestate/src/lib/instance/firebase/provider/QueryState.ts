@@ -78,7 +78,7 @@ export class QueryState<TState extends FirebaseClientStateObject>
   doc2Data<T>(doc: firebase.firestore.DocumentData): T {
     const dataSafe = doc.data() || {};
     if (this._disableIdInclusion) {
-      return dataSafe; 
+      return dataSafe;
     }
     const data = ({
       ...dataSafe,
@@ -92,31 +92,27 @@ export class QueryState<TState extends FirebaseClientStateObject>
   }
 
   public refCollection(): Observable<firebase.firestore.CollectionReference> {
-    return resolvePathVariables(this)
-      .pipe(
-        tap(collectionPath =>
-          this.logger.logINFO("refCollection() resolved document path", {
-            collectionPath
-          })
-        ),
-        map(collectionPath => this.app.firestore().collection(collectionPath)),
-        map(c => c as firebase.firestore.CollectionReference)
-      )
-      .pipe(take(1));
+    return resolvePathVariables(this).pipe(
+      tap(collectionPath =>
+        this.logger.logINFO("refCollection() resolved document path", {
+          collectionPath
+        })
+      ),
+      map(collectionPath => this.app.firestore().collection(collectionPath)),
+      map(c => c as firebase.firestore.CollectionReference)
+    );
   }
 
   public refDocument(): Observable<firebase.firestore.DocumentReference> {
-    return resolvePathVariables(this)
-      .pipe(
-        tap(documentPath =>
-          this.logger.logINFO("refDocument() resolved document path", {
-            documentPath
-          })
-        ),
-        map(collectionPath => this.app.firestore().doc(collectionPath)),
-        map(c => c as firebase.firestore.DocumentReference)
-      )
-      .pipe(take(1));
+    return resolvePathVariables(this).pipe(
+      tap(documentPath =>
+        this.logger.logINFO("refDocument() resolved document path", {
+          documentPath
+        })
+      ),
+      map(collectionPath => this.app.firestore().doc(collectionPath)),
+      map(c => c as firebase.firestore.DocumentReference)
+    );
   }
 
   public addRunAfter(callback: ActionFunction<any, any>): void {
