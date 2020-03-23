@@ -10,7 +10,12 @@ export function CollectionCommandUpdate<T>(
   obj: T,
   isMerged?: boolean
 ): Promise<any> {
-  q.logger.logDEBUG('CollectionCommandUpdate', {q, id, obj, isMerged});
+  q.logger.logDEBUG(">> start, CollectionCommandUpdate()", {
+    q,
+    id,
+    obj,
+    isMerged
+  });
   return q
     .refCollection()
     .pipe(
@@ -18,7 +23,8 @@ export function CollectionCommandUpdate<T>(
       switchMap(collection => {
         q.setUpdatedProps(obj, q.uid);
         return collection.doc(id).set(obj, { merge: isMerged });
-      })
+      }),
+      tap(data => q.logger.logINFO(">> end, data", { data }))
     )
     .pipe(take(1))
     .toPromise();
@@ -33,7 +39,13 @@ export function CollectionCommandUpdateMany(
 ): Promise<any> {
   const uid = q.uid;
   const ids = objs.map(o => o.id);
-  q.logger.logDEBUG('CollectionCommandUpdateMany', {uid, ids, q, isMerged, objs});
+  q.logger.logDEBUG(">> start, CollectionCommandUpdateMany()", {
+    uid,
+    ids,
+    q,
+    isMerged,
+    objs
+  });
   return q
     .refCollection()
     .pipe(
@@ -52,7 +64,8 @@ export function CollectionCommandUpdateMany(
             return batch.commit();
           })
         );
-      })
+      }),
+      tap(data => q.logger.logINFO(">> end, data", { data }))
     )
     .pipe(take(1))
     .toPromise();
@@ -63,7 +76,7 @@ export function CollectionCommandAdd<T>(
   obj: T
 ): Promise<firebase.firestore.DocumentReference> {
   const uid = q.uid;
-  q.logger.logDEBUG('CollectionCommandAdd', {uid, q, obj});
+  q.logger.logDEBUG(">> start, CollectionCommandAdd()", { uid, q, obj });
   q.setCreatedProps(obj, uid);
   q.setUpdatedProps(obj, uid);
   return q
@@ -81,7 +94,8 @@ export function CollectionCommandAdd<T>(
           });
           throw new Error(error);
         }
-      })
+      }),
+      tap(data => q.logger.logINFO(">> end, data", { data }))
     )
     .pipe(take(1))
     .toPromise();
@@ -92,7 +106,7 @@ export function CollectionCommandAddMany(
   objs: {}[]
 ): Promise<void> {
   const uid = q.uid;
-  q.logger.logDEBUG('CollectionCommandAddMany', {uid, q, objs});
+  q.logger.logDEBUG(">> start, CollectionCommandAddMany()", { uid, q, objs });
   return q
     .refCollection()
     .pipe(
@@ -113,7 +127,8 @@ export function CollectionCommandAddMany(
             return batch.commit();
           })
         );
-      })
+      }),
+      tap(data => q.logger.logINFO(">> end, data", { data }))
     )
     .pipe(take(1))
     .toPromise();
@@ -123,12 +138,13 @@ export function CollectionCommandDeleteId(
   q: QueryState<FirebaseClientStateObject>,
   id: string
 ): Promise<void> {
-  q.logger.logDEBUG('CollectionCommandDeleteId', {q, id});
+  q.logger.logDEBUG(">> start, CollectionCommandDeleteId()", { q, id });
   return q
     .refCollection()
     .pipe(
       tap(RunAfterCollection(q, "removed", [id])),
-      switchMap(collection => collection.doc(id).delete())
+      switchMap(collection => collection.doc(id).delete()),
+      tap(data => q.logger.logINFO(">> end, data", { data }))
     )
     .pipe(take(1))
     .toPromise();
@@ -138,7 +154,7 @@ export function CollectionCommandDeleteIds(
   q: QueryState<FirebaseClientStateObject>,
   ids: string[]
 ): Promise<any> {
-  q.logger.logDEBUG('CollectionCommandDeleteIds', {q, ids});
+  q.logger.logDEBUG(">> start, CollectionCommandDeleteIds()", { q, ids });
   return q
     .refCollection()
     .pipe(
@@ -153,7 +169,8 @@ export function CollectionCommandDeleteIds(
           batch.delete(docRef);
         });
         return batch.commit();
-      })
+      }),
+      tap(data => q.logger.logINFO(">> end, data", { data }))
     )
     .pipe(take(1))
     .toPromise();
