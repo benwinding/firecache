@@ -14,11 +14,6 @@ export function CollectionQueryGetAllDocsSnap<T>(
 ): Observable<T[]> {
   q.logger.logDEBUG("CollectionQueryGetAllDocsSnap", { q, whereQuery });
   return q.refCollection().pipe(
-    tap(collection =>
-      q.logger.logINFO("CollectionQueryGetAllDocsSnap() collection", {
-        path: collection.path
-      })
-    ),
     map(collection => {
       if (whereQuery) {
         q.logger.logINFO("CollectionQueryGetAllDocsSnap() whereQuery", { whereQuery });
@@ -57,7 +52,6 @@ export function CollectionQueryGetAllDocs<T>(
     take(1),
     map(collection => {
       if (whereQuery) {
-        q.logger.logINFO("CollectionQueryGetAllDocs() whereQuery", { whereQuery });
         return whereQuery(collection);
       }
       return collection;
@@ -75,7 +69,7 @@ export function CollectionQueryGetAllDocs<T>(
       }
     }),
     tap(docSnap =>
-      q.logger.logINFO("CollectionQueryGetAllDocs() after snapshotChanges...", {
+      q.logger.logINFO("CollectionQueryGetAllDocs() after get()...", {
         "docSnap?": docSnap
       })
     ),
@@ -94,7 +88,7 @@ export function CollectionQueryGetId<T>(
     map(collection => collection.doc(id)),
     switchMap(doc => doc.get()),
     tap(docSnap =>
-      q.logger.logINFO("CollectionQueryGetId() after fetching...", {
+      q.logger.logINFO("CollectionQueryGetId() after get()...", {
         "pathExists?": docSnap.exists
       })
     ),
@@ -112,7 +106,7 @@ export function CollectionQueryGetIdSnap<T>(
     map(collection => collection.doc(id)),
     switchMap(doc => documentSnap2Observable(doc)),
     tap(docSnap =>
-      q.logger.logINFO("CollectionQueryGetIdSnap after fetching...", {
+      q.logger.logINFO("CollectionQueryGetIdSnap after snapshotChanges...", {
         "docSnapExists?": docSnap.exists
       })
     ),
@@ -130,6 +124,11 @@ export function CollectionQueryGetManyIds<T>(
     take(1),
     switchMap(collection =>
       combineLatest(ids.map(id => collection.doc(id).get()))
+    ),
+    tap(docSnap =>
+      q.logger.logINFO("CollectionQueryGetIdSnap after get() many...", {
+        "docSnapExists?": docSnap.exists
+      })
     ),
     map(docs => q.docArray2Data<T>(docs)),
     tap(data =>
