@@ -12,7 +12,7 @@ export class LevelLogger {
   }
 
   public get logINFO() {
-    if (this.level <= 1) {
+    if (this.level < 1) {
       return blankLogger;
     }
     const boundLogFn: (...any) => void = console.log.bind(
@@ -23,7 +23,7 @@ export class LevelLogger {
   }
 
   public get logDEBUG() {
-    if (this.level <= 2) {
+    if (this.level < 2) {
       return blankLogger;
     }
     const boundLogFn: (...any) => void = console.log.bind(
@@ -34,7 +34,7 @@ export class LevelLogger {
   }
 
   public get logERROR() {
-    if (this.level <= 1) {
+    if (this.level < 1) {
       return blankLogger;
     }
     const boundLogFn: (...any) => void = console.error.bind(

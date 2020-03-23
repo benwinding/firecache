@@ -137,4 +137,7 @@ export class QueryState<TState extends FirebaseClientStateObject>
   public disableUpdateFields(): void {
     this._disableUpdateFields = true;
   }
+  public MakeLogger(contextTitle: string) {
+    return new LevelLogger(contextTitle, this.logLevel);
+  }
 }
