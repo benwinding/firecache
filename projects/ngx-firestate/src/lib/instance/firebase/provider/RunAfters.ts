@@ -29,7 +29,7 @@ export function RunAfterCollection(
 
 async function runAfters(
   q: QueryState<FirebaseClientStateObject>,
-  action: ActionType,
+  actionType: ActionType,
   collectionPath: string,
   ids: string[],
   type?: "DOC"
@@ -37,6 +37,7 @@ async function runAfters(
   const isDoc = type === "DOC";
   const callbacks = q.getRunAfters();
   const u = await q.user();
+  const idsSafe = ids || [];
   try {
     const actionArg = {
       user_id: u.uid,
@@ -44,13 +45,13 @@ async function runAfters(
       resource_type: isDoc ? "Document" : "Collection",
       resource_path_template: q.pathTemplate,
       resource_path_resolved: collectionPath,
-      action: action,
-      resource_ids: ids
+      action: actionType,
+      resource_ids: idsSafe
     } as ActionFunctionArguments<any, any>;
     q.logger.logDEBUG("runAfters", {
       actionArg,
       q,
-      action,
+      action: actionType,
       collectionPath,
       ids,
       type
