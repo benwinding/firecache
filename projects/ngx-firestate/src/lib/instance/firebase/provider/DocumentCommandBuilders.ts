@@ -8,6 +8,7 @@ export function DocumentCommandUpdate(
   obj: {},
   isMerged: boolean
 ): Promise<any> {
+  q.logger.logDEBUG('CollectionCommandAdd', {q,  obj, isMerged});
   return q.refDocument()
     .pipe(
       tap(RunAfterDoc(q, "edited")),

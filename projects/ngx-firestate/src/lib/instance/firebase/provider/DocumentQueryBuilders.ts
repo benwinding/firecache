@@ -7,6 +7,7 @@ import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
 export function DocumentQueryGetDoc<T>(
   q: QueryState<FirebaseClientStateObject>
 ): Observable<T> {
+  q.logger.logDEBUG('DocumentQueryGetDoc', {q});
   return q.refDocument().pipe(
     take(1),
     switchMap(doc => doc.get()),
@@ -17,6 +18,7 @@ export function DocumentQueryGetDoc<T>(
 export function DocumentQueryGetDocSnap<T>(
   q: QueryState<FirebaseClientStateObject>
 ): Observable<T> {
+  q.logger.logDEBUG('DocumentQueryGetDocSnap', {q});
   return q.refDocument().pipe(
     switchMap(doc => documentSnap2Observable(doc)),
     map(doc => q.doc2Data<T>(doc))

@@ -99,6 +99,11 @@ export class QueryState<TState extends FirebaseClientStateObject>
         })
       ),
       map(collectionPath => this.app.firestore().collection(collectionPath)),
+      tap(collection =>
+        this.logger.logINFO("refCollection() resolved collection", {
+          collection
+        })
+      ),
       map(c => c as firebase.firestore.CollectionReference)
     );
   }
@@ -110,7 +115,12 @@ export class QueryState<TState extends FirebaseClientStateObject>
           documentPath
         })
       ),
-      map(collectionPath => this.app.firestore().doc(collectionPath)),
+      map(documentPath => this.app.firestore().doc(documentPath)),
+      tap(doc =>
+        this.logger.logINFO("refDocument() resolved document", {
+          doc
+        })
+      ),
       map(c => c as firebase.firestore.DocumentReference)
     );
   }

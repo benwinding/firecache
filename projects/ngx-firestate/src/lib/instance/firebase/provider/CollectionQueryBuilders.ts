@@ -12,15 +12,16 @@ export function CollectionQueryGetAllDocsSnap<T>(
   q: QueryState<FirebaseClientStateObject>,
   whereQuery?: QueryFn
 ): Observable<T[]> {
+  q.logger.logDEBUG("CollectionQueryGetAllDocsSnap", { q, whereQuery });
   return q.refCollection().pipe(
     tap(collection =>
-      q.logger.logINFO("GetAllDocs() collection", {
+      q.logger.logINFO("CollectionQueryGetAllDocsSnap() collection", {
         path: collection.path
       })
     ),
     map(collection => {
       if (whereQuery) {
-        q.logger.logINFO("GetAllDocs() whereQuery", { whereQuery });
+        q.logger.logINFO("CollectionQueryGetAllDocsSnap() whereQuery", { whereQuery });
         return whereQuery(collection);
       }
       return collection;
@@ -29,7 +30,7 @@ export function CollectionQueryGetAllDocsSnap<T>(
       collectionSnap2Observable(collection).pipe(
         catchError(error => {
           q.logger.logERROR(
-            "GetAllDocs: error in switchMap(collection => ...",
+            "CollectionQueryGetAllDocsSnap: error in switchMap(collection => ...",
             error
           );
           return of({ docs: [] as any });
@@ -37,13 +38,13 @@ export function CollectionQueryGetAllDocsSnap<T>(
       )
     ),
     tap(docSnap =>
-      q.logger.logINFO("GetAllDocs() after snapshotChanges...", {
+      q.logger.logINFO("CollectionQueryGetAllDocsSnap() after snapshotChanges...", {
         "docSnap?": docSnap
       })
     ),
     map(docChanges => docChanges.docs),
     map(docs => docs.map(doc => q.doc2Data<T>(doc)) as T[]),
-    tap(data => q.logger.logINFO("GetAllDocs() collection", { data }))
+    tap(data => q.logger.logINFO("CollectionQueryGetAllDocsSnap() collection", { data }))
   );
 }
 
@@ -51,16 +52,12 @@ export function CollectionQueryGetAllDocs<T>(
   q: QueryState<FirebaseClientStateObject>,
   whereQuery?: QueryFn
 ): Observable<T[]> {
+  q.logger.logDEBUG("CollectionQueryGetAllDocs", { q, whereQuery });
   return q.refCollection().pipe(
     take(1),
-    tap(collection =>
-      q.logger.logINFO("GetAllDocsForce() collection", {
-        path: collection.path
-      })
-    ),
     map(collection => {
       if (whereQuery) {
-        q.logger.logINFO("GetAllDocsForce() whereQuery", { whereQuery });
+        q.logger.logINFO("CollectionQueryGetAllDocs() whereQuery", { whereQuery });
         return whereQuery(collection);
       }
       return collection;
@@ -71,19 +68,19 @@ export function CollectionQueryGetAllDocs<T>(
         return res.docs;
       } catch (error) {
         q.logger.logERROR(
-          "GetAllDocsForce: error in switchMap(collection => ...",
+          "CollectionQueryGetAllDocs: error in switchMap(collection => ...",
           error
         );
         return [];
       }
     }),
     tap(docSnap =>
-      q.logger.logINFO("GetAllDocsForce() after snapshotChanges...", {
+      q.logger.logINFO("CollectionQueryGetAllDocs() after snapshotChanges...", {
         "docSnap?": docSnap
       })
     ),
     map(docs => q.docArray2Data<T>(docs)),
-    tap(data => q.logger.logINFO("GetAllDocsForce() collection", { data }))
+    tap(data => q.logger.logINFO("CollectionQueryGetAllDocs() collection", { data }))
   );
 }
 
@@ -91,20 +88,18 @@ export function CollectionQueryGetId<T>(
   q: QueryState<FirebaseClientStateObject>,
   id: string
 ): Observable<T> {
+  q.logger.logDEBUG("CollectionQueryGetId", { q, id });
   return q.refCollection().pipe(
     take(1),
-    tap(collection =>
-      q.logger.logINFO("GetId() collection", { path: collection.path })
-    ),
     map(collection => collection.doc(id)),
     switchMap(doc => doc.get()),
     tap(docSnap =>
-      q.logger.logINFO("GetId() after fetching...", {
+      q.logger.logINFO("CollectionQueryGetId() after fetching...", {
         "pathExists?": docSnap.exists
       })
     ),
     map(doc => q.doc2Data<T>(doc)),
-    tap(data => q.logger.logINFO("GetAllDocs() data...", { data }))
+    tap(data => q.logger.logINFO("CollectionQueryGetId() data...", { data }))
   );
 }
 
@@ -112,19 +107,17 @@ export function CollectionQueryGetIdSnap<T>(
   q: QueryState<FirebaseClientStateObject>,
   id: string
 ): Observable<T> {
+  q.logger.logDEBUG("CollectionQueryGetIdSnap", { q, id });
   return q.refCollection().pipe(
-    tap(collection =>
-      q.logger.logINFO("GetId() collection", { path: collection.path })
-    ),
     map(collection => collection.doc(id)),
     switchMap(doc => documentSnap2Observable(doc)),
     tap(docSnap =>
-      q.logger.logINFO("GetId() after fetching...", {
-        "pathExists?": docSnap.exists
+      q.logger.logINFO("CollectionQueryGetIdSnap after fetching...", {
+        "docSnapExists?": docSnap.exists
       })
     ),
     map(doc => q.doc2Data<T>(doc)),
-    tap(data => q.logger.logINFO("GetAllDocs() data...", { data }))
+    tap(data => q.logger.logINFO("CollectionQueryGetIdSnap() data...", { data }))
   );
 }
 
@@ -132,12 +125,16 @@ export function CollectionQueryGetManyIds<T>(
   q: QueryState<FirebaseClientStateObject>,
   ids: string[]
 ): Observable<T[]> {
+  q.logger.logDEBUG("CollectionQueryGetManyIds", { q, ids });
   return q.refCollection().pipe(
     take(1),
     switchMap(collection =>
       combineLatest(ids.map(id => collection.doc(id).get()))
     ),
-    map(docs => q.docArray2Data<T>(docs))
+    map(docs => q.docArray2Data<T>(docs)),
+    tap(data =>
+      q.logger.logINFO("CollectionQueryGetManyIds() data...", { data })
+    )
   );
 }
 
@@ -145,11 +142,14 @@ export function CollectionQueryGetManyIdsSnap<T>(
   q: QueryState<FirebaseClientStateObject>,
   ids: string[]
 ): Observable<T[]> {
+  q.logger.logDEBUG("CollectionQueryGetManyIdsSnap", { q, ids });
   return q.refCollection().pipe(
     switchMap(collection =>
       combineLatest(ids.map(id => documentSnap2Observable(collection.doc(id))))
     ),
     map(docs => q.docArray2Data<T>(docs)),
-    tap(data => q.logger.logINFO("GetAllDocs() data...", { data }))
+    tap(data =>
+      q.logger.logINFO("CollectionQueryGetManyIdsSnap() data...", { data })
+    )
   );
 }

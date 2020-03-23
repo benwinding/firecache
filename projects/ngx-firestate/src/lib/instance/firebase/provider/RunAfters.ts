@@ -12,7 +12,7 @@ export function RunAfterDoc(
   return (ref: RefDoc) => {
     const docPath = ref.path;
     const docId = ref.id;
-    runAfters(q, action, docPath, [docId], 'DOC');
+    runAfters(q, action, docPath, [docId], "DOC");
   };
 }
 
@@ -32,21 +32,29 @@ async function runAfters(
   action: ActionType,
   collectionPath: string,
   ids: string[],
-  type?: 'DOC'
+  type?: "DOC"
 ): Promise<any> {
-  const isDoc = type === 'DOC';
+  const isDoc = type === "DOC";
   const callbacks = q.getRunAfters();
   const u = await q.user();
   try {
     const actionArg = {
       user_id: u.uid,
       user_email: u.email,
-      resource_type: isDoc ? 'Document' : 'Collection',
+      resource_type: isDoc ? "Document" : "Collection",
       resource_path_template: q.pathTemplate,
       resource_path_resolved: collectionPath,
       action: action,
       resource_ids: ids
     } as ActionFunctionArguments<any, any>;
+    q.logger.logDEBUG("runAfters", {
+      actionArg,
+      q,
+      action,
+      collectionPath,
+      ids,
+      type
+    });
     await Promise.all(
       callbacks.map(async cb => {
         return cb(actionArg);

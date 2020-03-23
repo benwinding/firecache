@@ -10,6 +10,7 @@ export function CollectionCommandUpdate<T>(
   obj: T,
   isMerged?: boolean
 ): Promise<any> {
+  q.logger.logDEBUG('CollectionCommandUpdate', {q, id, obj, isMerged});
   return q
     .refCollection()
     .pipe(
@@ -32,6 +33,7 @@ export function CollectionCommandUpdateMany(
 ): Promise<any> {
   const uid = q.uid;
   const ids = objs.map(o => o.id);
+  q.logger.logDEBUG('CollectionCommandUpdateMany', {uid, ids, q, isMerged, objs});
   return q
     .refCollection()
     .pipe(
@@ -61,6 +63,7 @@ export function CollectionCommandAdd<T>(
   obj: T
 ): Promise<firebase.firestore.DocumentReference> {
   const uid = q.uid;
+  q.logger.logDEBUG('CollectionCommandAdd', {uid, q, obj});
   q.setCreatedProps(obj, uid);
   q.setUpdatedProps(obj, uid);
   return q
@@ -89,6 +92,7 @@ export function CollectionCommandAddMany(
   objs: {}[]
 ): Promise<void> {
   const uid = q.uid;
+  q.logger.logDEBUG('CollectionCommandAddMany', {uid, q, objs});
   return q
     .refCollection()
     .pipe(
@@ -119,6 +123,7 @@ export function CollectionCommandDeleteId(
   q: QueryState<FirebaseClientStateObject>,
   id: string
 ): Promise<void> {
+  q.logger.logDEBUG('CollectionCommandDeleteId', {q, id});
   return q
     .refCollection()
     .pipe(
@@ -133,6 +138,7 @@ export function CollectionCommandDeleteIds(
   q: QueryState<FirebaseClientStateObject>,
   ids: string[]
 ): Promise<any> {
+  q.logger.logDEBUG('CollectionCommandDeleteIds', {q, ids});
   return q
     .refCollection()
     .pipe(
