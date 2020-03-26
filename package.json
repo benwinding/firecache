@@ -11,6 +11,7 @@
     "watch": "rimraf dist && tsc -w",
     "build": "rimraf dist && tsc",
     "test": "jest",
+    "test:badges": "jest-coverage-badges",
     "clean": "rimraf dist"
   },
   "peerDependencies": {
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@types/jest": "^25.1.4",
     "jest": "^25.2.1",
+    "jest-coverage-badges": "^1.1.2",
     "rimraf": "^3.0.2",
     "rxjs": "^6.5.4",
     "ts-jest": "^25.2.1",

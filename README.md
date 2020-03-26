@@ -5,6 +5,7 @@
 [![License](https://img.shields.io/npm/l/firecache.svg)](https://github.com/benwinding/firecache/blob/master/LICENSE) 
 [![Downloads/week](https://img.shields.io/npm/dm/firecache.svg)](https://www.npmjs.com/package/firecache) 
 [![Github Issues](https://img.shields.io/github/issues/benwinding/firecache.svg)](https://github.com/benwinding/firecache)
+[![Code Coverage](coverage/badge-lines.svg)](./coverage/coverage-summary.json)
 <!-- [END badges] -->
 
 A client state-management system for firebase.

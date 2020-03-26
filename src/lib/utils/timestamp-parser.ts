@@ -9,12 +9,12 @@ export function parseAllDatesDoc<T>(obj: T) {
   });
 }
 
-function recusivelyCheckObjectValue(input: any) {
+export function recusivelyCheckObjectValue(input: any) {
   const isFalsey = !input;
   if (isFalsey) {
     return input;
   }
-  const isString = typeof input === 'string';
+  const isString = typeof input === 'string' || typeof input === 'number';
   if (isString) {
     return input;
   }

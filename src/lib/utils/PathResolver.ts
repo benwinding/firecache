@@ -1,14 +1,15 @@
 import { Observable, Subject } from "rxjs";
 import { map, takeUntil } from "rxjs/operators";
 import { IQueryState, FirebaseClientStateObject } from "../interfaces";
+import { Object2constStatements } from './Object2constStatements';
 
 // RESOLVES: projectId, accountId, userId, hostId
-export function resolvePathVariables(q: IQueryState): Observable<string> {
+export function ResolvePathVariables(q: IQueryState): Observable<string> {
   const $rootState = q.appState$.$all;
   const pathTemplate = q.pathTemplate;
   const inputOverridenState = q.overridenState;
 
-  q.logger.logINFO("resolvePathVariables() query state", { q });
+  q.logger.logINFO("ResolvePathVariables() query state", { q });
 
   if (!pathTemplate) {
     console.error("pathTemplate was not found: ", {
@@ -34,7 +35,7 @@ export function resolvePathVariables(q: IQueryState): Observable<string> {
       let rootStateDeclarations: string;
       let pathResolved: string;
       try {
-        rootStateDeclarations = object2constStatements(rootState);
+        rootStateDeclarations = Object2constStatements(rootState);
         // tslint:disable-next-line: no-eval
         pathResolved = eval(rootStateDeclarations + ";" + evalTemplate);
         return pathResolved;
@@ -54,17 +55,4 @@ export function resolvePathVariables(q: IQueryState): Observable<string> {
     }),
     takeUntil(stopSignal$)
   );
-}
-
-function object2constStatements(rootState: {}) {
-  const constStatements = Object.keys(rootState || {})
-    .filter(k => typeof rootState[k] !== "object")
-    .map(k => {
-      const value = rootState[k];
-      return `var ${k} = "${value}";`;
-    })
-    .reduce((prev, cur) => {
-      return prev + cur;
-    }, "");
-  return constStatements;
 }

@@ -9,7 +9,7 @@ import {
   LogLevel
 } from "../interfaces";
 import { Observable } from "rxjs";
-import { resolvePathVariables } from "./PathResolver";
+import { ResolvePathVariables } from "../utils";
 
 interface SubCollectionState {
   id: string;
@@ -123,7 +123,7 @@ export class QueryState<TState extends FirebaseClientStateObject>
   }
 
   public refCollection(): Observable<firebase.firestore.CollectionReference> {
-    return resolvePathVariables(this).pipe(
+    return ResolvePathVariables(this).pipe(
       tap(collectionPath =>
         this.logger.logINFO("refCollection() resolved document path", {
           collectionPath
@@ -140,7 +140,7 @@ export class QueryState<TState extends FirebaseClientStateObject>
   }
 
   public refDocument(): Observable<firebase.firestore.DocumentReference> {
-    return resolvePathVariables(this).pipe(
+    return ResolvePathVariables(this).pipe(
       tap(documentPath =>
         this.logger.logINFO("refDocument() resolved document path", {
           documentPath

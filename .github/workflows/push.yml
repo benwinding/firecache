@@ -23,6 +23,9 @@ jobs:
       run: npm run-script build
     - name: Test
       run: npm test
+    - name: Generate Coverage Badges
+      if: github.ref == 'refs/heads/master'
+      run: npm test:badges
     - name: Publish
       if: github.ref == 'refs/heads/master'
       uses: benwinding/merge-release@master
