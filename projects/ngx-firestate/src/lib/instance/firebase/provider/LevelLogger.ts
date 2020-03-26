@@ -35,7 +35,7 @@ export class LevelLogger {
 
   public get logERROR() {
     if (this.level < 1) {
-      return blankLogger;
+      // return blankLogger;
     }
     const boundLogFn: (...any) => void = console.error.bind(
       console,
