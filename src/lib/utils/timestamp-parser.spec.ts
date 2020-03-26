@@ -1,6 +1,18 @@
-import { parseAllDatesDoc } from "./timestamp-parser";
+import { parseAllDatesDoc, recusivelyCheckObjectValue } from "./timestamp-parser";
 
 describe("timestamp-parser tests", () => {
+  test("retains number", () => {
+    const doc = null;
+    parseAllDatesDoc(doc);
+    expect(doc).toBe(null);
+  });
+
+  test("retains falsey", () => {
+    const doc = { a: null };
+    parseAllDatesDoc(doc);
+    expect(doc.a).toBe(null);
+  });
+
   test("retains number", () => {
     const doc = { a: 1 };
     parseAllDatesDoc(doc);
@@ -43,6 +55,12 @@ describe("timestamp-parser tests", () => {
     const doc = { a: { c: [{ d: makeTimestamp() }] } };
     parseAllDatesDoc(doc);
     expect(doc.a.c[0].d).toBeInstanceOf(Date);
+  });
+
+  test("retains falsey", () => {
+    const doc = ['okay'];
+    recusivelyCheckObjectValue(doc);
+    expect(doc[0]).toBe('okay');
   });
 });
 

@@ -22,6 +22,10 @@ export function recusivelyCheckObjectValue(input: any) {
   if (isTimestamp) {
     return input.toDate();
   }
+  const isArray = Array.isArray(input);
+  if (isArray) {
+    return input.map(value => recusivelyCheckObjectValue(value));
+  }
   const isObject = typeof input === 'object';
   if (isObject) {
     Object.keys(input).map(key => {
@@ -29,9 +33,5 @@ export function recusivelyCheckObjectValue(input: any) {
       input[key] = recusivelyCheckObjectValue(value);
     });
     return input;
-  }
-  const isArray = Array.isArray(input);
-  if (isArray) {
-    return input.map(value => recusivelyCheckObjectValue(value));
   }
 }
