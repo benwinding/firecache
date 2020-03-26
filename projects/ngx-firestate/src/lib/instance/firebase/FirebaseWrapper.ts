@@ -10,8 +10,9 @@ import {
   MakeAuthstateObservable
 } from "./provider/firebase-helpers";
 import { take } from "rxjs/operators";
-import { FirebaseClientStateObject } from '../FirebaseClientStateObject';
-import { LevelLogger } from './provider/LevelLogger';
+import { FirebaseClientStateObject } from "../FirebaseClientStateObject";
+import { LevelLogger } from "./provider/LevelLogger";
+import { FireStateOptions } from "./interfaces/FireStateOptions";
 
 export class FirebaseWrapper<
   EnumPathTemplatesCollections,
@@ -22,22 +23,22 @@ export class FirebaseWrapper<
   public provider: FirestoreWrapper<
     EnumPathTemplatesCollections,
     EnumPathTemplatesDocuments,
-    TState 
+    TState
   >;
   private logger: LevelLogger;
 
   constructor(
     firebaseConfig: FirebaseConfigObject,
     private clientState: FirebaseClientStateManager<TState>,
-    logLevel: number
+    private options: FireStateOptions
   ) {
-    this.logger = new LevelLogger('FirebaseWrapper', logLevel)
+    this.logger = new LevelLogger("FirebaseWrapper", options.logLevel);
     this.app = GetApp(firebaseConfig);
     this.provider = new FirestoreWrapper<
       EnumPathTemplatesCollections,
       EnumPathTemplatesDocuments,
       TState
-    >(this.app, this.clientState);
+    >(this.app, this.clientState, this.options);
     this.initFirebaseFromCache().catch(e => console.error(e));
   }
 
@@ -46,7 +47,7 @@ export class FirebaseWrapper<
     try {
       await this.initUserFromBrowser();
     } catch (error) {
-      console.warn(error)
+      console.warn(error);
     }
     this.clientState.InitializationDone();
   }
@@ -56,10 +57,14 @@ export class FirebaseWrapper<
     const authState$ = MakeAuthstateObservable(this.app.auth());
     const user = await authState$.pipe(take(1)).toPromise();
     if (!user) {
-      this.logger.logINFO("initUserFromBrowser() could not log user in...", { user });
+      this.logger.logINFO("initUserFromBrowser() could not log user in...", {
+        user
+      });
       throw new Error("User is not previously logged in");
     }
-    this.logger.logINFO("initUserFromBrowser() user logged in from cache!", { user });
+    this.logger.logINFO("initUserFromBrowser() user logged in from cache!", {
+      user
+    });
     this.clientState.PatchRootState({ user: user } as TState);
   }
 
@@ -97,6 +102,6 @@ export class FirebaseWrapper<
       EnumPathTemplatesCollections,
       EnumPathTemplatesDocuments,
       TState
-    >(this.app, this.clientState);
+    >(this.app, this.clientState, this.options);
   }
 }

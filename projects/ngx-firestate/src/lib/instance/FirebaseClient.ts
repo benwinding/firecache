@@ -5,7 +5,8 @@ import { FirebaseConfigObject } from "./firebase/provider/firebase-helpers";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { FirebaseClientStateObject } from "./FirebaseClientStateObject";
-import { LevelLogger } from './firebase/provider/LevelLogger';
+import { LevelLogger } from "./firebase/provider/LevelLogger";
+import { FireStateOptions } from "./firebase/interfaces/FireStateOptions";
 
 export class FirebaseClient<
   EnumPathTemplatesCollections,
@@ -21,15 +22,19 @@ export class FirebaseClient<
   public appSDK: firebase.app.App;
   private logger: LevelLogger;
 
-  constructor(firebaseConfig: FirebaseConfigObject, logLevel: number) {
-    this.logger = new LevelLogger('FirebaseClient', logLevel);
+  constructor(
+    firebaseConfig: FirebaseConfigObject,
+    private options?: FireStateOptions
+  ) {
+    this.options = options || {};
+    this.logger = new LevelLogger("FirebaseClient", this.options.logLevel);
     this.logger.logINFO("instance created...");
-    this.clientState = new FirebaseClientStateManager<TState>(logLevel)
+    this.clientState = new FirebaseClientStateManager<TState>(this.options);
     this.firebaseWrapper = new FirebaseWrapper<
       EnumPathTemplatesCollections,
       EnumPathTemplatesDocuments,
       TState
-    >(firebaseConfig, this.clientState, logLevel);
+    >(firebaseConfig, this.clientState, this.options);
     this.appSDK = this.firebaseWrapper.app;
   }
 

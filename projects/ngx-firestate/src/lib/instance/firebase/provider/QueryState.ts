@@ -7,7 +7,8 @@ import { resolvePathVariables } from "./PathResolver";
 import { Observable } from "rxjs";
 import { IQueryState } from "../interfaces/IQueryState";
 import { ActionFunction } from "../interfaces/Actions";
-import { parseAllDatesDoc } from '../utils';
+import { parseAllDatesDoc } from "../utils";
+import { FireStateOptions } from "../interfaces/FireStateOptions";
 
 interface SubCollectionState {
   id: string;
@@ -23,13 +24,14 @@ export class QueryState<TState extends FirebaseClientStateObject>
   private callbacks: ActionFunction<any, any>[] = [];
   private _disableIdInclusion: boolean;
   private _disableUpdateFields: boolean;
+  private _disableFixAllDates: boolean;
   private _fixAllDates: boolean;
-  private _fixAllDatesRecursive: boolean;
 
   constructor(
     public appState$: FirebaseClientStateManager<TState>,
     private _pathTemplate: string,
     public app: firebase.app.App,
+    private options: FireStateOptions,
     public logLevel: LogLevel
   ) {
     this.logger = new LevelLogger("Query", this.logLevel);
@@ -78,18 +80,20 @@ export class QueryState<TState extends FirebaseClientStateObject>
     obj["created_at"] = new Date();
   }
 
-  public enableFixAllDates(isRecursive?: boolean) {
+  public enableFixAllDates() {
     this._fixAllDates = true;
-    this._fixAllDatesRecursive = isRecursive;
+  }
+  public disableFixAllDates() {
+    this._disableFixAllDates = true;
   }
 
   private getDocData<T>(doc: firebase.firestore.DocumentData): T {
     const dataSafe = doc.data() || {};
-    if (!this._fixAllDates) {
-      return dataSafe;
-    }
-    parseAllDatesDoc(dataSafe);
-    if (!this._fixAllDatesRecursive) {
+    const shouldFixDates =
+      (this.options.convertTimestamps || this._fixAllDates) &&
+      !this._disableFixAllDates;
+    if (shouldFixDates) {
+      parseAllDatesDoc(dataSafe);
     }
     return dataSafe;
   }
@@ -97,7 +101,7 @@ export class QueryState<TState extends FirebaseClientStateObject>
   doc2Data<T>(doc: firebase.firestore.DocumentData): T {
     const dataSafe = this.getDocData<T>(doc);
     if (!this._disableIdInclusion) {
-      dataSafe['id'] = doc.id;
+      dataSafe["id"] = doc.id;
     }
     return dataSafe;
   }

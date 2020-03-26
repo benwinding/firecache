@@ -5,6 +5,7 @@ import { LogLevel } from "../interfaces/LogLevel";
 import { QueryState } from "./QueryState";
 import * as firebase from "firebase/app";
 import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
+import { FireStateOptions } from '../interfaces/FireStateOptions';
 
 export class FirestoreWrapper<
   EnumPathTemplatesCollections,
@@ -13,7 +14,8 @@ export class FirestoreWrapper<
 > {
   constructor(
     private app: firebase.app.App,
-    private rootState: FirebaseClientStateManager<TState>
+    private rootState: FirebaseClientStateManager<TState>,
+    private options: FireStateOptions
   ) {}
 
   public FromCollection(
@@ -24,6 +26,7 @@ export class FirestoreWrapper<
       this.rootState,
       (collectionPathTemplate as any) as string,
       this.app,
+      this.options,
       logLevel
     );
     return new CollectionQueryBuilder(queryState);
@@ -37,6 +40,7 @@ export class FirestoreWrapper<
       this.rootState,
       (documentPathTemplate as any) as string,
       this.app,
+      this.options,
       logLevel
     );
     return new DocumentQueryBuilder(queryState);
@@ -50,6 +54,7 @@ export class FirestoreWrapper<
       this.rootState,
       (collectionPathTemplate as any) as string,
       this.app,
+      this.options,
       logLevel
     );
     return new CollectionQueryBuilder(queryState);

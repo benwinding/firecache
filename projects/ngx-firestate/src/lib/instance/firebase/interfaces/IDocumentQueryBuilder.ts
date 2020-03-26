@@ -12,7 +12,7 @@ export interface IDocumentQueryBuilder<TState extends FirebaseClientStateObject,
   ): IDocumentQueryBuilder<TState, Colls, Docs>;
   DisableUpdateFields(): IDocumentQueryBuilder<TState, Colls, Docs>;
   DisableIdInclusion(): IDocumentQueryBuilder<TState, Colls, Docs>;
-  FixAllDates(recursively?: boolean): IDocumentQueryBuilder<TState, Colls, Docs>;
+  FixAllDates(): IDocumentQueryBuilder<TState, Colls, Docs>;
   // Queries
   GetDoc<T>(): Observable<T>;
   GetDocSnap<T>(): Observable<T>;

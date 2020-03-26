@@ -2,6 +2,7 @@ import { BehaviorSubject, combineLatest, Observable } from "rxjs";
 import { filter, map } from "rxjs/operators";
 import { FirebaseClientStateObject } from "./FirebaseClientStateObject";
 import { LevelLogger } from "./firebase/provider/LevelLogger";
+import { FireStateOptions } from "./firebase/interfaces/FireStateOptions";
 
 export class FirebaseClientStateManager<
   TState extends FirebaseClientStateObject
@@ -10,9 +11,11 @@ export class FirebaseClientStateManager<
   private _root = new BehaviorSubject<TState>(null);
   private _hasBeenInitialized = new BehaviorSubject<boolean>(null);
 
-  private logger = new LevelLogger("state-manager", this.logLevel);
+  private logger;
 
-  constructor(private logLevel: number) {}
+  constructor(private options: FireStateOptions) {
+    this.logger = new LevelLogger("state-manager", options.logLevel);
+  }
 
   public InitializationDone() {
     this.logger.logINFO("client state has finished initializing");

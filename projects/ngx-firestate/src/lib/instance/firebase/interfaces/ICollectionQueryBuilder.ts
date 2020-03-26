@@ -20,7 +20,7 @@ export interface ICollectionQueryBuilder<
   ): ICollectionQueryBuilder<TState, Colls, Docs>;
   DisableUpdateFields(): ICollectionQueryBuilder<TState, Colls, Docs>;
   DisableIdInclusion(): ICollectionQueryBuilder<TState, Colls, Docs>;
-  FixAllDates(recursively?: boolean): ICollectionQueryBuilder<TState, Colls, Docs>;
+  FixAllDates(): ICollectionQueryBuilder<TState, Colls, Docs>;
   FromSubCollection<T>(
     id: string,
     subcollection: string
