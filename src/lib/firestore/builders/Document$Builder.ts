@@ -1,13 +1,15 @@
 import { Observable } from "rxjs";
-import { IDocumentQueryBuilder } from "../interfaces/IDocumentQueryBuilder";
-import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
-import { QueryState } from "./QueryState";
+import {
+  FirebaseClientStateObject,
+  IDocumentQueryBuilder,
+  ActionFunction
+} from "../../interfaces";
+import { QueryState } from "../QueryState";
 import {
   DocumentQueryGetDoc,
   DocumentQueryGetDocSnap
 } from "./DocumentQueryBuilders";
 import { DocumentCommandUpdate } from "./DocumentCommandBuilders";
-import { ActionFunction } from "../interfaces/Actions";
 
 export class DocumentQueryBuilder<
   TState extends FirebaseClientStateObject,

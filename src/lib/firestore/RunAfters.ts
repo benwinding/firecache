@@ -1,6 +1,9 @@
-import { ActionType, ActionFunctionArguments } from "../interfaces/Actions";
 import { QueryState } from "./QueryState";
-import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
+import {
+  FirebaseClientStateObject,
+  ActionType,
+  ActionFunctionArguments
+} from "../interfaces";
 
 type RefColl = firebase.firestore.CollectionReference;
 type RefDoc = firebase.firestore.DocumentReference;

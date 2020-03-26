@@ -1,8 +1,8 @@
 import { Observable } from "rxjs";
 import { map, switchMap, take, tap } from "rxjs/operators";
-import { documentSnap2Observable } from "./firebase-helpers";
-import { QueryState } from "./QueryState";
-import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
+import { documentSnap2Observable } from "../../utils";
+import { QueryState } from "../QueryState";
+import { FirebaseClientStateObject } from "../../interfaces";
 
 export function DocumentQueryGetDoc<T>(
   q: QueryState<FirebaseClientStateObject>

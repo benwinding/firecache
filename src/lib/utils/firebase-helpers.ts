@@ -1,5 +1,5 @@
 import * as firebase from 'firebase/app';
-import { Observable, ReplaySubject, Observer, throwError } from 'rxjs';
+import { Observable, Observer, throwError } from 'rxjs';
 
 export function collectionSnap2Observable(
   collection: firebase.firestore.Query

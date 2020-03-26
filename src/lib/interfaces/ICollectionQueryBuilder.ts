@@ -1,5 +1,5 @@
 import { Observable } from "rxjs";
-import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
+import { FirebaseClientStateObject } from "../interfaces";
 import { ActionFunction } from "./Actions";
 
 export type QueryFn = (

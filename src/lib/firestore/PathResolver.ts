@@ -1,11 +1,6 @@
-import { Observable, combineLatest, BehaviorSubject, Subject } from "rxjs";
+import { Observable, Subject } from "rxjs";
 import { map, takeUntil } from "rxjs/operators";
-import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
-import { IQueryState } from "../interfaces/IQueryState";
-
-function blank$(overridenState: FirebaseClientStateObject) {
-  return new BehaviorSubject(overridenState);
-}
+import { IQueryState, FirebaseClientStateObject } from "../interfaces";
 
 // RESOLVES: projectId, accountId, userId, hostId
 export function resolvePathVariables(q: IQueryState): Observable<string> {

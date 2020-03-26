@@ -1,8 +1,8 @@
 import { BehaviorSubject, combineLatest, Observable } from "rxjs";
 import { filter, map } from "rxjs/operators";
-import { FirebaseClientStateObject } from "./FirebaseClientStateObject";
-import { LevelLogger } from "./firebase/provider/LevelLogger";
-import { FireStateOptions } from "./firebase/interfaces/FireStateOptions";
+import { FirebaseClientStateObject } from "./interfaces";
+import { LevelLogger } from "./utils";
+import { FireStateOptions } from "./interfaces/FireStateOptions";
 
 export class FirebaseClientStateManager<
   TState extends FirebaseClientStateObject

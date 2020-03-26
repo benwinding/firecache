@@ -1,12 +1,12 @@
 import { FirebaseWrapper } from "./firebase/FirebaseWrapper";
 import { FirebaseClientStateManager } from "./FirebaseClientStateManager";
-import { FirestoreWrapper } from "./firebase/provider/FirestoreWrapper";
-import { FirebaseConfigObject } from "./firebase/provider/firebase-helpers";
+import { FirestoreWrapper } from "./firestore/FirestoreWrapper";
+import { FirebaseConfigObject } from "./utils";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { FirebaseClientStateObject } from "./FirebaseClientStateObject";
-import { LevelLogger } from "./firebase/provider/LevelLogger";
-import { FireStateOptions } from "./firebase/interfaces/FireStateOptions";
+import { FirebaseClientStateObject } from "./interfaces";
+import { LevelLogger } from "./utils";
+import { FireStateOptions } from "./interfaces/FireStateOptions";
 
 export class FirebaseClient<
   EnumPathTemplatesCollections,

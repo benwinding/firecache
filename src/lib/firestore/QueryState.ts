@@ -1,14 +1,15 @@
-import { LevelLogger } from "./LevelLogger";
-import { FirebaseClientStateManager } from "../../FirebaseClientStateManager";
+import { LevelLogger, getWithoutUndefined, parseAllDatesDoc } from "../utils";
+import { FirebaseClientStateManager } from "../FirebaseClientStateManager";
 import { map, take, tap } from "rxjs/operators";
-import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
-import { LogLevel } from "../interfaces/LogLevel";
-import { resolvePathVariables } from "./PathResolver";
+import {
+  FirebaseClientStateObject,
+  IQueryState,
+  ActionFunction,
+  FireStateOptions,
+  LogLevel
+} from "../interfaces";
 import { Observable } from "rxjs";
-import { IQueryState } from "../interfaces/IQueryState";
-import { ActionFunction } from "../interfaces/Actions";
-import { parseAllDatesDoc, getWithoutUndefined } from "../utils";
-import { FireStateOptions } from "../interfaces/FireStateOptions";
+import { resolvePathVariables } from "./PathResolver";
 
 interface SubCollectionState {
   id: string;

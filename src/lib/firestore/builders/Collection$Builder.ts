@@ -1,9 +1,12 @@
 import { Observable } from "rxjs";
 import {
   ICollectionQueryBuilder,
-  QueryFn
-} from "../interfaces/ICollectionQueryBuilder";
-import { QueryState } from "./QueryState";
+  QueryFn,
+  FirebaseClientStateObject,
+  DocWithId,
+  ActionFunction
+} from "../../interfaces";
+import { QueryState } from "../QueryState";
 import {
   CollectionCommandAdd,
   CollectionCommandAddMany,
@@ -20,9 +23,6 @@ import {
   CollectionQueryGetManyIds,
   CollectionQueryGetManyIdsSnap
 } from "./CollectionQueryBuilders";
-import { DocWithId } from "../interfaces/DocWithId";
-import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
-import { ActionFunction } from "../interfaces/Actions";
 
 export class CollectionQueryBuilder<
   TState extends FirebaseClientStateObject,

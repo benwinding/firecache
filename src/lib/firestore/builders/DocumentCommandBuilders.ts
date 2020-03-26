@@ -1,7 +1,7 @@
 import { switchMap, take, tap } from "rxjs/operators";
-import { QueryState } from "./QueryState";
-import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
-import { RunAfterDoc } from './RunAfters';
+import { QueryState } from "../QueryState";
+import { FirebaseClientStateObject } from "../../interfaces";
+import { RunAfterDoc } from '../RunAfters';
 
 export function DocumentCommandUpdate(
   q: QueryState<FirebaseClientStateObject>,

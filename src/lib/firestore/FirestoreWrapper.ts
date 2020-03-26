@@ -1,11 +1,8 @@
-import { CollectionQueryBuilder } from "./Collection$Builder";
-import { DocumentQueryBuilder } from "./Document$Builder";
-import { FirebaseClientStateManager } from "../../FirebaseClientStateManager";
-import { LogLevel } from "../interfaces/LogLevel";
+import { CollectionQueryBuilder, DocumentQueryBuilder } from "./builders";
+import { FirebaseClientStateManager } from "../FirebaseClientStateManager";
+import { LogLevel, FireStateOptions, FirebaseClientStateObject } from "../interfaces";
 import { QueryState } from "./QueryState";
 import * as firebase from "firebase/app";
-import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
-import { FireStateOptions } from '../interfaces/FireStateOptions';
 
 export class FirestoreWrapper<
   EnumPathTemplatesCollections,

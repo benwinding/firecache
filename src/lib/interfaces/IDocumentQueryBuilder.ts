@@ -1,5 +1,5 @@
 import { Observable } from "rxjs";
-import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
+import { FirebaseClientStateObject } from "./FirebaseClientStateObject";
 import { ActionFunction } from "./Actions";
 
 export interface IDocumentQueryBuilder<TState extends FirebaseClientStateObject, Colls, Docs> {

@@ -1,8 +1,8 @@
-import { QueryState } from "./QueryState";
+import { QueryState } from "../QueryState";
 import { switchMap, take, tap } from "rxjs/operators";
-import { chunkify } from "./chunkify";
-import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
-import { RunAfterCollection } from "./RunAfters";
+import { chunkify } from "../../utils";
+import { FirebaseClientStateObject } from "../../interfaces";
+import { RunAfterCollection } from "../RunAfters";
 
 export function CollectionCommandUpdate<T>(
   q: QueryState<FirebaseClientStateObject>,

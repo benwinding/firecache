@@ -2,11 +2,10 @@ import { tap, map, switchMap, catchError, take } from "rxjs/operators";
 import {
   collectionSnap2Observable,
   documentSnap2Observable
-} from "./firebase-helpers";
+} from "../../utils";
 import { of, Observable, combineLatest } from "rxjs";
-import { QueryFn } from "../interfaces/ICollectionQueryBuilder";
-import { QueryState } from "./QueryState";
-import { FirebaseClientStateObject } from "../../FirebaseClientStateObject";
+import { QueryState } from "../QueryState";
+import { FirebaseClientStateObject, QueryFn } from "../../interfaces";
 
 export function CollectionQueryGetAllDocsSnap<T>(
   q: QueryState<FirebaseClientStateObject>,

@@ -1,4 +1,4 @@
-import { FirestoreWrapper } from "./provider/FirestoreWrapper";
+import { FirestoreWrapper } from "../firestore/FirestoreWrapper";
 import * as firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
@@ -8,11 +8,11 @@ import {
   GetApp,
   FirebaseConfigObject,
   MakeAuthstateObservable
-} from "./provider/firebase-helpers";
+} from "../utils";
 import { take } from "rxjs/operators";
-import { FirebaseClientStateObject } from "../FirebaseClientStateObject";
-import { LevelLogger } from "./provider/LevelLogger";
-import { FireStateOptions } from "./interfaces/FireStateOptions";
+import { FirebaseClientStateObject } from "../interfaces";
+import { LevelLogger } from "../utils";
+import { FireStateOptions } from "../interfaces";
 
 export class FirebaseWrapper<
   EnumPathTemplatesCollections,

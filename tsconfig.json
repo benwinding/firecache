@@ -14,5 +14,5 @@
     "importHelpers": true,
     "lib": ["dom", "es2018"]
   },
-  "exclude": ["**/*.spec.ts"]
+  "exclude": ["**/*.spec.ts", "dist"]
 }
