@@ -45,6 +45,10 @@ export class DocumentQueryBuilder<
     this.queryState.disableIdInclusion();
     return this;
   }
+  FixAllDates(recursively?: boolean): IDocumentQueryBuilder<TState, Colls, Docs> {
+    this.queryState.enableFixAllDates(recursively);
+    return this;
+  }
   ref(): Observable<firebase.firestore.DocumentReference> {
     return this.queryState.refDocument();
   }

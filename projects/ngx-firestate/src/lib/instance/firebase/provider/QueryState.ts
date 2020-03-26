@@ -7,6 +7,7 @@ import { resolvePathVariables } from "./PathResolver";
 import { Observable } from "rxjs";
 import { IQueryState } from "../interfaces/IQueryState";
 import { ActionFunction } from "../interfaces/Actions";
+import { parseAllDatesDoc } from '../utils';
 
 interface SubCollectionState {
   id: string;
@@ -22,6 +23,8 @@ export class QueryState<TState extends FirebaseClientStateObject>
   private callbacks: ActionFunction<any, any>[] = [];
   private _disableIdInclusion: boolean;
   private _disableUpdateFields: boolean;
+  private _fixAllDates: boolean;
+  private _fixAllDatesRecursive: boolean;
 
   constructor(
     public appState$: FirebaseClientStateManager<TState>,
@@ -75,16 +78,28 @@ export class QueryState<TState extends FirebaseClientStateObject>
     obj["created_at"] = new Date();
   }
 
-  doc2Data<T>(doc: firebase.firestore.DocumentData): T {
+  public enableFixAllDates(isRecursive?: boolean) {
+    this._fixAllDates = true;
+    this._fixAllDatesRecursive = isRecursive;
+  }
+
+  private getDocData<T>(doc: firebase.firestore.DocumentData): T {
     const dataSafe = doc.data() || {};
-    if (this._disableIdInclusion) {
+    if (!this._fixAllDates) {
       return dataSafe;
     }
-    const data = ({
-      ...dataSafe,
-      id: doc.id
-    } as any) as T;
-    return data;
+    parseAllDatesDoc(dataSafe);
+    if (!this._fixAllDatesRecursive) {
+    }
+    return dataSafe;
+  }
+
+  doc2Data<T>(doc: firebase.firestore.DocumentData): T {
+    const dataSafe = this.getDocData<T>(doc);
+    if (!this._disableIdInclusion) {
+      dataSafe['id'] = doc.id;
+    }
+    return dataSafe;
   }
 
   docArray2Data<T>(docs: firebase.firestore.DocumentData[]): T[] {
