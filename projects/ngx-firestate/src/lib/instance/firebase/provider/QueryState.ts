@@ -9,7 +9,6 @@ import { IQueryState } from "../interfaces/IQueryState";
 import { ActionFunction } from "../interfaces/Actions";
 import { parseAllDatesDoc, getWithoutUndefined } from "../utils";
 import { FireStateOptions } from "../interfaces/FireStateOptions";
-import { ActionType } from 'ngx-firestate/public-api';
 
 interface SubCollectionState {
   id: string;
