@@ -5,16 +5,33 @@ export function parseAllDatesDoc<T>(obj: T) {
   }
   Object.keys(obj).map(key => {
     const value = obj[key];
-    obj[key] = getDate(value);
+    obj[key] = recusivelyCheckObjectValue(value);
   });
 }
 
-function getDate(inputVal): Date {
-  if (inputVal && inputVal.toDate) {
-    return inputVal.toDate();
+function recusivelyCheckObjectValue(input: any) {
+  const isFalsey = !input;
+  if (isFalsey) {
+    return input;
   }
-  if (inputVal instanceof Date) {
-    return inputVal;
+  const isString = typeof input === 'string';
+  if (isString) {
+    return input;
   }
-  return inputVal;
+  const isTimestamp = !!input.toDate && typeof input.toDate === 'function';
+  if (isTimestamp) {
+    return input.toDate();
+  }
+  const isObject = typeof input === 'object';
+  if (isObject) {
+    Object.keys(input).map(key => {
+      const value = input[key];
+      input[key] = recusivelyCheckObjectValue(value);
+    });
+    return input;
+  }
+  const isArray = Array.isArray(input);
+  if (isArray) {
+    return input.map(value => recusivelyCheckObjectValue(value));
+  }
 }
