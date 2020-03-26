@@ -22,7 +22,8 @@ export function CollectionCommandUpdate<T>(
       tap(RunAfterCollection(q, "edited", [id])),
       switchMap(collection => {
         q.setUpdatedProps(obj, q.uid);
-        return collection.doc(id).set(obj, { merge: isMerged });
+        const parsed = q.parseBeforeUpload(obj);
+        return collection.doc(id).set(parsed, { merge: isMerged });
       }),
       tap(data => q.logger.logINFO(">> end, data", { data }))
     )
@@ -57,9 +58,10 @@ export function CollectionCommandUpdateMany(
           objs500Groups.map(async objs500 => {
             const batch = db.batch();
             objs500.map(obj => {
-              q.setUpdatedProps(obj, uid);
               const docRef = collection.doc(obj.id);
-              batch.set(docRef, obj, { merge: isMerged });
+              q.setUpdatedProps(obj, uid);
+              const parsed = q.parseBeforeUpload(obj);
+              batch.set(docRef, parsed, { merge: isMerged });
             });
             return batch.commit();
           })
@@ -77,19 +79,20 @@ export function CollectionCommandAdd<T>(
 ): Promise<firebase.firestore.DocumentReference> {
   const uid = q.uid;
   q.logger.logDEBUG(">> start, CollectionCommandAdd()", { uid, q, obj });
-  q.setCreatedProps(obj, uid);
   q.setUpdatedProps(obj, uid);
+  q.setCreatedProps(obj, uid);
+  const parsed = q.parseBeforeUpload(obj);
   return q
     .refCollection()
     .pipe(
       tap(RunAfterCollection(q, "added")),
       switchMap(async collection => {
         try {
-          const result = await collection.add(obj);
+          const result = await collection.add(parsed);
           return result;
         } catch (error) {
           q.logger.logERROR("error in Update()", error, {
-            obj,
+            parsed,
             collection
           });
           throw new Error(error);
@@ -120,9 +123,10 @@ export function CollectionCommandAddMany(
             objs500.map(obj => {
               q.setCreatedProps(obj, uid);
               q.setUpdatedProps(obj, uid);
+              const parsed = q.parseBeforeUpload(obj);
               const newId = db.doc("").id;
               const docRef = collection.doc(newId);
-              batch.set(docRef, obj, { merge: true });
+              batch.set(docRef, parsed, { merge: true });
             });
             return batch.commit();
           })

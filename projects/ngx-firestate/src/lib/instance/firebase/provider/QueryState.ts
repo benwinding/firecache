@@ -7,8 +7,9 @@ import { resolvePathVariables } from "./PathResolver";
 import { Observable } from "rxjs";
 import { IQueryState } from "../interfaces/IQueryState";
 import { ActionFunction } from "../interfaces/Actions";
-import { parseAllDatesDoc } from "../utils";
+import { parseAllDatesDoc, getWithoutUndefined } from "../utils";
 import { FireStateOptions } from "../interfaces/FireStateOptions";
+import { ActionType } from 'ngx-firestate/public-api';
 
 interface SubCollectionState {
   id: string;
@@ -25,7 +26,8 @@ export class QueryState<TState extends FirebaseClientStateObject>
   private _disableIdInclusion: boolean;
   private _disableUpdateFields: boolean;
   private _disableFixAllDates: boolean;
-  private _fixAllDates: boolean;
+  private _enableFixAllDates: boolean;
+  private _enableRemoveUndefinedValues: boolean;
 
   constructor(
     public appState$: FirebaseClientStateManager<TState>,
@@ -64,6 +66,13 @@ export class QueryState<TState extends FirebaseClientStateObject>
     };
   }
 
+  public parseBeforeUpload(obj: any): any {
+    if (this._enableRemoveUndefinedValues) {
+      return getWithoutUndefined(obj);
+    }
+    return obj;
+  }
+
   public setUpdatedProps(obj: any, updatedUid: string) {
     if (this._disableUpdateFields) {
       return;
@@ -80,8 +89,11 @@ export class QueryState<TState extends FirebaseClientStateObject>
     obj["created_at"] = new Date();
   }
 
+  public enableRemoveUndefinedValues() {
+    this._enableRemoveUndefinedValues = true;
+  }
   public enableFixAllDates() {
-    this._fixAllDates = true;
+    this._enableFixAllDates = true;
   }
   public disableFixAllDates() {
     this._disableFixAllDates = true;
@@ -90,7 +102,7 @@ export class QueryState<TState extends FirebaseClientStateObject>
   private getDocData<T>(doc: firebase.firestore.DocumentData): T {
     const dataSafe = doc.data() || {};
     const shouldFixDates =
-      (this.options.convertTimestamps || this._fixAllDates) &&
+      (this.options.convertTimestamps || this._enableFixAllDates) &&
       !this._disableFixAllDates;
     if (shouldFixDates) {
       parseAllDatesDoc(dataSafe);

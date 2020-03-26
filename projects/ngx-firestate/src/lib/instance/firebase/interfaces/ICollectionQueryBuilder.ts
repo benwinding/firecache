@@ -22,6 +22,7 @@ export interface ICollectionQueryBuilder<
   DisableIdInclusion(): ICollectionQueryBuilder<TState, Colls, Docs>;
   DisableFixAllDates(): ICollectionQueryBuilder<TState, Colls, Docs>;
   EnableFixAllDates(): ICollectionQueryBuilder<TState, Colls, Docs>;
+  EnableRemoveUndefinedValues(): ICollectionQueryBuilder<TState, Colls, Docs>;
   FromSubCollection<T>(
     id: string,
     subcollection: string

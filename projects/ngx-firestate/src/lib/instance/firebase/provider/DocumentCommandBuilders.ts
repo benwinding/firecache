@@ -14,7 +14,8 @@ export function DocumentCommandUpdate(
       tap(RunAfterDoc(q, "edited")),
       switchMap(doc => {
         q.setUpdatedProps(obj, q.uid);
-        return doc.set(obj, { merge: isMerged });
+        const parsed = q.parseBeforeUpload(obj);
+        return doc.set(parsed, { merge: isMerged });
       }),
       tap(data =>
         q.logger.logINFO(">> end, data", { data })

@@ -102,6 +102,10 @@ export class CollectionQueryBuilder<
     this.queryState.enableFixAllDates();
     return this;
   }
+  EnableRemoveUndefinedValues(): ICollectionQueryBuilder<TState, Colls, Docs> {
+    this.queryState.enableRemoveUndefinedValues();
+    return this;
+  }
   ref(): Observable<firebase.firestore.CollectionReference> {
     return this.queryState.refCollection();
   }

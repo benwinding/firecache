@@ -53,6 +53,10 @@ export class DocumentQueryBuilder<
     this.queryState.enableFixAllDates();
     return this;
   }
+  EnableRemoveUndefinedValues(): IDocumentQueryBuilder<TState, Colls, Docs> {
+    this.queryState.enableRemoveUndefinedValues();
+    return this;
+  }
   ref(): Observable<firebase.firestore.DocumentReference> {
     return this.queryState.refDocument();
   }
