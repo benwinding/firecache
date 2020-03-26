@@ -94,7 +94,11 @@ export class CollectionQueryBuilder<
     this.queryState.disableIdInclusion();
     return this;
   }
-  FixAllDates(): ICollectionQueryBuilder<TState, Colls, Docs> {
+  DisableFixAllDates(): ICollectionQueryBuilder<TState, Colls, Docs> {
+    this.queryState.disableFixAllDates();
+    return this;
+  }
+  EnableFixAllDates(): ICollectionQueryBuilder<TState, Colls, Docs> {
     this.queryState.enableFixAllDates();
     return this;
   }

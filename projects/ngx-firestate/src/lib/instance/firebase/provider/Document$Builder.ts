@@ -45,7 +45,11 @@ export class DocumentQueryBuilder<
     this.queryState.disableIdInclusion();
     return this;
   }
-  FixAllDates(): IDocumentQueryBuilder<TState, Colls, Docs> {
+  DisableFixAllDates(): IDocumentQueryBuilder<TState, Colls, Docs> {
+    this.queryState.disableFixAllDates();
+    return this;
+  }
+  EnableFixAllDates(): IDocumentQueryBuilder<TState, Colls, Docs> {
     this.queryState.enableFixAllDates();
     return this;
   }
