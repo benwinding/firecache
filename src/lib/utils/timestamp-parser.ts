@@ -14,8 +14,8 @@ export function recusivelyCheckObjectValue(input: any) {
   if (isFalsey) {
     return input;
   }
-  const isString = typeof input === 'string' || typeof input === 'number';
-  if (isString) {
+  const isPrimitive = typeof input !== 'object';
+  if (isPrimitive) {
     return input;
   }
   const isTimestamp = !!input.toDate && typeof input.toDate === 'function';

@@ -13,6 +13,12 @@ describe("timestamp-parser tests", () => {
     expect(parsed.a).toBe("1");
   });
 
+  test("retains boolean", () => {
+    const doc = { a: true };
+    const parsed = getWithoutUndefined(doc);
+    expect(parsed.a).toBe(true);
+  });
+
   test("retains object", () => {
     const doc = { a: { f: "1" } };
     const parsed = getWithoutUndefined(doc);
