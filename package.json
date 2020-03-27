@@ -15,10 +15,8 @@
     "clean": "rimraf dist"
   },
   "peerDependencies": {
+    "firebase": "7.9.x",
     "rxjs": "^6.5.4"
-  },
-  "dependencies": {
-    "firebase": "^7.12.0"
   },
   "devDependencies": {
     "@types/jest": "^25.1.4",
