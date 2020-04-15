@@ -124,7 +124,7 @@ export function CollectionCommandAddMany(
               q.setCreatedProps(obj, uid);
               q.setUpdatedProps(obj, uid);
               const parsed = q.parseBeforeUpload(obj);
-              const newId = db.doc("").id;
+              const newId = db.doc("randid").id;
               const docRef = collection.doc(newId);
               batch.set(docRef, parsed, { merge: true });
             });
