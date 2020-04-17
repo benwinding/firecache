@@ -40,5 +40,4 @@ jobs:
         ref: ${{ github.event.pull_request.head.ref }}
         fetch-depth: 1
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        pr-comment: "Deployed to npm! as version:${{steps.deploystep.outputs.version}}"
-        pr-label-to-remove: ''        
+        pr-comment: "Deployed to npm! as version: ${{steps.deploystep.outputs.version}}"
