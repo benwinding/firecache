@@ -27,11 +27,9 @@ jobs:
     - name: Test
       run: npm run-script test
     - name: Generate Coverage Badges
-      if: github.ref == 'refs/heads/master'
       run: npm run-script test:badges
     - name: Deploy to npm 🚀
       id: deploystep
-      if: github.ref == 'refs/heads/master'
       uses: benwinding/merge-release@add-outputs
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
