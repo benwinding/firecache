@@ -42,3 +42,4 @@ jobs:
         fetch-depth: 1
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         pr-comment: "Deployed to npm! https://www.npmjs.com/package/react-admin-import-csv"
+        pr-label-to-remove: ''
