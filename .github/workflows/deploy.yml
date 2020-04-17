@@ -30,8 +30,9 @@ jobs:
       if: github.ref == 'refs/heads/master'
       run: npm run-script test:badges
     - name: Deploy to npm 🚀
+      id: deploystep
       if: github.ref == 'refs/heads/master'
-      uses: benwinding/merge-release@master
+      uses: benwinding/merge-release@add-outputs
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
@@ -41,5 +42,5 @@ jobs:
         ref: ${{ github.event.pull_request.head.ref }}
         fetch-depth: 1
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        pr-comment: "Deployed to npm! https://www.npmjs.com/package/react-admin-import-csv"
-        pr-label-to-remove: ''
+        pr-comment: "Deployed to npm! as version:${{steps.deploystep.outputs.version}}"
+        pr-label-to-remove: ''        
