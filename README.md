@@ -9,3 +9,8 @@
 <!-- [END badges] -->
 
 A client state-management system for firebase.
+
+# Features
+
+- Path wildcards using state variables
+- Implemented in Typescript
