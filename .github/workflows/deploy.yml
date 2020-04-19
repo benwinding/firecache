@@ -29,7 +29,7 @@ jobs:
     - name: Generate Coverage Badges
       run: npm run-script test:badges
     - name: 'Debug output'
-      uses: hmarr/debug-action
+      uses: hmarr/debug-action@master
     - name: Deploy to npm 🚀
       id: deploystep
       uses: benwinding/merge-release@master
