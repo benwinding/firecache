@@ -16,6 +16,6 @@ A client state-management system for firebase.
 - Implemented in Typescript
 
 
-
+.
 
 
