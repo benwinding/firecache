@@ -19,6 +19,8 @@ jobs:
       - name: Install Dependencies
         if: steps.cache-modules.outputs.cache-hit != 'true'
         run: npm install
+      - name: 'Debug output'
+        uses: hmarr/debug-action@master
       - name: Build Library
         run: npm run-script build
       - name: Test
