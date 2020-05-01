@@ -1,6 +1,6 @@
 import { QueryState } from "../QueryState";
 import { switchMap, take, tap } from "rxjs/operators";
-import { chunkify } from "../../utils";
+import { chunkify, makeRandomId } from "../../utils";
 import { FirebaseClientStateObject } from "../../interfaces";
 import { RunAfterCollection } from "../RunAfters";
 
@@ -124,7 +124,7 @@ export function CollectionCommandAddMany(
               q.setCreatedProps(obj, uid);
               q.setUpdatedProps(obj, uid);
               const parsed = q.parseBeforeUpload(obj);
-              const newId = db.doc("creating/random_id").id;
+              const newId = makeRandomId(db);
               const docRef = collection.doc(newId);
               batch.set(docRef, parsed, { merge: true });
             });

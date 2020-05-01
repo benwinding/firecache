@@ -75,3 +75,9 @@ export function MakeAuthstateObservable(
   });
   return authState;
 }
+
+export function makeRandomId(db: firebase.firestore.Firestore) {
+  const ref = db.collection("random").doc();
+  const randomId = ref.id;
+  return randomId;
+}
