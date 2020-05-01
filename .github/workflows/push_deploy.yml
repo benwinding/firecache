@@ -1,7 +1,4 @@
-on: 
-  pull_request:
-    types: [closed]
-
+on: push
 name: Deploy to npm
 jobs:
   build:
@@ -31,15 +28,16 @@ jobs:
     - name: 'Debug output'
       uses: hmarr/debug-action@master
     - name: Deploy to npm 🚀
+      if: github.ref == 'refs/heads/master'
       id: deploystep
       uses: benwinding/merge-release@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-    - name: Write comment
-      uses: fastlane/github-actions/communicate-on-pull-request-merged@master
-      with:
-        ref: ${{ github.event.pull_request.head.ref }}
-        fetch-depth: 1
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        pr-comment: "Deployed to npm! as version: ${{steps.deploystep.outputs.version}}"
+    # - name: Write comment
+    #   uses: fastlane/github-actions/communicate-on-pull-request-merged@master
+    #   with:
+    #     ref: ${{ github.event.pull_request.head.ref }}
+    #     fetch-depth: 1
+    #     repo-token: ${{ secrets.GITHUB_TOKEN }}
+    #     pr-comment: "Deployed to npm! as version: ${{steps.deploystep.outputs.version}}"
