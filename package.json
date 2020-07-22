@@ -28,6 +28,12 @@
     "ts-jest": "^25.2.1",
     "typescript": "3.1.6"
   },
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "tsconfig.json"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "source": "src/index.ts"
