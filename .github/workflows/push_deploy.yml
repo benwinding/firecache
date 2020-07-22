@@ -33,7 +33,7 @@ jobs:
         uses: hmarr/debug-action@master
       - name: Deploy to npm 🚀
         id: deploystep
-        uses: benwinding/merge-release@e9e357ae2b21f35fc1cbd9acf47f14d01d2bb0c5
+        uses: benwinding/merge-release@87f0410e7678aa4dd12c76c1c9569d4f9f29eb9f
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
