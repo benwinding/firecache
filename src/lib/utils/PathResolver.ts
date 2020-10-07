@@ -1,5 +1,5 @@
 import { Observable, Subject } from "rxjs";
-import { map, takeUntil } from "rxjs/operators";
+import { filter, map, takeUntil } from "rxjs/operators";
 import { IQueryState, FirebaseClientStateObject } from "../interfaces";
 import { Object2constStatements } from './Object2constStatements';
 
@@ -38,6 +38,11 @@ export function ResolvePathVariables(q: IQueryState): Observable<string> {
         rootStateDeclarations = Object2constStatements(rootState);
         // tslint:disable-next-line: no-eval
         pathResolved = eval(rootStateDeclarations + ";" + evalTemplate);
+        const invalidPath = pathResolved.includes('//');
+        if (invalidPath) {
+          console.warn('Invalid path: ' + pathResolved, 'stopping before feeding to firebase');
+          return null;
+        }
         return pathResolved;
       } catch (error) {
         console.warn(
@@ -53,6 +58,7 @@ export function ResolvePathVariables(q: IQueryState): Observable<string> {
         stopSignal$.next();
       }
     }),
+    filter(path => !!path),
     takeUntil(stopSignal$)
   );
 }
