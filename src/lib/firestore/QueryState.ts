@@ -16,6 +16,10 @@ interface SubCollectionState {
   subcollection: string;
 }
 
+type FirebaseDocData = firebase.firestore.DocumentData;
+type FirebaseDocRef = firebase.firestore.DocumentReference;
+type FirebaseCollectionRef = firebase.firestore.CollectionReference;
+
 export class QueryState<TState extends FirebaseClientStateObject>
   implements IQueryState {
   public overridenState: FirebaseClientStateObject;
@@ -99,7 +103,7 @@ export class QueryState<TState extends FirebaseClientStateObject>
     this._disableFixAllDates = true;
   }
 
-  private getDocData<T>(doc: firebase.firestore.DocumentData): T {
+  private getDocData<T>(doc: FirebaseDocData): T {
     const dataSafe = doc.data() || {};
     const shouldFixDates =
       (this.options.convertTimestamps || this._enableFixAllDates) &&
@@ -110,7 +114,7 @@ export class QueryState<TState extends FirebaseClientStateObject>
     return dataSafe;
   }
 
-  doc2Data<T>(doc: firebase.firestore.DocumentData): T {
+  doc2Data<T>(doc: FirebaseDocData): T {
     const dataSafe = this.getDocData<T>(doc);
     if (!this._disableIdInclusion) {
       dataSafe["id"] = doc.id;
@@ -118,41 +122,41 @@ export class QueryState<TState extends FirebaseClientStateObject>
     return dataSafe;
   }
 
-  docArray2Data<T>(docs: firebase.firestore.DocumentData[]): T[] {
+  docArray2Data<T>(docs: FirebaseDocData[]): T[] {
     return docs.map(doc => this.doc2Data<T>(doc)) as T[];
   }
 
-  public refCollection(): Observable<firebase.firestore.CollectionReference> {
+  public refCollection(): Observable<FirebaseCollectionRef> {
     return ResolvePathVariables(this).pipe(
       tap(collectionPath =>
         this.logger.logINFO("refCollection() resolved document path", {
           collectionPath
         })
       ),
-      map(collectionPath => this.app.firestore().collection(collectionPath)),
+      map(collectionPath => !!collectionPath ? this.app.firestore().collection(collectionPath) : null),
       tap(collection =>
         this.logger.logINFO("refCollection() resolved collection", {
           collection
         })
       ),
-      map(c => c as firebase.firestore.CollectionReference)
+      map(c => c as FirebaseCollectionRef)
     );
   }
 
-  public refDocument(): Observable<firebase.firestore.DocumentReference> {
+  public refDocument(): Observable<FirebaseDocRef> {
     return ResolvePathVariables(this).pipe(
       tap(documentPath =>
         this.logger.logINFO("refDocument() resolved document path", {
           documentPath
         })
       ),
-      map(documentPath => this.app.firestore().doc(documentPath)),
+      map(documentPath => !!documentPath ? this.app.firestore().doc(documentPath) : null),
       tap(doc =>
         this.logger.logINFO("refDocument() resolved document", {
           doc
         })
       ),
-      map(c => c as firebase.firestore.DocumentReference)
+      map(c => c as FirebaseDocRef)
     );
   }
 

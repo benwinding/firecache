@@ -15,16 +15,16 @@
     "clean": "rimraf dist"
   },
   "peerDependencies": {
-    "firebase": "7.9.x",
-    "rxjs": "^6.5.4"
+    "firebase": "7.17.x",
+    "rxjs": "6.5.x"
   },
   "devDependencies": {
     "@types/jest": "^25.1.4",
-    "firebase": "7.9.x",
+    "firebase": "7.17.x",
     "jest": "^25.2.1",
     "jest-coverage-badges": "^1.1.2",
     "rimraf": "^3.0.2",
-    "rxjs": "^6.5.4",
+    "rxjs": "6.5.5",
     "ts-jest": "^25.2.1",
     "typescript": "3.5.x"
   },

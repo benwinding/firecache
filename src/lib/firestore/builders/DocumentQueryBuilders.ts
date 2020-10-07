@@ -1,4 +1,4 @@
-import { Observable } from "rxjs";
+import { merge, Observable, partition } from "rxjs";
 import { map, switchMap, take, tap } from "rxjs/operators";
 import { documentSnap2Observable } from "../../utils";
 import { QueryState } from "../QueryState";
@@ -21,12 +21,22 @@ export function DocumentQueryGetDoc<T>(
 export function DocumentQueryGetDocSnap<T>(
   q: QueryState<FirebaseClientStateObject>
 ): Observable<T> {
-  q.logger.logDEBUG('>> start, DocumentQueryGetDocSnap()', {q});
-  return q.refDocument().pipe(
-    switchMap(doc => documentSnap2Observable(doc)),
-    map(doc => q.doc2Data<T>(doc)),
-    tap(data =>
-      q.logger.logINFO(">> end, data", { data })
-    )
+  q.logger.logDEBUG(">> start, DocumentQueryGetDocSnap()", { q });
+  const $collection = q.refDocument();
+  const [$collectionResolved, $collectionNull] = partition(
+    $collection,
+    (c) => !!c
   );
+  const $resultNull = $collectionNull.pipe(
+    map(() => ({} as T)),
+    tap((data) => q.logger.logINFO(">> null document path"))
+  );
+  const $resultResolved = $collectionResolved.pipe(
+    switchMap((doc) => documentSnap2Observable(doc)),
+    map((doc) => q.doc2Data<T>(doc))
+  );
+  const $result = merge($resultNull, $resultResolved).pipe(
+    tap((data) => q.logger.logINFO(">> end, data", { data }))
+  );
+  return $result;
 }

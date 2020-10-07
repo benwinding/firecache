@@ -3,7 +3,7 @@ import {
   collectionSnap2Observable,
   documentSnap2Observable
 } from "../../utils";
-import { of, Observable, combineLatest } from "rxjs";
+import { of, Observable, combineLatest, partition, merge } from "rxjs";
 import { QueryState } from "../QueryState";
 import { FirebaseClientStateObject, QueryFn } from "../../interfaces";
 
@@ -12,7 +12,13 @@ export function CollectionQueryGetAllDocsSnap<T>(
   whereQuery?: QueryFn
 ): Observable<T[]> {
   q.logger.logDEBUG(">> start, CollectionQueryGetAllDocsSnap()", { q, whereQuery });
-  return q.refCollection().pipe(
+  const $collection = q.refCollection();
+  const [$collectionResolved, $collectionNull] = partition($collection, c => !!c);
+  const $resultNull = $collectionNull.pipe(
+    map(() => [] as T[]),
+    tap(() => q.logger.logINFO(">> null collection path"))
+  );
+  const $resultResolved = $collectionResolved.pipe(
     map(collection => {
       if (whereQuery) {
         q.logger.logINFO("CollectionQueryGetAllDocsSnap() whereQuery", {
@@ -43,10 +49,12 @@ export function CollectionQueryGetAllDocsSnap<T>(
     ),
     map(docChanges => docChanges.docs),
     map(docs => docs.map(doc => q.doc2Data<T>(doc)) as T[]),
-    tap(data =>
-      q.logger.logINFO(">> end, data", { data })
-    )
+
   );
+  const $result = merge($resultNull, $resultResolved).pipe(
+    tap((data) => q.logger.logINFO(">> end, data", { data }))
+  );
+  return $result;
 }
 
 export function CollectionQueryGetAllDocs<T>(

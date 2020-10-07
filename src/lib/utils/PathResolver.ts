@@ -1,5 +1,5 @@
-import { Observable, Subject } from "rxjs";
-import { filter, map, takeUntil } from "rxjs/operators";
+import { Observable } from "rxjs";
+import { distinctUntilChanged, filter, map } from "rxjs/operators";
 import { IQueryState, FirebaseClientStateObject } from "../interfaces";
 import { Object2constStatements } from './Object2constStatements';
 
@@ -27,9 +27,7 @@ export function ResolvePathVariables(q: IQueryState): Observable<string> {
     })
   );
 
-  const stopSignal$ = new Subject();
-
-  return $rootStateOverriden.pipe(
+  const $pathResolved = $rootStateOverriden.pipe(
     map(rootState => {
       const evalTemplate = "`" + pathTemplate + "`";
       let rootStateDeclarations: string;
@@ -55,10 +53,10 @@ export function ResolvePathVariables(q: IQueryState): Observable<string> {
           },
           error
         );
-        stopSignal$.next();
+        return '';
       }
     }),
-    filter(path => !!path),
-    takeUntil(stopSignal$)
+    distinctUntilChanged(),
   );
+  return $pathResolved;
 }
