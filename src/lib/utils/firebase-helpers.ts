@@ -5,7 +5,7 @@ export function collectionSnap2Observable(
   collection: firebase.firestore.Query
 ): Observable<firebase.firestore.QuerySnapshot> {
   const onError = (err: Error) => {
-    console.error('document2Observable', { collection }, err);
+    console.error('collectionSnap2Observable', { collection }, err);
     return throwError(err);
   };
 

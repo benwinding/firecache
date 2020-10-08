@@ -49,7 +49,6 @@ export function CollectionQueryGetAllDocsSnap<T>(
     ),
     map(docChanges => docChanges.docs),
     map(docs => docs.map(doc => q.doc2Data<T>(doc)) as T[]),
-
   );
   const $result = merge($resultNull, $resultResolved).pipe(
     tap((data) => q.logger.logINFO(">> end, data", { data }))
