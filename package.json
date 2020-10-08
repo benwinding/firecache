@@ -1,6 +1,6 @@
 {
   "name": "firecache",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "rxjs state-management for firebase",
   "repository": "https://github.com/benwinding/firecache",
   "homepage": "https://github.com/benwinding/firecache",
