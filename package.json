@@ -9,13 +9,17 @@
   "private": false,
   "scripts": {
     "watch": "rimraf dist && tsc -w",
-    "build": "yarn build-js && yarn build-es6",
-    "build-js": "rimraf dist && tsc",
-    "build-es6": "rimraf dist-es6 && tsc --target es6 --outDir dist-es6",
+    "build": "rimraf dist && yarn build:es2015 && yarn build:es6",
+    "build:es2015": "tsc --outDir dist/lib",
+    "build:es6": "tsc --module es6 --target es5 --outDir dist/es6",
     "test": "jest",
     "test:badges": "jest-coverage-badges",
     "clean": "rimraf dist"
   },
+  "module": "dist/es6/index.js",
+  "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
+  "source": "src/index.ts",
   "peerDependencies": {
     "firebase": "^7.17.0",
     "rxjs": "6.5.x"
@@ -33,12 +37,7 @@
   "files": [
     "src",
     "dist",
-    "dist-es6",
     "README.md",
     "tsconfig.json"
-  ],
-  "module": "dist-es6/index.js",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "source": "src/index.ts"
+  ]
 }

@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "typeRoots": ["node_modules/@types"],
-    "outDir": "dist",
+    "outDir": "dist/lib",
     "target": "es2015",
     "module": "es2015",
     "moduleResolution": "node",
