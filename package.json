@@ -9,7 +9,9 @@
   "private": false,
   "scripts": {
     "watch": "rimraf dist && tsc -w",
-    "build": "rimraf dist && tsc",
+    "build": "yarn build-js && yarn build-es6",
+    "build-js": "rimraf dist && tsc",
+    "build-es6": "rimraf dist-es6 && tsc --target es6 --outDir dist-es6",
     "test": "jest",
     "test:badges": "jest-coverage-badges",
     "clean": "rimraf dist"
@@ -31,9 +33,11 @@
   "files": [
     "src",
     "dist",
+    "dist-es6",
     "README.md",
     "tsconfig.json"
   ],
+  "module": "dist-es6/index.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "source": "src/index.ts"
