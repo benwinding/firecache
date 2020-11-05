@@ -1,4 +1,5 @@
 import { Observable } from "rxjs";
+import { observableToPromise } from '../../utils';
 import {
   ICollectionQueryBuilder,
   QueryFn,
@@ -30,6 +31,21 @@ export class CollectionQueryBuilder<
   Docs
 > implements ICollectionQueryBuilder<TState, Colls, Docs> {
   constructor(private queryState: QueryState<TState>) {}
+
+  promise = {
+    GetId: async <T>(id: string): Promise<T> => {
+      return observableToPromise(this.GetId<T>(id));
+    },
+    GetManyIds: async <T>(ids: string[]): Promise<T[]> => {
+      return observableToPromise(this.GetManyIds<T>(ids));
+    },
+    GetAllDocs: async <T>(whereQuery?: QueryFn): Promise<T[]> => {
+      return observableToPromise(this.GetAllDocs<T>(whereQuery));
+    },
+    ref: async (): Promise<firebase.firestore.CollectionReference> => {
+      return observableToPromise(this.ref());
+    }
+  }
 
   GetId<T>(id: string): Observable<T> {
     return CollectionQueryGetId<T>(this.queryState, id);

@@ -28,7 +28,14 @@ export interface ICollectionQueryBuilder<
     subcollection: string
   ): ICollectionQueryBuilder<TState, Colls, Docs>;
 
-  // Queries
+  // Queries 
+  //   Promise versions
+  promise: {
+    GetId<T>(id: string): Promise<T>;
+    GetManyIds<T>(ids: string[]): Promise<T[]>;
+    GetAllDocs<T>(whereQuery?: QueryFn): Promise<T[]>;
+    ref(): Promise<firebase.firestore.CollectionReference>;
+  }
   //   get once
   GetId<T>(id: string): Observable<T>;
   GetManyIds<T>(ids: string[]): Observable<T[]>;
