@@ -66,7 +66,7 @@ export class FirebaseClient<
   }
 
   public $CurrentUser(): Observable<firebase.User> {
-    return this.clientState.$user;
+    return this.firebaseWrapper.GetAuthUser$();
   }
 
   public $GetRootState(): Observable<TState> {
