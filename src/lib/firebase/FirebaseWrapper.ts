@@ -13,6 +13,7 @@ import { take } from "rxjs/operators";
 import { FirebaseClientStateObject } from "../interfaces";
 import { LevelLogger } from "../utils";
 import { FireStateOptions } from "../interfaces";
+import { Observable } from 'rxjs';
 
 export class FirebaseWrapper<
   EnumPathTemplatesCollections,
@@ -103,5 +104,10 @@ export class FirebaseWrapper<
       EnumPathTemplatesDocuments,
       TState
     >(this.app, this.clientState, this.options);
+  }
+
+  GetAuthUser$(): Observable<firebase.User> {
+    const authState$ = MakeAuthstateObservable(this.app.auth());
+    return authState$;
   }
 }
