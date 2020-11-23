@@ -41,6 +41,12 @@ export class QueryState<TState extends FirebaseClientStateObject>
     public logLevel: LogLevel
   ) {
     this.logger = new LevelLogger("Query", this.logLevel);
+    if (this.options.removeAllUndefined) {
+      this.enableRemoveUndefinedValues();
+    }
+    if (this.options.convertTimestamps) {
+      this.enableFixAllDates();
+    }
   }
 
   public get pathTemplate(): string {
@@ -105,9 +111,7 @@ export class QueryState<TState extends FirebaseClientStateObject>
 
   private getDocData<T>(doc: FirebaseDocData): T {
     const dataSafe = doc.data() || {};
-    const shouldFixDates =
-      (this.options.convertTimestamps || this._enableFixAllDates) &&
-      !this._disableFixAllDates;
+    const shouldFixDates = this._enableFixAllDates && !this._disableFixAllDates;
     if (shouldFixDates) {
       parseAllDatesDoc(dataSafe);
     }
