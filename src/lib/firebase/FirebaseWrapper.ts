@@ -66,7 +66,7 @@ export class FirebaseWrapper<
     this.logger.logINFO("initUserFromBrowser() user logged in from cache!", {
       user
     });
-    this.clientState.PatchRootState({ user: user } as TState);
+    this.clientState.PatchRootState({ user: user, uid: user.uid } as TState);
   }
 
   async login(email: string, password: string): Promise<firebase.User> {
