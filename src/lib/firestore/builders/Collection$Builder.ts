@@ -5,7 +5,8 @@ import {
   QueryFn,
   FirebaseClientStateObject,
   DocWithId,
-  ActionFunction
+  ActionFunction,
+  LimitFetcher
 } from "../../interfaces";
 import { QueryState } from "../QueryState";
 import {
@@ -48,8 +49,8 @@ export class CollectionQueryBuilder<
     }
   }
 
-  MakePageFetcher<T>(pageSize: number, whereQuery?: QueryFn) {
-    return MakeFetcher<T>(this.queryState, pageSize, whereQuery);
+  MakePageFetcher<T extends DocWithId>(pageSize: number, whereQuery: QueryFn, watchFirst?: number): LimitFetcher<T> {
+    return MakeFetcher<T>(this.queryState, pageSize, whereQuery, watchFirst);
   }
 
   GetId<T>(id: string): Observable<T> {

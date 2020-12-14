@@ -1,22 +1,42 @@
 import { Observable, BehaviorSubject } from "rxjs";
 import { map, switchMap, take, tap } from "rxjs/operators";
-import { collectionSnap2Observable, parseAllDatesDoc } from "../../utils";
+import {
+  collectionSnap2Observable,
+  convertObservableToBehaviorSubject,
+} from "../../utils";
 import {
   QueryFn,
   LimitFetcher,
   FirebaseClientStateObject,
+  DocWithId,
 } from "../../interfaces";
 import { QueryState } from "../QueryState";
 
-export function MakeFetcher<T>(
+export function MakeFetcher<T extends DocWithId>(
   q: QueryState<FirebaseClientStateObject>,
   limitTo: number,
-  queryFn?: QueryFn
+  queryFn: QueryFn,
+  watchFirst: number = 10,
 ): LimitFetcher<T> {
   const $nextId = new BehaviorSubject<string>(null);
   const querySafe: QueryFn = !!queryFn ? queryFn : (c) => c;
+
+  const $changes = GetChangesAfterFirst<T>(q, querySafe, watchFirst);
+  const $changesBehavior = convertObservableToBehaviorSubject($changes, []);
+
+  function GetChangesBy(
+    changeType: firebase.firestore.DocumentChangeType
+  ): Observable<T[]> {
+    return $changesBehavior.pipe(
+      map((arr) => arr.filter((item) => item.changeType === changeType)),
+      map((arr) => arr.map((a) => a.data))
+    );
+  }
+
   const fetcher: LimitFetcher<T> = {
-    $newlyAdded: WatchForAdded<T>(q, querySafe),
+    $realtimeAdded: GetChangesBy("added"),
+    $realtimeModified: GetChangesBy("modified"),
+    $realtimeRemoved: GetChangesBy("removed"),
     fetchNext: async () => {
       const nextId = $nextId.getValue();
       const res = await FetchLimited<T>(q, limitTo, querySafe, nextId);
@@ -46,37 +66,50 @@ async function FetchLimited<T>(
   } else {
     limitQuery = (c) => queryFn(c).limit(limitToPlus1);
   }
-  const docSnap = await limitQuery(getDocsBase).get();
-  const docData = docSnap.docs;
+  const result = await limitQuery(getDocsBase).get();
+  const docData = result.docs;
   const hasMore = docData.length === limitToPlus1;
   const lastId = hasMore ? docData.pop().id : undefined;
-  const docs = docSnap.docs.map((d) => q.TransformDocData<T>(d));
+  const docs = result.docs.map((d) => q.TransformDocData<T>(d));
   // console.log('FetchLimited get', { collectionPath, lastId, lastDoc, docs });
   return { docs, nextId: lastId };
 }
 
-function WatchForAdded<T>(
+function GetChangesAfterFirst<T>(
   q: QueryState<FirebaseClientStateObject>,
-  queryFn: QueryFn
-): Observable<T[]> {
+  queryFn: QueryFn,
+  watchDocsCount: number
+): Observable<ParsedDocData<T>[]> {
   let isFirst = true;
-  const newItems = q.refCollection().pipe(
+  const changes$ = q.refCollection().pipe(
     switchMap((c) => {
-      const query = queryFn(c).limit(1);
+      const query = queryFn(c).limit(watchDocsCount);
       return collectionSnap2Observable(query);
     }),
     map((snap) => (isFirst ? [] : snap.docChanges())),
     tap(() => {
-      isFirst ? (isFirst = false) : null;
+      if (isFirst) {
+        isFirst = false;
+      }
     }),
-    map((changes) => changes.filter((a) => a.type === "added")),
-    map((data) =>
-      data.map((d) => ({
-        ...(d.doc.data() as T),
-        id: d.doc.id,
-      }))
-    ),
-    tap((items) => items.map(parseAllDatesDoc))
+    map((changes) =>
+      changes.map((change) => {
+        const doc = change.doc;
+        const transformed: T = doc.exists ? q.TransformDocData(doc) : null;
+        const data: ParsedDocData<T> = {
+          changeType: change.type,
+          data: transformed,
+          id: doc.id,
+        };
+        return data;
+      })
+    )
   );
-  return newItems;
+  return changes$;
+}
+
+interface ParsedDocData<T> {
+  changeType: firebase.firestore.DocumentChangeType;
+  data: T;
+  id: string;
 }

@@ -110,7 +110,7 @@ export class QueryState<TState extends FirebaseClientStateObject>
   }
 
   public TransformDocData<T>(doc: FirebaseDocData): T {
-    return this.getDocData<T>(doc);
+    return this.doc2Data<T>(doc);
   }
 
   private getDocData<T>(doc: FirebaseDocData): T {

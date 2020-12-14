@@ -1,5 +1,5 @@
 import { Observable } from "rxjs";
-import { FirebaseClientStateObject } from "../interfaces";
+import { DocWithId, FirebaseClientStateObject, LimitFetcher } from "../interfaces";
 import { ActionFunction } from "./Actions";
 
 export type QueryFn = (
@@ -45,6 +45,8 @@ export interface ICollectionQueryBuilder<
   GetAllDocsSnap<T>(whereQuery?: QueryFn): Observable<T[]>;
   GetManyIdsSnap<T>(ids: string[]): Observable<T[]>;
 
+  MakePageFetcher<T extends DocWithId>(pageSize: number, whereQuery: QueryFn): LimitFetcher<T>;
+  
   // Commands
   UpdateMany(
     objs: {
