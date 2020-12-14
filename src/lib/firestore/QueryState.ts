@@ -109,6 +109,10 @@ export class QueryState<TState extends FirebaseClientStateObject>
     this._disableFixAllDates = true;
   }
 
+  public TransformDocData<T>(doc: FirebaseDocData): T {
+    return this.getDocData<T>(doc);
+  }
+
   private getDocData<T>(doc: FirebaseDocData): T {
     const dataSafe = doc.data() || {};
     const shouldFixDates = this._enableFixAllDates && !this._disableFixAllDates;

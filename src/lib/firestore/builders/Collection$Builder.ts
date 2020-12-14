@@ -24,6 +24,7 @@ import {
   CollectionQueryGetManyIds,
   CollectionQueryGetManyIdsSnap
 } from "./CollectionQueryBuilders";
+import { MakeFetcher } from "./PageLimitFetcher";
 
 export class CollectionQueryBuilder<
   TState extends FirebaseClientStateObject,
@@ -45,6 +46,10 @@ export class CollectionQueryBuilder<
     ref: async (): Promise<firebase.firestore.CollectionReference> => {
       return observableToPromise(this.ref());
     }
+  }
+
+  MakePageFetcher<T>(pageSize: number, whereQuery?: QueryFn) {
+    return MakeFetcher<T>(this.queryState, pageSize, whereQuery);
   }
 
   GetId<T>(id: string): Observable<T> {
