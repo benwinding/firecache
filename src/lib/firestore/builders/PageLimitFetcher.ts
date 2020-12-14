@@ -70,7 +70,7 @@ async function FetchLimited<T>(
   const docData = result.docs;
   const hasMore = docData.length === limitToPlus1;
   const lastId = hasMore ? docData.pop().id : undefined;
-  const docs = result.docs.map((d) => q.TransformDocData<T>(d));
+  const docs = docData.map((d) => q.TransformDocData<T>(d));
   // console.log('FetchLimited get', { collectionPath, lastId, lastDoc, docs });
   return { docs, nextId: lastId };
 }
