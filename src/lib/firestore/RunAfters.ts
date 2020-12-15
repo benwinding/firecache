@@ -10,24 +10,22 @@ type RefDoc = firebase.firestore.DocumentReference;
 
 export function RunAfterDoc(
   q: QueryState<FirebaseClientStateObject>,
-  action: ActionType
-): (ref: RefDoc) => void {
-  return (ref: RefDoc) => {
-    const docPath = ref.path;
-    const docId = ref.id;
-    runAfters(q, action, docPath, [docId], "DOC");
-  };
+  action: ActionType,
+  ref: RefDoc
+) {
+  const docPath = ref.path;
+  const docId = ref.id;
+  return runAfters(q, action, docPath, [docId], "DOC");
 }
 
-export function RunAfterCollection(
+export async function RunAfterCollection(
   q: QueryState<FirebaseClientStateObject>,
   action: ActionType,
-  ids?: string[]
-): (ref: RefColl) => void {
-  return (ref: RefColl) => {
-    const collectionPath = ref.path;
-    runAfters(q, action, collectionPath, ids);
-  };
+  ids: string[],
+  ref: RefColl
+) {
+  const collectionPath = ref.path;
+  return runAfters(q, action, collectionPath, ids);
 }
 
 async function runAfters(

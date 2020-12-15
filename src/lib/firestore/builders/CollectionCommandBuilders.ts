@@ -1,10 +1,9 @@
 import { QueryState } from "../QueryState";
-import { switchMap, take, tap } from "rxjs/operators";
-import { chunkify, makeRandomId } from "../../utils";
+import { chunkify, makeRandomId, observableToPromise } from "../../utils";
 import { FirebaseClientStateObject } from "../../interfaces";
 import { RunAfterCollection } from "../RunAfters";
 
-export function CollectionCommandUpdate<T>(
+export async function CollectionCommandUpdate<T>(
   q: QueryState<FirebaseClientStateObject>,
   id: string,
   obj: T,
@@ -14,24 +13,19 @@ export function CollectionCommandUpdate<T>(
     q,
     id,
     obj,
-    isMerged
+    isMerged,
   });
-  return q
-    .refCollection()
-    .pipe(
-      tap(RunAfterCollection(q, "edited", [id])),
-      switchMap(collection => {
-        q.setUpdatedProps(obj, q.uid);
-        const parsed = q.parseBeforeUpload(obj);
-        return collection.doc(id).set(parsed, { merge: isMerged });
-      }),
-      tap(data => q.logger.logINFO(">> end, data", { data }))
-    )
-    .pipe(take(1))
-    .toPromise();
+  const collection = await observableToPromise(q.refCollection());
+  q.setUpdatedProps(obj, q.uid);
+  const parsed = q.parseBeforeUpload(obj);
+  await Promise.all([
+    collection.doc(id).set(parsed, { merge: isMerged }),
+    RunAfterCollection(q, "edited", [id], collection),
+  ]);
+  q.logger.logINFO(">> end, CollectionCommandUpdate");
 }
 
-export function CollectionCommandUpdateMany(
+export async function CollectionCommandUpdateMany(
   q: QueryState<FirebaseClientStateObject>,
   objs: {
     id: string;
@@ -39,41 +33,27 @@ export function CollectionCommandUpdateMany(
   isMerged?: boolean
 ): Promise<any> {
   const uid = q.uid;
-  const ids = objs.map(o => o.id);
+  const ids = objs.map((o) => o.id);
   q.logger.logDEBUG(">> start, CollectionCommandUpdateMany()", {
     uid,
     ids,
     q,
     isMerged,
-    objs
+    objs,
   });
-  return q
-    .refCollection()
-    .pipe(
-      tap(RunAfterCollection(q, "edited some", ids)),
-      switchMap(collection => {
-        const db = q.app.firestore();
-        const objs500Groups = chunkify(objs, 500);
-        return Promise.all(
-          objs500Groups.map(async objs500 => {
-            const batch = db.batch();
-            objs500.map(obj => {
-              const docRef = collection.doc(obj.id);
-              q.setUpdatedProps(obj, uid);
-              const parsed = q.parseBeforeUpload(obj);
-              batch.set(docRef, parsed, { merge: isMerged });
-            });
-            return batch.commit();
-          })
-        );
-      }),
-      tap(data => q.logger.logINFO(">> end, data", { data }))
-    )
-    .pipe(take(1))
-    .toPromise();
+  const collection = await observableToPromise(q.refCollection());
+  const db = q.app.firestore();
+  await BatchIt500(db, objs, (obj, batch) => {
+    const docRef = collection.doc(obj.id);
+    q.setUpdatedProps(obj, uid);
+    const parsed = q.parseBeforeUpload(obj);
+    batch.set(docRef, parsed, { merge: isMerged });
+  });
+  await RunAfterCollection(q, "edited some", ids, collection);
+  q.logger.logINFO(">> end, CollectionCommandUpdateMany");
 }
 
-export function CollectionCommandAdd<T>(
+export async function CollectionCommandAdd<T>(
   q: QueryState<FirebaseClientStateObject>,
   obj: T
 ): Promise<firebase.firestore.DocumentReference> {
@@ -82,100 +62,81 @@ export function CollectionCommandAdd<T>(
   q.setUpdatedProps(obj, uid);
   q.setCreatedProps(obj, uid);
   const parsed = q.parseBeforeUpload(obj);
-  return q
-    .refCollection()
-    .pipe(
-      tap(RunAfterCollection(q, "added")),
-      switchMap(async collection => {
-        try {
-          const result = await collection.add(parsed);
-          return result;
-        } catch (error) {
-          q.logger.logERROR("error in Update()", error, {
-            parsed,
-            collection
-          });
-          throw new Error(error);
-        }
-      }),
-      tap(data => q.logger.logINFO(">> end, data", { data }))
-    )
-    .pipe(take(1))
-    .toPromise();
+  const collection = await observableToPromise(q.refCollection());
+  try {
+    const result = await collection.add(parsed);
+    await RunAfterCollection(q, "added", [result.id], collection);
+    return result;
+  } catch (error) {
+    q.logger.logERROR("error in Update()", error, {
+      parsed,
+      collection,
+    });
+    throw new Error(error);
+  }
 }
 
-export function CollectionCommandAddMany(
+export async function CollectionCommandAddMany(
   q: QueryState<FirebaseClientStateObject>,
   objs: {}[]
 ): Promise<void> {
   const uid = q.uid;
   q.logger.logDEBUG(">> start, CollectionCommandAddMany()", { uid, q, objs });
-  return q
-    .refCollection()
-    .pipe(
-      tap(RunAfterCollection(q, "added some")),
-      switchMap(async collection => {
-        const db = q.app.firestore();
-        const objs500Groups = chunkify(objs, 500);
-        await Promise.all(
-          objs500Groups.map(async objs500 => {
-            const batch = db.batch();
-            objs500.map(obj => {
-              q.setCreatedProps(obj, uid);
-              q.setUpdatedProps(obj, uid);
-              const parsed = q.parseBeforeUpload(obj);
-              const newId = makeRandomId(db);
-              const docRef = collection.doc(newId);
-              batch.set(docRef, parsed, { merge: true });
-            });
-            return batch.commit();
-          })
-        );
-      }),
-      tap(data => q.logger.logINFO(">> end, data", { data }))
-    )
-    .pipe(take(1))
-    .toPromise();
+  const collection = await observableToPromise(q.refCollection());
+  const db = q.app.firestore();
+  const idsAdded: string[] = [];
+  await BatchIt500(db, objs, (obj, batch) => {
+    q.setCreatedProps(obj, uid);
+    q.setUpdatedProps(obj, uid);
+    const parsed = q.parseBeforeUpload(obj);
+    const newId = makeRandomId(db);
+    const docRef = collection.doc(newId);
+    batch.set(docRef, parsed, { merge: true });
+    idsAdded.push(newId);
+  });
+  await RunAfterCollection(q, "added some", idsAdded, collection);
+  q.logger.logDEBUG(">> end, CollectionCommandAddMany()");
 }
 
-export function CollectionCommandDeleteId(
+export async function CollectionCommandDeleteId(
   q: QueryState<FirebaseClientStateObject>,
   id: string
 ): Promise<void> {
   q.logger.logDEBUG(">> start, CollectionCommandDeleteId()", { q, id });
-  return q
-    .refCollection()
-    .pipe(
-      tap(RunAfterCollection(q, "removed", [id])),
-      switchMap(collection => collection.doc(id).delete()),
-      tap(data => q.logger.logINFO(">> end, data", { data }))
-    )
-    .pipe(take(1))
-    .toPromise();
+  const collection = await observableToPromise(q.refCollection());
+  await collection.doc(id).delete();
+  await RunAfterCollection(q, "removed", [id], collection);
+  q.logger.logDEBUG(">> end, CollectionCommandDeleteId()");
 }
 
-export function CollectionCommandDeleteIds(
+export async function CollectionCommandDeleteIds(
   q: QueryState<FirebaseClientStateObject>,
   ids: string[]
-): Promise<any> {
+): Promise<void> {
   q.logger.logDEBUG(">> start, CollectionCommandDeleteIds()", { q, ids });
-  return q
-    .refCollection()
-    .pipe(
-      tap(RunAfterCollection(q, "removed some", ids)),
-      switchMap(collection => {
-        const db = q.app.firestore();
+  const collection = await observableToPromise(q.refCollection());
+  const db = q.app.firestore();
+  await BatchIt500(db, ids, (id, batch) => {
+    const docRef = collection.doc(id);
+    batch.delete(docRef);
+  });
+  await RunAfterCollection(q, "removed some", ids, collection);
+  q.logger.logDEBUG(">> end, CollectionCommandDeleteIds()");
+}
 
-        const batch = db.batch();
-
-        ids.map(id => {
-          const docRef = collection.doc(id);
-          batch.delete(docRef);
-        });
-        return batch.commit();
-      }),
-      tap(data => q.logger.logINFO(">> end, data", { data }))
-    )
-    .pipe(take(1))
-    .toPromise();
+async function BatchIt500(
+  db: firebase.firestore.Firestore,
+  objs: any[],
+  fnEach: (obj: any, batch: firebase.firestore.WriteBatch) => void
+) {
+  const objs500Groups = chunkify(objs, 500);
+  return Promise.all(
+    objs500Groups.map(async (objs500) => {
+      const batch = db.batch();
+      objs500.map((obj) => {
+        fnEach(obj, batch);
+      });
+      return batch.commit();
+    })
+  );
 }
