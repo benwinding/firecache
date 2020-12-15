@@ -15,6 +15,10 @@ export interface IDocumentQueryBuilder<TState extends FirebaseClientStateObject,
   DisableFixAllDates(): IDocumentQueryBuilder<TState, Colls, Docs>;
   EnableFixAllDates(): IDocumentQueryBuilder<TState, Colls, Docs>;
   EnableRemoveUndefinedValues(): IDocumentQueryBuilder<TState, Colls, Docs>;
+  // Promise-based
+  promise: {
+    GetDoc<T>(): Promise<T>;
+  }
   // Queries
   GetDoc<T>(): Observable<T>;
   GetDocSnap<T>(): Observable<T>;

@@ -10,6 +10,7 @@ import {
   DocumentQueryGetDocSnap
 } from "./DocumentQueryBuilders";
 import { DocumentCommandUpdate } from "./DocumentCommandBuilders";
+import { observableToPromise } from "../../utils";
 
 export class DocumentQueryBuilder<
   TState extends FirebaseClientStateObject,
@@ -18,6 +19,11 @@ export class DocumentQueryBuilder<
 > implements IDocumentQueryBuilder<TState, Colls, Docs> {
   constructor(private queryState: QueryState<TState>) {}
 
+  promise = { 
+    GetDoc: async <T>(): Promise<T> => {
+      return observableToPromise(this.GetDoc<T>());
+    }
+  };
   GetDoc<T>(): Observable<T> {
     return DocumentQueryGetDoc<T>(this.queryState);
   }
