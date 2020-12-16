@@ -93,7 +93,7 @@ export class CollectionQueryBuilder<
     id: string,
     subcollection: string
   ): ICollectionQueryBuilder<TState, Colls, Docs> {
-    this.queryState.SetSubCollection(id, subcollection);
+    this.queryState.addSubCollection(id, subcollection);
     return this;
   }
   OnFinishedHook(

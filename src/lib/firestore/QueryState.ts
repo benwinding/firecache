@@ -6,7 +6,7 @@ import {
   IQueryState,
   ActionFunction,
   FireStateOptions,
-  LogLevel
+  LogLevel,
 } from "../interfaces";
 import { Observable } from "rxjs";
 import { ResolvePathVariables } from "../utils";
@@ -25,7 +25,7 @@ export class QueryState<TState extends FirebaseClientStateObject>
   public overridenState: FirebaseClientStateObject;
   public logger: LevelLogger;
 
-  private subcollectionState: SubCollectionState;
+  private subcollectionState: SubCollectionState[] = [];
   private callbacks: ActionFunction<any, any>[] = [];
   private _disableIdInclusion: boolean;
   private _disableUpdateFields: boolean;
@@ -50,8 +50,12 @@ export class QueryState<TState extends FirebaseClientStateObject>
   }
 
   public get pathTemplate(): string {
-    if (this.subcollectionState) {
-      return `${this._pathTemplate}/${this.subcollectionState.id}/${this.subcollectionState.subcollection}`;
+    if (this.subcollectionState.length) {
+      const allSubs = this.subcollectionState.reduce(
+        (acc, cur) => `${acc}/${cur.id}/${cur.subcollection}`,
+        this._pathTemplate
+      );
+      return allSubs;
     }
     return this._pathTemplate;
   }
@@ -69,11 +73,11 @@ export class QueryState<TState extends FirebaseClientStateObject>
     return this;
   }
 
-  public SetSubCollection(id: string, subcollection: string) {
-    this.subcollectionState = {
+  public addSubCollection(id: string, subcollection: string) {
+    this.subcollectionState.push({
       id: id,
-      subcollection: subcollection
-    };
+      subcollection: subcollection,
+    });
   }
 
   public parseBeforeUpload(obj: any): any {
@@ -131,40 +135,46 @@ export class QueryState<TState extends FirebaseClientStateObject>
   }
 
   docArray2Data<T>(docs: FirebaseDocData[]): T[] {
-    return docs.map(doc => this.doc2Data<T>(doc)) as T[];
+    return docs.map((doc) => this.doc2Data<T>(doc)) as T[];
   }
 
   public refCollection(): Observable<FirebaseCollectionRef> {
     return ResolvePathVariables(this).pipe(
-      tap(collectionPath =>
+      tap((collectionPath) =>
         this.logger.logINFO("refCollection() resolved document path", {
-          collectionPath
+          collectionPath,
         })
       ),
-      map(collectionPath => !!collectionPath ? this.app.firestore().collection(collectionPath) : null),
-      tap(collection =>
+      map((collectionPath) =>
+        !!collectionPath
+          ? this.app.firestore().collection(collectionPath)
+          : null
+      ),
+      tap((collection) =>
         this.logger.logINFO("refCollection() resolved collection", {
-          collection
+          collection,
         })
       ),
-      map(c => c as FirebaseCollectionRef)
+      map((c) => c as FirebaseCollectionRef)
     );
   }
 
   public refDocument(): Observable<FirebaseDocRef> {
     return ResolvePathVariables(this).pipe(
-      tap(documentPath =>
+      tap((documentPath) =>
         this.logger.logINFO("refDocument() resolved document path", {
-          documentPath
+          documentPath,
         })
       ),
-      map(documentPath => !!documentPath ? this.app.firestore().doc(documentPath) : null),
-      tap(doc =>
+      map((documentPath) =>
+        !!documentPath ? this.app.firestore().doc(documentPath) : null
+      ),
+      tap((doc) =>
         this.logger.logINFO("refDocument() resolved document", {
-          doc
+          doc,
         })
       ),
-      map(c => c as FirebaseDocRef)
+      map((c) => c as FirebaseDocRef)
     );
   }
 
