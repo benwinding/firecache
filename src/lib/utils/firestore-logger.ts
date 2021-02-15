@@ -1,7 +1,6 @@
+import { LogLevel } from "../interfaces";
 import { FireStateOptions } from "../interfaces/FireStateOptions";
 import { LevelLogger } from "./LevelLogger";
-
-const logger = new LevelLogger("💸firestore-costs:");
 
 const KEY_READS = "firecosts-doc-reads";
 const KEY_WRITES = "firecosts-doc-writes";
@@ -17,6 +16,8 @@ export interface IFirestoreLogger {
 export function MakeFirestoreLogger(
   options: FireStateOptions
 ): IFirestoreLogger {
+  const logger = new LevelLogger("💸firestore-costs:", LogLevel.DEBUG);
+
   function notEnabled() {
     return !options || !options.logCosts;
   }
