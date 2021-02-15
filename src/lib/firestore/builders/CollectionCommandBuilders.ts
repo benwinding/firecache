@@ -15,6 +15,7 @@ export async function CollectionCommandUpdate<T>(
     obj,
     isMerged,
   });
+  q.logCosts.LogWrites(1);
   const collection = await observableToPromise(q.refCollection());
   q.setUpdatedProps(obj, q.uid);
   const parsed = q.parseBeforeUpload(obj);
@@ -49,6 +50,7 @@ export async function CollectionCommandUpdateMany(
     const parsed = q.parseBeforeUpload(obj);
     batch.set(docRef, parsed, { merge: isMerged });
   });
+  q.logCosts.LogWrites(objs.length);
   await RunAfterCollection(q, "edited some", ids, collection);
   q.logger.logINFO(">> end, CollectionCommandUpdateMany");
 }
@@ -65,6 +67,7 @@ export async function CollectionCommandAdd<T>(
   const collection = await observableToPromise(q.refCollection());
   try {
     const result = await collection.add(parsed);
+    q.logCosts.LogWrites(1);
     await RunAfterCollection(q, "added", [result.id], collection);
     return result;
   } catch (error) {
@@ -95,6 +98,7 @@ export async function CollectionCommandAddMany(
     idsAdded.push(newId);
   });
   await RunAfterCollection(q, "added some", idsAdded, collection);
+  q.logCosts.LogWrites(objs.length);
   q.logger.logDEBUG(">> end, CollectionCommandAddMany()");
 }
 
@@ -106,6 +110,7 @@ export async function CollectionCommandDeleteId(
   const collection = await observableToPromise(q.refCollection());
   await collection.doc(id).delete();
   await RunAfterCollection(q, "removed", [id], collection);
+  q.logCosts.LogWrites(1);
   q.logger.logDEBUG(">> end, CollectionCommandDeleteId()");
 }
 
@@ -121,6 +126,7 @@ export async function CollectionCommandDeleteIds(
     batch.delete(docRef);
   });
   await RunAfterCollection(q, "removed some", ids, collection);
+  q.logCosts.LogWrites(ids.length);
   q.logger.logDEBUG(">> end, CollectionCommandDeleteIds()");
 }
 

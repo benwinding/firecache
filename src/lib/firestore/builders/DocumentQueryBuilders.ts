@@ -7,14 +7,15 @@ import { FirebaseClientStateObject } from "../../interfaces";
 export function DocumentQueryGetDoc<T>(
   q: QueryState<FirebaseClientStateObject>
 ): Observable<T> {
-  q.logger.logDEBUG('>> start, DocumentQueryGetDoc()', {q});
+  q.logger.logDEBUG(">> start, DocumentQueryGetDoc()", { q });
   return q.refDocument().pipe(
     take(1),
-    switchMap(doc => doc.get()),
-    map(doc => q.doc2Data<T>(doc)),
-    tap(data =>
-      q.logger.logINFO(">> end, data", { data })
-    )
+    switchMap((doc) => doc.get()),
+    map((doc) => q.doc2Data<T>(doc)),
+    tap((data) => {
+      q.logCosts.LogReads(1);
+      q.logger.logINFO(">> end, data", { data });
+    })
   );
 }
 
@@ -36,7 +37,10 @@ export function DocumentQueryGetDocSnap<T>(
     map((doc) => q.doc2Data<T>(doc))
   );
   const $result = merge($resultNull, $resultResolved).pipe(
-    tap((data) => q.logger.logINFO(">> end, data", { data }))
+    tap((data) => {
+      q.logCosts.LogReads(1);
+      q.logger.logINFO(">> end, data", { data });
+    })
   );
   return $result;
 }

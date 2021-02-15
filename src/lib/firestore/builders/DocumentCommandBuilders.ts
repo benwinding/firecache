@@ -14,5 +14,6 @@ export async function DocumentCommandUpdate(
   const parsed = q.parseBeforeUpload(obj);
   const result = await doc.set(parsed, { merge: isMerged });
   await RunAfterDoc(q, "edited", doc);
+  q.logCosts.LogWrites(1);
   return result;
 }

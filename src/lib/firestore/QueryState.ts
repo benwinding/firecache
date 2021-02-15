@@ -10,6 +10,7 @@ import {
 } from "../interfaces";
 import { Observable } from "rxjs";
 import { ResolvePathVariables } from "../utils";
+import { IFirestoreLogger, MakeFirestoreLogger } from "../utils/firestore-logger";
 
 interface SubCollectionState {
   id: string;
@@ -24,6 +25,7 @@ export class QueryState<TState extends FirebaseClientStateObject>
   implements IQueryState {
   public overridenState: FirebaseClientStateObject;
   public logger: LevelLogger;
+  public logCosts: IFirestoreLogger;
 
   private subcollectionState: SubCollectionState[] = [];
   private callbacks: ActionFunction<any, any>[] = [];
@@ -41,6 +43,7 @@ export class QueryState<TState extends FirebaseClientStateObject>
     public logLevel: LogLevel
   ) {
     this.logger = new LevelLogger("Query", this.logLevel);
+    this.logCosts = MakeFirestoreLogger(this.options);
     if (this.options.removeAllUndefined) {
       this.enableRemoveUndefinedValues();
     }
