@@ -46,7 +46,7 @@ export function CollectionQueryGetAllDocsSnap<T>(
       )
     ),
     tap((docSnap) => {
-      q.logCosts.LogReads(docSnap.docs.length);
+      q.logCosts.LogReads(docSnap.docs.length)();
       q.logger.logINFO(
         "CollectionQueryGetAllDocsSnap() after snapshotChanges...",
         {
@@ -86,7 +86,7 @@ export function CollectionQueryGetAllDocs<T>(
       }
     }),
     tap((docSnap) => {
-      q.logCosts.LogReads(docSnap.length);
+      q.logCosts.LogReads(docSnap.length)();
       q.logger.logINFO("after get()...", {
         "docSnap?": docSnap,
       });
@@ -106,7 +106,7 @@ export function CollectionQueryGetId<T>(
     map((collection) => collection.doc(id)),
     switchMap((doc) => doc.get()),
     tap((docSnap) => {
-      q.logCosts.LogReads(1);
+      q.logCosts.LogReads(1)();
       q.logger.logINFO("after get()...", {
         "pathExists?": docSnap.exists,
       });
@@ -125,7 +125,7 @@ export function CollectionQueryGetIdSnap<T>(
     map((collection) => collection.doc(id)),
     switchMap((doc) => documentSnap2Observable(doc)),
     tap((docSnap) => {
-      q.logCosts.LogReads(1);
+      q.logCosts.LogReads(1)();
       q.logger.logINFO("after snapshotChanges...", {
         "docSnapExists?": docSnap.exists,
       });
@@ -146,7 +146,7 @@ export function CollectionQueryGetManyIds<T>(
       combineLatest(ids.map((id) => collection.doc(id).get()))
     ),
     tap((docs) => {
-      q.logCosts.LogReads(docs.length);
+      q.logCosts.LogReads(docs.length)();
       q.logger.logINFO("after get() many...", {
         "docSnapExists?": docs,
       });
@@ -169,7 +169,7 @@ export function CollectionQueryGetManyIdsSnap<T>(
     ),
     map((docs) => q.docArray2Data<T>(docs)),
     tap((data) => {
-      q.logCosts.LogReads(data.length);
+      q.logCosts.LogReads(data.length)();
       q.logger.logINFO(">> end, data...", { data });
     })
   );

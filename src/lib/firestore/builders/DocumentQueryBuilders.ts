@@ -13,7 +13,7 @@ export function DocumentQueryGetDoc<T>(
     switchMap((doc) => doc.get()),
     map((doc) => q.doc2Data<T>(doc)),
     tap((data) => {
-      q.logCosts.LogReads(1);
+      q.logCosts.LogReads(1)();
       q.logger.logINFO(">> end, data", { data });
     })
   );
@@ -38,7 +38,7 @@ export function DocumentQueryGetDocSnap<T>(
   );
   const $result = merge($resultNull, $resultResolved).pipe(
     tap((data) => {
-      q.logCosts.LogReads(1);
+      q.logCosts.LogReads(1)();
       q.logger.logINFO(">> end, data", { data });
     })
   );
