@@ -49,8 +49,8 @@ export class CollectionQueryBuilder<
     }
   }
 
-  MakePageFetcher<T extends DocWithId>(pageSize: number, whereQuery: QueryFn, watchFirst?: number): LimitFetcher<T> {
-    return MakeFetcher<T>(this.queryState, pageSize, whereQuery, watchFirst);
+  MakePageFetcher<T extends DocWithId>(pageSize: number, whereQuery: QueryFn): LimitFetcher<T> {
+    return MakeFetcher<T>(this.queryState, pageSize, whereQuery);
   }
 
   GetId<T>(id: string): Observable<T> {

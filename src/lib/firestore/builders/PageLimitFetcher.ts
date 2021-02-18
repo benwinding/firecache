@@ -1,9 +1,6 @@
-import { Observable, BehaviorSubject } from "rxjs";
-import { map, switchMap, take, tap } from "rxjs/operators";
-import {
-  collectionSnap2Observable,
-  convertObservableToBehaviorSubject,
-} from "../../utils";
+import { Observable, BehaviorSubject, Subject } from "rxjs";
+import { map, switchMap, take, takeUntil, tap } from "rxjs/operators";
+import { collectionSnap2Observable } from "../../utils";
 import {
   QueryFn,
   LimitFetcher,
@@ -12,17 +9,25 @@ import {
 } from "../../interfaces";
 import { QueryState } from "../QueryState";
 
+/* 
+
+This implementation creates a "Fetcher" abstraction. 
+Which can be paginated and includes realtime updates
+
+*/
+
+type FirebaseCollectionRef = firebase.firestore.CollectionReference;
+
 export function MakeFetcher<T extends DocWithId>(
   q: QueryState<FirebaseClientStateObject>,
   limitTo: number,
-  queryFn: QueryFn,
-  watchFirst: number = 10,
+  queryFn: QueryFn
 ): LimitFetcher<T> {
   const $nextId = new BehaviorSubject<string>(null);
   const querySafe: QueryFn = !!queryFn ? queryFn : (c) => c;
 
-  const $changes = GetChangesAfterFirst<T>(q, querySafe, watchFirst);
-  const $changesBehavior = convertObservableToBehaviorSubject($changes, []);
+  const $destroyed = new Subject();
+  const $changesBehavior = new BehaviorSubject<ParsedDocData<T>[]>([]);
 
   function GetChangesBy(
     changeType: firebase.firestore.DocumentChangeType
@@ -40,9 +45,15 @@ export function MakeFetcher<T extends DocWithId>(
     fetchNext: async () => {
       const nextId = $nextId.getValue();
       const res = await FetchLimited<T>(q, limitTo, querySafe, nextId);
+      GetChangesAfterFirst<T>(q, res.limitQuery)
+        .pipe(takeUntil($destroyed))
+        .subscribe((docs) => {
+          $changesBehavior.next(docs);
+        });
       $nextId.next(res.nextId);
       return res.docs;
     },
+    destroy: () => $destroyed.next(),
     hasNext: () => $nextId.pipe(map((id) => !!id)),
   };
   return fetcher;
@@ -53,11 +64,36 @@ async function FetchLimited<T>(
   limitTo: number,
   queryFn: QueryFn,
   startAtId?: string
-): Promise<{ docs: T[]; nextId: string | undefined }> {
+): Promise<{ docs: T[]; nextId: string | undefined; limitQuery: QueryFn }> {
   const getDocsBase = await q.refCollection().pipe(take(1)).toPromise();
 
-  const isStartAfter = !!startAtId;
   const limitToPlus1 = limitTo + 1;
+  const limitQuery = await GetLimitQuery(
+    getDocsBase,
+    queryFn,
+    limitToPlus1,
+    startAtId
+  );
+  const result = await limitQuery(getDocsBase).get();
+  const docData = result.docs;
+  const hasMore = docData.length === limitToPlus1;
+  let lastId: string;
+  if (hasMore) {
+    const lastItemRemoved = docData.pop();
+    lastId = lastItemRemoved.id;
+  }
+  const docs = docData.map((d) => q.TransformDocData<T>(d));
+  // console.log('FetchLimited get', { collectionPath, lastId, lastDoc, docs });
+  return { docs, nextId: lastId, limitQuery };
+}
+
+async function GetLimitQuery(
+  getDocsBase: FirebaseCollectionRef,
+  queryFn: QueryFn,
+  limitToPlus1: number,
+  startAtId: string | undefined
+) {
+  const isStartAfter = !!startAtId;
   let limitQuery: QueryFn;
   if (isStartAfter) {
     console.log("FetchLimited get", { path: getDocsBase.path });
@@ -66,24 +102,24 @@ async function FetchLimited<T>(
   } else {
     limitQuery = (c) => queryFn(c).limit(limitToPlus1);
   }
-  const result = await limitQuery(getDocsBase).get();
-  const docData = result.docs;
-  const hasMore = docData.length === limitToPlus1;
-  const lastId = hasMore ? docData.pop().id : undefined;
-  const docs = docData.map((d) => q.TransformDocData<T>(d));
-  // console.log('FetchLimited get', { collectionPath, lastId, lastDoc, docs });
-  return { docs, nextId: lastId };
+  return limitQuery;
 }
+
+/* 
+
+Firestore only returns the first new items, based on the query limit()
+If limit(2) then there will only be 2 new items in snapshot changes no more.
+
+*/
 
 function GetChangesAfterFirst<T>(
   q: QueryState<FirebaseClientStateObject>,
-  queryFn: QueryFn,
-  watchDocsCount: number
+  limitQuery: QueryFn
 ): Observable<ParsedDocData<T>[]> {
   let isFirst = true;
   const changes$ = q.refCollection().pipe(
     switchMap((c) => {
-      const query = queryFn(c).limit(watchDocsCount);
+      const query = limitQuery(c);
       return collectionSnap2Observable(query);
     }),
     map((snap) => (isFirst ? [] : snap.docChanges())),
