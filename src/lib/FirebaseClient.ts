@@ -23,7 +23,7 @@ export class FirebaseClient<
   private logger: LevelLogger;
 
   constructor(
-    firebaseConfig: FirebaseConfigObject,
+    firebaseConfigOrApp: FirebaseConfigObject | firebase.app.App,
     private options?: FireStateOptions
   ) {
     this.options = options || {};
@@ -34,7 +34,7 @@ export class FirebaseClient<
       EnumPathTemplatesCollections,
       EnumPathTemplatesDocuments,
       TState
-    >(firebaseConfig, this.clientState, this.options);
+    >(firebaseConfigOrApp, this.clientState, this.options);
     this.appSDK = this.firebaseWrapper.app;
   }
 

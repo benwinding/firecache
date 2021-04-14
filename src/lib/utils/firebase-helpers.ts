@@ -38,8 +38,14 @@ export interface FirebaseConfigObject {
   [key: string]: string | boolean;
 }
 
-export function GetApp(firebaseConfig: FirebaseConfigObject): firebase.app.App {
+export function GetApp(firebaseConfigOrApp: FirebaseConfigObject | firebase.app.App): firebase.app.App {
   try {
+    const appInstance = firebaseConfigOrApp as firebase.app.App;
+    const isAppInstance = !!appInstance.firestore && typeof appInstance.firestore == 'function';
+    if (isAppInstance) {
+      return appInstance;
+    }
+    const firebaseConfig = firebaseConfigOrApp as FirebaseConfigObject;
     const appName = firebaseConfig.projectId;
     const f = firebase;
     if (AppExists(appName)) {

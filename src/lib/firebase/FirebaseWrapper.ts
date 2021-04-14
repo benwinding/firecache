@@ -29,12 +29,12 @@ export class FirebaseWrapper<
   private logger: LevelLogger;
 
   constructor(
-    firebaseConfig: FirebaseConfigObject,
+    firebaseConfigOrApp: FirebaseConfigObject | firebase.app.App,
     private clientState: FirebaseClientStateManager<TState>,
     private options: FireStateOptions
   ) {
     this.logger = new LevelLogger("FirebaseWrapper", options.logLevel);
-    this.app = GetApp(firebaseConfig);
+    this.app = GetApp(firebaseConfigOrApp);
     this.provider = new FirestoreWrapper<
       EnumPathTemplatesCollections,
       EnumPathTemplatesDocuments,
