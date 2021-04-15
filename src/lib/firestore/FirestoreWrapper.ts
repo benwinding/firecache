@@ -1,6 +1,12 @@
 import { CollectionQueryBuilder, DocumentQueryBuilder } from "./builders";
 import { FirebaseClientStateManager } from "../FirebaseClientStateManager";
-import { LogLevel, FireStateOptions, FirebaseClientStateObject } from "../interfaces";
+import {
+  LogLevel,
+  FireStateOptions,
+  FirebaseClientStateObject,
+  ICollectionQueryBuilder,
+  IDocumentQueryBuilder,
+} from "../interfaces";
 import { QueryState } from "./QueryState";
 import * as firebase from "firebase/app";
 
@@ -18,7 +24,11 @@ export class FirestoreWrapper<
   public FromCollection(
     collectionPathTemplate: EnumPathTemplatesCollections,
     logLevel?: LogLevel
-  ): CollectionQueryBuilder<TState, EnumPathTemplatesCollections, EnumPathTemplatesDocuments> {
+  ): ICollectionQueryBuilder<
+    TState,
+    EnumPathTemplatesCollections,
+    EnumPathTemplatesDocuments
+  > {
     const queryState = new QueryState(
       this.rootState,
       (collectionPathTemplate as any) as string,
@@ -32,7 +42,11 @@ export class FirestoreWrapper<
   public FromDocument(
     documentPathTemplate: EnumPathTemplatesDocuments,
     logLevel?: LogLevel
-  ): DocumentQueryBuilder<TState, EnumPathTemplatesCollections, EnumPathTemplatesDocuments> {
+  ): IDocumentQueryBuilder<
+    TState,
+    EnumPathTemplatesCollections,
+    EnumPathTemplatesDocuments
+  > {
     const queryState = new QueryState(
       this.rootState,
       (documentPathTemplate as any) as string,
@@ -46,7 +60,11 @@ export class FirestoreWrapper<
   public UNSAFEFromCollection(
     collectionPathTemplate: string,
     logLevel?: LogLevel
-  ): CollectionQueryBuilder<TState, EnumPathTemplatesCollections, EnumPathTemplatesDocuments> {
+  ): ICollectionQueryBuilder<
+    TState,
+    EnumPathTemplatesCollections,
+    EnumPathTemplatesDocuments
+  > {
     const queryState = new QueryState(
       this.rootState,
       (collectionPathTemplate as any) as string,
@@ -58,6 +76,6 @@ export class FirestoreWrapper<
   }
 
   public GetRandomDocId(): string {
-    return this.app.firestore().collection('collections').doc().id;
+    return this.app.firestore().collection("collections").doc().id;
   }
 }
