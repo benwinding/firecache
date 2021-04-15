@@ -1,5 +1,9 @@
 import { Observable } from "rxjs";
-import { DocWithId, FirebaseClientStateObject, LimitFetcher } from "../interfaces";
+import {
+  DocWithId,
+  FirebaseClientStateObject,
+  LimitFetcher,
+} from "../interfaces";
 import { ActionFunction } from "./Actions";
 
 export type QueryFn = (
@@ -18,25 +22,31 @@ export interface ICollectionQueryBuilder<
   OverrideAppState(
     overridenState: TState
   ): ICollectionQueryBuilder<TState, Colls, Docs>;
-  DisableUpdateFields(): ICollectionQueryBuilder<TState, Colls, Docs>;
-  DisableIdInclusion(): ICollectionQueryBuilder<TState, Colls, Docs>;
-  DisableFixAllDates(): ICollectionQueryBuilder<TState, Colls, Docs>;
-  EnableResolveDocRefs(): ICollectionQueryBuilder<TState, Colls, Docs>;
-  EnableFixAllDates(): ICollectionQueryBuilder<TState, Colls, Docs>;
-  EnableRemoveUndefinedValues(): ICollectionQueryBuilder<TState, Colls, Docs>;
   FromSubCollection<T>(
     id: string,
     subcollection: string
   ): ICollectionQueryBuilder<TState, Colls, Docs>;
 
-  // Queries 
+  // Enable/Disable Flags
+  EnableResolveDocRefs(): ICollectionQueryBuilder<TState, Colls, Docs>;
+  EnableFixAllDates(): ICollectionQueryBuilder<TState, Colls, Docs>;
+  EnableUpdateFields(): ICollectionQueryBuilder<TState, Colls, Docs>;
+  EnableIdInclusion(): ICollectionQueryBuilder<TState, Colls, Docs>;
+  EnableRemoveUndefinedValues(): ICollectionQueryBuilder<TState, Colls, Docs>;
+  DisableResolveDocRefs(): ICollectionQueryBuilder<TState, Colls, Docs>;
+  DisableFixAllDates(): ICollectionQueryBuilder<TState, Colls, Docs>;
+  DisableUpdateFields(): ICollectionQueryBuilder<TState, Colls, Docs>;
+  DisableIdInclusion(): ICollectionQueryBuilder<TState, Colls, Docs>;
+  DisableRemoveUndefinedValues(): ICollectionQueryBuilder<TState, Colls, Docs>;
+
+  // Queries
   //   Promise versions
   promise: {
     GetId<T>(id: string): Promise<T>;
     GetManyIds<T>(ids: string[]): Promise<T[]>;
     GetAllDocs<T>(whereQuery?: QueryFn): Promise<T[]>;
     ref(): Promise<firebase.firestore.CollectionReference>;
-  }
+  };
   //   get once
   GetId<T>(id: string): Observable<T>;
   GetManyIds<T>(ids: string[]): Observable<T[]>;
@@ -46,8 +56,11 @@ export interface ICollectionQueryBuilder<
   GetAllDocsSnap<T>(whereQuery?: QueryFn): Observable<T[]>;
   GetManyIdsSnap<T>(ids: string[]): Observable<T[]>;
 
-  MakePageFetcher<T extends DocWithId>(pageSize: number, whereQuery: QueryFn): LimitFetcher<T>;
-  
+  MakePageFetcher<T extends DocWithId>(
+    pageSize: number,
+    whereQuery: QueryFn
+  ): LimitFetcher<T>;
+
   // Commands
   UpdateMany(
     objs: {

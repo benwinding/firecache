@@ -2,12 +2,12 @@ import { Observable } from "rxjs";
 import {
   FirebaseClientStateObject,
   IDocumentQueryBuilder,
-  ActionFunction
+  ActionFunction,
 } from "../../interfaces";
 import { QueryState } from "../QueryState";
 import {
   DocumentQueryGetDoc,
-  DocumentQueryGetDocSnap
+  DocumentQueryGetDocSnap,
 } from "./DocumentQueryBuilders";
 import { DocumentCommandUpdate } from "./DocumentCommandBuilders";
 import { observableToPromise } from "../../utils";
@@ -19,10 +19,10 @@ export class DocumentQueryBuilder<
 > implements IDocumentQueryBuilder<TState, Colls, Docs> {
   constructor(private queryState: QueryState<TState>) {}
 
-  promise = { 
+  promise = {
     GetDoc: async <T>(): Promise<T> => {
       return observableToPromise(this.GetDoc<T>());
-    }
+    },
   };
   GetDoc<T>(): Observable<T> {
     return DocumentQueryGetDoc<T>(this.queryState);
@@ -45,26 +45,47 @@ export class DocumentQueryBuilder<
     this.queryState.addRunAfter(callback);
     return this;
   }
-  DisableUpdateFields(): IDocumentQueryBuilder<TState, Colls, Docs> {
-    this.queryState.disableUpdateFields();
+  EnableResolveDocRefs() {
+    this.queryState.enableResolveDocRefs();
     return this;
   }
-  DisableIdInclusion(): IDocumentQueryBuilder<TState, Colls, Docs> {
-    this.queryState.disableIdInclusion();
-    return this;
-  }
-  DisableFixAllDates(): IDocumentQueryBuilder<TState, Colls, Docs> {
-    this.queryState.disableFixAllDates();
-    return this;
-  }
-  EnableFixAllDates(): IDocumentQueryBuilder<TState, Colls, Docs> {
+  EnableFixAllDates() {
     this.queryState.enableFixAllDates();
     return this;
   }
-  EnableRemoveUndefinedValues(): IDocumentQueryBuilder<TState, Colls, Docs> {
+  EnableUpdateFields() {
+    this.queryState.enableUpdateFields();
+    return this;
+  }
+  EnableIdInclusion() {
+    this.queryState.enableIdInclusion();
+    return this;
+  }
+  EnableRemoveUndefinedValues() {
     this.queryState.enableRemoveUndefinedValues();
     return this;
   }
+  DisableResolveDocRefs() {
+    this.queryState.disableResolveDocRefs();
+    return this;
+  }
+  DisableFixAllDates() {
+    this.queryState.disableFixAllDates();
+    return this;
+  }
+  DisableUpdateFields() {
+    this.queryState.disableUpdateFields();
+    return this;
+  }
+  DisableIdInclusion() {
+    this.queryState.disableIdInclusion();
+    return this;
+  }
+  DisableRemoveUndefinedValues() {
+    this.queryState.disableRemoveUndefinedValues();
+    return this;
+  }
+
   ref(): Observable<firebase.firestore.DocumentReference> {
     return this.queryState.refDocument();
   }

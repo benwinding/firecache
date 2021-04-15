@@ -38,10 +38,15 @@ export class QueryState<TState extends FirebaseClientStateObject>
 
   private subcollectionState: SubCollectionState[] = [];
   private callbacks: ActionFunction<any, any>[] = [];
+
   private _disableIdInclusion: boolean;
   private _disableUpdateFields: boolean;
   private _disableFixAllDates: boolean;
+  private _disableRemoveUndefinedValues: boolean;
   private _disableResolveDocRefs: boolean;
+
+  private _enableIdInclusion: boolean;
+  private _enableUpdateFields: boolean;
   private _enableFixAllDates: boolean;
   private _enableRemoveUndefinedValues: boolean;
   private _enableResolveDocRefs: boolean;
@@ -98,14 +103,18 @@ export class QueryState<TState extends FirebaseClientStateObject>
   }
 
   public parseBeforeUpload(obj: any): any {
-    if (this._enableRemoveUndefinedValues) {
+    const shouldParseUndefined =
+      this._enableRemoveUndefinedValues && !this._disableRemoveUndefinedValues;
+    if (shouldParseUndefined) {
       return getWithoutUndefined(obj);
     }
     return obj;
   }
 
   public setUpdatedProps(obj: any, updatedUid: string) {
-    if (this._disableUpdateFields) {
+    const shouldSetFields =
+      this._enableUpdateFields && !this._disableUpdateFields;
+    if (!shouldSetFields) {
       return;
     }
     obj["updated_by"] = updatedUid;
@@ -113,25 +122,28 @@ export class QueryState<TState extends FirebaseClientStateObject>
   }
 
   public setCreatedProps(obj: any, updatedUid: string) {
-    if (this._disableUpdateFields) {
+    const shouldSetFields =
+      this._enableUpdateFields && !this._disableUpdateFields;
+    if (!shouldSetFields) {
       return;
     }
     obj["created_by"] = updatedUid;
     obj["created_at"] = new Date();
   }
 
-  public enableResolveDocRefs() {
-    this._enableResolveDocRefs = true;
-  }
-  public enableRemoveUndefinedValues() {
-    this._enableRemoveUndefinedValues = true;
-  }
-  public enableFixAllDates() {
-    this._enableFixAllDates = true;
-  }
-  public disableFixAllDates() {
-    this._disableFixAllDates = true;
-  }
+  public enableIdInclusion = () => (this._enableResolveDocRefs = true);
+  public enableUpdateFields = () => (this._enableUpdateFields = true);
+  public enableFixAllDates = () => (this._enableFixAllDates = true);
+  public enableResolveDocRefs = () => (this._enableResolveDocRefs = true);
+  public enableRemoveUndefinedValues = () =>
+    (this._enableRemoveUndefinedValues = true);
+
+  public disableIdInclusion = () => (this._disableIdInclusion = true);
+  public disableUpdateFields = () => (this._disableUpdateFields = true);
+  public disableFixAllDates = () => (this._disableFixAllDates = true);
+  public disableResolveDocRefs = () => (this._disableResolveDocRefs = true);
+  public disableRemoveUndefinedValues = () =>
+    (this._disableRemoveUndefinedValues = true);
 
   public async TransformDocData<T>(doc: FirebaseDocData): Promise<T> {
     return this.doc2Data<T>(doc);
@@ -154,7 +166,9 @@ export class QueryState<TState extends FirebaseClientStateObject>
 
   doc2Data<T>(doc: FirebaseDocData): Promise<T> {
     const dataSafe = this.getDocData<T>(doc);
-    if (!this._disableIdInclusion) {
+    const shouldSetIdField =
+      this._enableIdInclusion && !this._disableIdInclusion;
+    if (shouldSetIdField) {
       dataSafe["id"] = doc.id;
     }
     return dataSafe;
@@ -213,12 +227,6 @@ export class QueryState<TState extends FirebaseClientStateObject>
   }
   public getRunAfters(): ActionFunction<any, any>[] {
     return this.callbacks;
-  }
-  public disableIdInclusion(): void {
-    this._disableIdInclusion = true;
-  }
-  public disableUpdateFields(): void {
-    this._disableUpdateFields = true;
   }
   public MakeLogger(contextTitle: string) {
     return new LevelLogger(contextTitle, this.logLevel);

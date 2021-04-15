@@ -108,31 +108,48 @@ export class CollectionQueryBuilder<
     this.queryState.OverrideAppState(overridenState);
     return this;
   }
-  DisableUpdateFields(): ICollectionQueryBuilder<TState, Colls, Docs> {
-    this.queryState.disableUpdateFields();
-    return this;
+  ref(): Observable<firebase.firestore.CollectionReference> {
+    return this.queryState.refCollection();
   }
-  DisableIdInclusion(): ICollectionQueryBuilder<TState, Colls, Docs> {
-    this.queryState.disableIdInclusion();
-    return this;
-  }
-  DisableFixAllDates(): ICollectionQueryBuilder<TState, Colls, Docs> {
-    this.queryState.disableFixAllDates();
-    return this;
-  }
-  EnableFixAllDates(): ICollectionQueryBuilder<TState, Colls, Docs> {
-    this.queryState.enableFixAllDates();
-    return this;
-  }
-  EnableRemoveUndefinedValues(): ICollectionQueryBuilder<TState, Colls, Docs> {
-    this.queryState.enableRemoveUndefinedValues();
-    return this;
-  }
-  EnableResolveDocRefs(): ICollectionQueryBuilder<TState, Colls, Docs> {
+
+  EnableResolveDocRefs() {
     this.queryState.enableResolveDocRefs();
     return this;
   }
-  ref(): Observable<firebase.firestore.CollectionReference> {
-    return this.queryState.refCollection();
+  EnableFixAllDates() {
+    this.queryState.enableFixAllDates();
+    return this;
+  }
+  EnableUpdateFields() {
+    this.queryState.enableUpdateFields();
+    return this;
+  }
+  EnableIdInclusion() {
+    this.queryState.enableIdInclusion();
+    return this;
+  }
+  EnableRemoveUndefinedValues() {
+    this.queryState.enableRemoveUndefinedValues();
+    return this;
+  }
+  DisableResolveDocRefs() {
+    this.queryState.disableResolveDocRefs();
+    return this;
+  }
+  DisableFixAllDates() {
+    this.queryState.disableFixAllDates();
+    return this;
+  }
+  DisableUpdateFields() {
+    this.queryState.disableUpdateFields();
+    return this;
+  }
+  DisableIdInclusion() {
+    this.queryState.disableIdInclusion();
+    return this;
+  }
+  DisableRemoveUndefinedValues() {
+    this.queryState.disableRemoveUndefinedValues();
+    return this;
   }
 }
