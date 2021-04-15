@@ -1,3 +1,5 @@
+import { IsRefDoc } from "./is-ref-doc";
+
 export function parseAllDatesDoc<T>(obj: T) {
   const isObject = !!obj && typeof obj === 'object';
   if (!isObject) {
@@ -25,6 +27,10 @@ export function recusivelyCheckObjectValue(input: any) {
   const isArray = Array.isArray(input);
   if (isArray) {
     return input.map(value => recusivelyCheckObjectValue(value));
+  }
+  const isDocRef = IsRefDoc(input);
+  if (isDocRef) {
+    return input;
   }
   const isObject = typeof input === 'object';
   if (isObject) {
