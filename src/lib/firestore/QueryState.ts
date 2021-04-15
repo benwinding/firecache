@@ -158,15 +158,22 @@ export class QueryState<TState extends FirebaseClientStateObject>
 
   private async getDocData<T>(doc: FirebaseDocData): Promise<T> {
     const dataSafe = doc.data() || {};
-    const shouldFixDates = this._enableFixAllDates && !this._disableFixAllDates;
-    if (shouldFixDates) {
-      parseAllDatesDoc(dataSafe);
-    }
     const shouldGetDocRefs =
       this._enableResolveDocRefs && !this._disableResolveDocRefs;
     if (shouldGetDocRefs) {
       const docRefs = parseDocGetAllRefs(dataSafe);
-      await ResolveDocRefsToData(this.app.firestore(), dataSafe, docRefs);
+      const shouldSetIdField =
+        this._enableIdInclusion && !this._disableIdInclusion;
+      await ResolveDocRefsToData(
+        this.app.firestore(),
+        dataSafe,
+        docRefs,
+        shouldSetIdField
+      );
+    }
+    const shouldFixDates = this._enableFixAllDates && !this._disableFixAllDates;
+    if (shouldFixDates) {
+      parseAllDatesDoc(dataSafe);
     }
     return dataSafe;
   }
