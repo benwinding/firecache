@@ -17,6 +17,7 @@ Which can be paginated and includes realtime updates
 */
 
 type FirebaseCollectionRef = firebase.firestore.CollectionReference;
+type FirebaseDocData = firebase.firestore.DocumentData;
 
 export function MakeFetcher<T extends DocWithId>(
   q: QueryState<FirebaseClientStateObject>,
@@ -82,7 +83,7 @@ async function FetchLimited<T>(
     const lastItemRemoved = docData.pop();
     lastId = lastItemRemoved.id;
   }
-  const docs = docData.map((d) => q.TransformDocData<T>(d));
+  const docs = await q.docArray2Data<T>(docData);
   // console.log('FetchLimited get', { collectionPath, lastId, lastDoc, docs });
   return { docs, nextId: lastId, limitQuery };
 }
@@ -117,6 +118,18 @@ function GetChangesAfterFirst<T>(
   limitQuery: QueryFn
 ): Observable<ParsedDocData<T>[]> {
   let isFirst = true;
+
+  const ProcessDocChange = async (change: FirebaseDocData) => {
+    const doc = change.doc;
+    const transformed: T = doc.exists ? await q.TransformDocData(doc) : null;
+    const data: ParsedDocData<T> = {
+      changeType: change.type,
+      data: transformed,
+      id: doc.id,
+    };
+    return data;
+  };
+
   const changes$ = q.refCollection().pipe(
     switchMap((c) => {
       const query = limitQuery(c);
@@ -128,17 +141,8 @@ function GetChangesAfterFirst<T>(
         isFirst = false;
       }
     }),
-    map((changes) =>
-      changes.map((change) => {
-        const doc = change.doc;
-        const transformed: T = doc.exists ? q.TransformDocData(doc) : null;
-        const data: ParsedDocData<T> = {
-          changeType: change.type,
-          data: transformed,
-          id: doc.id,
-        };
-        return data;
-      })
+    switchMap((changes) =>
+      Promise.all(changes.map((change) => ProcessDocChange(change)))
     )
   );
   return changes$;

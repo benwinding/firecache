@@ -3,4 +3,5 @@ export interface FireStateOptions {
   logCosts?: boolean;
   convertTimestamps?: boolean;
   removeAllUndefined?: boolean;
+  resolveDocRefs?: boolean;
 }

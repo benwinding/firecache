@@ -128,6 +128,10 @@ export class CollectionQueryBuilder<
     this.queryState.enableRemoveUndefinedValues();
     return this;
   }
+  EnableResolveDocRefs(): ICollectionQueryBuilder<TState, Colls, Docs> {
+    this.queryState.enableResolveDocRefs();
+    return this;
+  }
   ref(): Observable<firebase.firestore.CollectionReference> {
     return this.queryState.refCollection();
   }

@@ -8,8 +8,9 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "watch": "rimraf dist && yarn watch-tsc",
-    "watch-tsc": "concurrently --kill-others \"yarn build:es2015 -w\" \"yarn build:es6 -w\"",
+    "watch": "rimraf dist && yarn watch-both",
+    "watch-one": "rimraf dist && yarn build:es2015 -w",
+    "watch-both": "concurrently --kill-others \"yarn build:es2015 -w\" \"yarn build:es6 -w\"",
     "build": "rimraf dist && yarn build:es2015 && yarn build:es6",
     "build:es2015": "tsc --outDir dist/lib",
     "build:es6": "tsc --module es6 --target es5 --outDir dist/es6",
@@ -25,7 +26,11 @@
     "firebase": "^7.17.0",
     "rxjs": "6.5.x"
   },
+  "dependencies": {
+    "lodash": "^4.x"
+  },
   "devDependencies": {
+    "@types/lodash": "^4.x",
     "@types/jest": "^25.1.4",
     "firebase": "7.17.x",
     "jest": "^25.2.1",

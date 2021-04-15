@@ -11,7 +11,7 @@ export function DocumentQueryGetDoc<T>(
   return q.refDocument().pipe(
     take(1),
     switchMap((doc) => doc.get()),
-    map((doc) => q.doc2Data<T>(doc)),
+    switchMap((doc) => q.doc2Data<T>(doc)),
     tap((data) => {
       q.logCosts.LogReads(1)();
       q.logger.logINFO(">> end, data", { data });
@@ -34,7 +34,7 @@ export function DocumentQueryGetDocSnap<T>(
   );
   const $resultResolved = $collectionResolved.pipe(
     switchMap((doc) => documentSnap2Observable(doc)),
-    map((doc) => q.doc2Data<T>(doc))
+    switchMap((doc) => q.doc2Data<T>(doc))
   );
   const $result = merge($resultNull, $resultResolved).pipe(
     tap((data) => {

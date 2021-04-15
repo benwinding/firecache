@@ -55,7 +55,7 @@ export function CollectionQueryGetAllDocsSnap<T>(
       );
     }),
     map((docChanges) => docChanges.docs),
-    map((docs) => docs.map((doc) => q.doc2Data<T>(doc)) as T[])
+    switchMap((docs) => q.docArray2Data<T>(docs))
   );
   const $result = merge($resultNull, $resultResolved).pipe(
     tap((data) => q.logger.logINFO(">> end, data", { data }))
@@ -91,7 +91,7 @@ export function CollectionQueryGetAllDocs<T>(
         "docSnap?": docSnap,
       });
     }),
-    map((docs) => q.docArray2Data<T>(docs)),
+    switchMap((docs) => q.docArray2Data<T>(docs)),
     tap((data) => q.logger.logINFO(">> end, data", { data }))
   );
 }
@@ -111,7 +111,7 @@ export function CollectionQueryGetId<T>(
         "pathExists?": docSnap.exists,
       });
     }),
-    map((doc) => q.doc2Data<T>(doc)),
+    switchMap((doc) => q.doc2Data<T>(doc)),
     tap((data) => q.logger.logINFO(">> end, data...", { data }))
   );
 }
@@ -130,7 +130,7 @@ export function CollectionQueryGetIdSnap<T>(
         "docSnapExists?": docSnap.exists,
       });
     }),
-    map((doc) => q.doc2Data<T>(doc)),
+    switchMap((doc) => q.doc2Data<T>(doc)),
     tap((data) => q.logger.logINFO(">> end. data...", { data }))
   );
 }
@@ -151,7 +151,7 @@ export function CollectionQueryGetManyIds<T>(
         "docSnapExists?": docs,
       });
     }),
-    map((docs) => q.docArray2Data<T>(docs)),
+    switchMap((docs) => q.docArray2Data<T>(docs)),
     tap((data) => q.logger.logINFO(">> end data...", { data }))
   );
 }
@@ -167,7 +167,7 @@ export function CollectionQueryGetManyIdsSnap<T>(
         ids.map((id) => documentSnap2Observable(collection.doc(id)))
       )
     ),
-    map((docs) => q.docArray2Data<T>(docs)),
+    switchMap((docs) => q.docArray2Data<T>(docs)),
     tap((data) => {
       q.logCosts.LogReads(data.length)();
       q.logger.logINFO(">> end, data...", { data });

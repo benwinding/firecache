@@ -1,4 +1,9 @@
-import { LevelLogger, getWithoutUndefined, parseAllDatesDoc } from "../utils";
+import {
+  LevelLogger,
+  getWithoutUndefined,
+  parseAllDatesDoc,
+  ResolveDocRefsToData,
+} from "../utils";
 import { FirebaseClientStateManager } from "../FirebaseClientStateManager";
 import { map, take, tap } from "rxjs/operators";
 import {
@@ -10,7 +15,11 @@ import {
 } from "../interfaces";
 import { Observable } from "rxjs";
 import { ResolvePathVariables } from "../utils";
-import { IFirestoreLogger, MakeFirestoreLogger } from "../utils/firestore-logger";
+import {
+  IFirestoreLogger,
+  MakeFirestoreLogger,
+} from "../utils/firestore-logger";
+import { parseDocGetAllRefs } from "../utils/docref-parser";
 
 interface SubCollectionState {
   id: string;
@@ -32,8 +41,10 @@ export class QueryState<TState extends FirebaseClientStateObject>
   private _disableIdInclusion: boolean;
   private _disableUpdateFields: boolean;
   private _disableFixAllDates: boolean;
+  private _disableResolveDocRefs: boolean;
   private _enableFixAllDates: boolean;
   private _enableRemoveUndefinedValues: boolean;
+  private _enableResolveDocRefs: boolean;
 
   constructor(
     public appState$: FirebaseClientStateManager<TState>,
@@ -49,6 +60,9 @@ export class QueryState<TState extends FirebaseClientStateObject>
     }
     if (this.options.convertTimestamps) {
       this.enableFixAllDates();
+    }
+    if (this.options.resolveDocRefs) {
+      this.enableResolveDocRefs();
     }
   }
 
@@ -106,6 +120,9 @@ export class QueryState<TState extends FirebaseClientStateObject>
     obj["created_at"] = new Date();
   }
 
+  public enableResolveDocRefs() {
+    this._enableResolveDocRefs = true;
+  }
   public enableRemoveUndefinedValues() {
     this._enableRemoveUndefinedValues = true;
   }
@@ -116,20 +133,26 @@ export class QueryState<TState extends FirebaseClientStateObject>
     this._disableFixAllDates = true;
   }
 
-  public TransformDocData<T>(doc: FirebaseDocData): T {
+  public async TransformDocData<T>(doc: FirebaseDocData): Promise<T> {
     return this.doc2Data<T>(doc);
   }
 
-  private getDocData<T>(doc: FirebaseDocData): T {
+  private async getDocData<T>(doc: FirebaseDocData): Promise<T> {
     const dataSafe = doc.data() || {};
     const shouldFixDates = this._enableFixAllDates && !this._disableFixAllDates;
     if (shouldFixDates) {
       parseAllDatesDoc(dataSafe);
     }
+    const shouldGetDocRefs =
+      this._enableResolveDocRefs && !this._disableResolveDocRefs;
+    if (shouldGetDocRefs) {
+      const docRefs = parseDocGetAllRefs(dataSafe);
+      await ResolveDocRefsToData(this.app.firestore(), dataSafe, docRefs);
+    }
     return dataSafe;
   }
 
-  doc2Data<T>(doc: FirebaseDocData): T {
+  doc2Data<T>(doc: FirebaseDocData): Promise<T> {
     const dataSafe = this.getDocData<T>(doc);
     if (!this._disableIdInclusion) {
       dataSafe["id"] = doc.id;
@@ -137,8 +160,9 @@ export class QueryState<TState extends FirebaseClientStateObject>
     return dataSafe;
   }
 
-  docArray2Data<T>(docs: FirebaseDocData[]): T[] {
-    return docs.map((doc) => this.doc2Data<T>(doc)) as T[];
+  docArray2Data<T>(docs: FirebaseDocData[]): Promise<T[]> {
+    const promises = docs.map((doc) => this.doc2Data<T>(doc));
+    return Promise.all(promises);
   }
 
   public refCollection(): Observable<FirebaseCollectionRef> {
@@ -169,9 +193,12 @@ export class QueryState<TState extends FirebaseClientStateObject>
           documentPath,
         })
       ),
-      map((documentPath) =>
-        !!documentPath ? this.app.firestore().doc(documentPath) : null
-      ),
+      map((documentPath) => {
+        if (documentPath) {
+          return this.app.firestore().doc(documentPath);
+        }
+        throw new Error("No document path could not be resolved!!");
+      }),
       tap((doc) =>
         this.logger.logINFO("refDocument() resolved document", {
           doc,
