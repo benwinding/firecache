@@ -55,18 +55,25 @@ export class QueryState<TState extends FirebaseClientStateObject>
     public appState$: FirebaseClientStateManager<TState>,
     private _pathTemplate: string,
     public app: firebase.app.App,
-    private options: FireStateOptions,
+    options: FireStateOptions,
     public logLevel: LogLevel
   ) {
     this.logger = new LevelLogger("Query", this.logLevel);
-    this.logCosts = MakeFirestoreLogger(this.options);
-    if (this.options.removeAllUndefined) {
+    this.logCosts = MakeFirestoreLogger(options);
+    this.InitFromOptions(options);
+  }
+
+  private InitFromOptions(options: FireStateOptions) {
+    if (!options.preventIdInclusion) {
+      this.enableIdInclusion();
+    }
+    if (options.removeAllUndefined) {
       this.enableRemoveUndefinedValues();
     }
-    if (this.options.convertTimestamps) {
+    if (options.convertTimestamps) {
       this.enableFixAllDates();
     }
-    if (this.options.resolveDocRefs) {
+    if (options.resolveDocRefs) {
       this.enableResolveDocRefs();
     }
   }
