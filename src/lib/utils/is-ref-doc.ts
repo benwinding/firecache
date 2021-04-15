@@ -1,8 +1,10 @@
 export function IsRefDoc(obj: any) {
   const isRefDoc =
     !!obj &&
-    obj.hasOwnProperty("id") &&
-    obj.hasOwnProperty("path") &&
-    obj.hasOwnProperty("parent") && obj.hasOwnProperty('firestore');
+    typeof obj === "object" &&
+    obj.id &&
+    obj.path &&
+    obj.parent &&
+    obj.firestore;
   return isRefDoc;
 }
