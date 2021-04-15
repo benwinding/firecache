@@ -138,7 +138,7 @@ export class QueryState<TState extends FirebaseClientStateObject>
     obj["created_at"] = new Date();
   }
 
-  public enableIdInclusion = () => (this._enableResolveDocRefs = true);
+  public enableIdInclusion = () => (this._enableIdInclusion = true);
   public enableUpdateFields = () => (this._enableUpdateFields = true);
   public enableFixAllDates = () => (this._enableFixAllDates = true);
   public enableResolveDocRefs = () => (this._enableResolveDocRefs = true);
