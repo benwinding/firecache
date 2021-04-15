@@ -178,8 +178,8 @@ export class QueryState<TState extends FirebaseClientStateObject>
     return dataSafe;
   }
 
-  doc2Data<T>(doc: FirebaseDocData): Promise<T> {
-    const dataSafe = this.getDocData<T>(doc);
+  async doc2Data<T>(doc: FirebaseDocData): Promise<T> {
+    const dataSafe = await this.getDocData<T>(doc);
     const shouldSetIdField =
       this._enableIdInclusion && !this._disableIdInclusion;
     if (shouldSetIdField) {
@@ -188,7 +188,7 @@ export class QueryState<TState extends FirebaseClientStateObject>
     return dataSafe;
   }
 
-  docArray2Data<T>(docs: FirebaseDocData[]): Promise<T[]> {
+  async docArray2Data<T>(docs: FirebaseDocData[]): Promise<T[]> {
     const promises = docs.map((doc) => this.doc2Data<T>(doc));
     return Promise.all(promises);
   }
