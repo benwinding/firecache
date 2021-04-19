@@ -33,7 +33,6 @@ export function documentSnap2Observable(
 
 // tslint:disable-next-line: class-name
 export interface FirebaseConfigObject {
-  convertTimestamps?: boolean;
   projectId: string;
   [key: string]: string | boolean;
 }
