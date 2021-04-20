@@ -14,6 +14,7 @@
     "build": "rimraf dist && yarn build:es2015 && yarn build:es6",
     "build:es2015": "tsc --outDir dist/lib",
     "build:es6": "tsc --module es6 --target es5 --outDir dist/es6",
+    "docs": "yarn docsify serve docs",
     "test": "jest",
     "test:badges": "jest-coverage-badges",
     "clean": "rimraf dist"
@@ -32,6 +33,7 @@
   "devDependencies": {
     "@types/lodash": "^4.x",
     "@types/jest": "^25.1.4",
+    "docsify-cli": "^4.4.2",
     "firebase": "7.17.x",
     "jest": "^25.2.1",
     "jest-coverage-badges": "^1.1.2",
