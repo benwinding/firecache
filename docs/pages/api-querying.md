@@ -190,7 +190,7 @@ fire.db.FromCollection(CollectionPaths.Users)
 
 This is an escape hatch to get out of the FirebaseClient api and back to the firebase SDK objects.
 
-- Returns observable of the firestore `DocumentReference`.
+- Returns observable of the firestore `CollectionReference`.
 - Watches for changes in path state, e.g: `${userId}`
 
 ``` js
@@ -204,3 +204,57 @@ fire.db.FromCollection(CollectionPaths.Users)
 ```
 
 # FromDocument
+
+## `GetDoc()`
+
+- Gets document from document path
+- Returns an observable object
+- Watches for changes in path state, e.g: `${userId}`
+
+``` js
+fire.db.FromDocument(DocumentPaths.CurrentUser)
+  .GetDoc<User>()
+// Promise version
+fire.db.FromDocument(DocumentPaths.CurrentUser)
+  .promise
+  .GetDoc<User>()
+```
+
+## `GetDocSnap()`
+
+- Gets document from document path
+- Returns an observable object
+- Watches for changes in path state, e.g: `${userId}`
+- Watches for changes in firestore
+
+``` js
+fire.db.FromDocument(DocumentPaths.CurrentUser)
+  .GetDocSnap<User>()
+```
+
+## `Update()`
+
+- Updates a document on document path
+- Returns promise
+
+``` js
+fire.db.FromDocument(DocumentPaths.CurrentUser)
+  .Update<User>(newUserObj)
+```
+
+## `ref()`
+
+This is an escape hatch to get out of the FirebaseClient api and back to the firebase SDK objects.
+
+- Returns observable of the firestore `DocumentReference`.
+- Watches for changes in path state, e.g: `${userId}`
+
+``` js
+fire.db.FromCollection(CollectionPaths.Users)
+  .ref()
+
+// Promise version
+fire.db.FromCollection(CollectionPaths.Users)
+  .promise
+  .ref()
+```
