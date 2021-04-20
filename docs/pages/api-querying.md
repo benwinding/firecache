@@ -258,3 +258,50 @@ fire.db.FromCollection(CollectionPaths.Users)
   .promise
   .ref()
 ```
+
+# `OverrideAppState`
+
+A common problem is how can we override the application state, for just a few queries. Well that's what `OverrideAppState` is for and is very similar to `PatchRootState`.
+
+``` js
+fire.db.FromCollection(CollectionPaths.Users) // Or FromDocument
+  .OverrideAppState({userId: 'anotherIds'})   // Will use this variable instead of the root state 
+  .GetAllDocs()
+```
+
+# Query Flags
+
+There's a few flags that can be trigger from the query API. They can be enabled or disabled in any order like shown below
+
+``` js
+fire.db.FromCollection(CollectionPaths.Users) // Or FromDocument
+  .EnableResolveDocRefs()
+  .DisableUpdateFields()
+  .DisableRemoveUndefinedValues()
+```
+
+## `EnableResolveDocRefs()`
+- Enables the resolution of firestore `DocumentReference` fields
+- Document references are automatically resolved and the field is replaced by the document data that they refer to
+- Available in `DisableResolveDocRefs()` too
+
+## `EnableFixAllDates()`
+- All timestamp objects are converted to javascript Date objects
+- Available in `DisableFixAllDates()` too
+
+## `EnableUpdateFields()`
+- Enables meta fields in the updated document
+  - `updated_by` user id of last updated
+  - `updated_at` timestamp of last update
+  - `created_by` user id of creator
+  - `created_at` timestamp of created at
+- Available in `DisableUpdateFields()` too
+
+## `EnableIdInclusion()`
+- If enabled `id` field is included in update or get. 
+- Available in `DisableIdInclusion()` too
+
+## `EnableRemoveUndefinedValues()`
+- If enabled `undefined` fields are parsed and removed from objects before passed to firestore API. 
+- Available in `DisableRemoveUndefinedValues()` too
+
