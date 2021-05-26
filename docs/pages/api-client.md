@@ -22,6 +22,8 @@ You might also want to have specific state in your application. There's 3 types 
 Here's an example of how to initialize `firecache` with type-checked state.
 
 ``` js
+import { FirebaseClient, FirebaseClientStateObject } from 'firecache';
+
 enum CollectionPaths = {
   Users = 'users'
 }
@@ -30,7 +32,7 @@ enum DocumentPaths = {
   CurrentUser = 'users/${userId}'
 }
 
-interface RootStateObject {
+interface RootStateObject extends FirebaseClientStateObject {
   userId: string;
 }
 

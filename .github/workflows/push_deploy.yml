@@ -6,6 +6,7 @@ on:
 name: Deploy to npm
 jobs:
   build:
+    if: "!contains(github.event.head_commit.message, 'skip-ci')"
     name: Build & Deploy
     runs-on: ubuntu-latest
     steps:
