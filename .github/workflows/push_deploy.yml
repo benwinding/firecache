@@ -1,7 +1,8 @@
 on:
   push:
     branches:
-      - master
+      - "**"
+        # - master
 
 name: Deploy to npm
 jobs:
@@ -11,10 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Use Node.js 10.17
+      - name: Use Node.js 16.17.0
         uses: actions/setup-node@v1
         with:
-          node-version: 10.17
+          node-version: 16.17.0
       - name: Cache node_modules
         id: cache-modules
         uses: actions/cache@v1
@@ -25,23 +26,12 @@ jobs:
         if: steps.cache-modules.outputs.cache-hit != 'true'
         run: npm install
       - name: Build Library
-        run: npm run-script build
+        run: npm run build
       - name: Test
-        run: npm run-script test
-      - name: Generate Coverage Badges
-        run: npm run-script test:badges
-      - name: "Debug output"
-        uses: hmarr/debug-action@master
-      - name: Deploy to npm 🚀
-        id: deploystep
-        uses: benwinding/merge-release@87f0410e7678aa4dd12c76c1c9569d4f9f29eb9f
+        run: npm run test
+      - name: Deploy to GPR 🚀
+        uses: mikeal/merge-release@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-    # - name: Write comment
-    #   uses: fastlane/github-actions/communicate-on-pull-request-merged@master
-    #   with:
-    #     ref: ${{ github.event.pull_request.head.ref }}
-    #     fetch-depth: 1
-    #     repo-token: ${{ secrets.GITHUB_TOKEN }}
-    #     pr-comment: "Deployed to npm! as version: ${{steps.deploystep.outputs.version}}"
+          NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_REGISTRY_URL: https://npm.pkg.github.com/
