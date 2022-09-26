@@ -1,12 +1,12 @@
 {
-  "name": "firecache",
+  "name": "firecache-internal",
   "version": "0.2.0",
   "description": "rxjs state-management for firebase",
-  "repository": "https://github.com/benwinding/firecache",
-  "homepage": "https://github.com/benwinding/firecache",
+  "repository": "https://github.com/resvu/firecache-internal.git",
+  "homepage": "https://github.com/resvu/firecache-internal",
   "author": "Ben Winding and Resvu Pty Ltd",
   "license": "MIT",
-  "private": false,
+  "private": true,
   "engines": {
     "node": "^16"
   },
