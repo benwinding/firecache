@@ -50,6 +50,7 @@
     "src",
     "dist",
     "README.md",
-    "tsconfig.json"
+    "tsconfig.json",
+    ".npmrc"
   ]
 }
