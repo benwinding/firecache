@@ -4,18 +4,18 @@ on:
       - "**"
         # - master
 
-name: Deploy to npm
+name: Deploy package to Github Branch
 jobs:
   build:
-    if: "!contains(github.event.head_commit.message, 'skip-ci')"
     name: Build & Deploy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - name: Use Node.js 16.17.0
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2.3.1
+      - name: Use Node.js 16.17
         uses: actions/setup-node@v1
         with:
-          node-version: 16.17.0
+          node-version: 16.17
       - name: Cache node_modules
         id: cache-modules
         uses: actions/cache@v1
@@ -25,10 +25,8 @@ jobs:
       - name: Install Dependencies
         if: steps.cache-modules.outputs.cache-hit != 'true'
         run: npm install
-      - name: Build Library
+      - name: Build Lib
         run: npm run build
-      - name: Test
-        run: npm run test
       - name: Deploy to GPR 🚀
         uses: mikeal/merge-release@master
         env:
