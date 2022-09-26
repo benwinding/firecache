@@ -26,13 +26,14 @@ import {
   CollectionQueryGetManyIdsSnap
 } from "./CollectionQueryBuilders";
 import { MakeFetcher } from "./PageLimitFetcher";
+import firebase from "firebase/compat/app";
 
 export class CollectionQueryBuilder<
   TState extends FirebaseClientStateObject,
   Colls,
   Docs
 > implements ICollectionQueryBuilder<TState, Colls, Docs> {
-  constructor(private queryState: QueryState<TState>) {}
+  constructor(private queryState: QueryState<TState>) { }
 
   promise = {
     GetId: async <T>(id: string): Promise<T> => {

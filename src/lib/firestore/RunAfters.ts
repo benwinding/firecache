@@ -4,6 +4,7 @@ import {
   ActionType,
   ActionFunctionArguments
 } from "../interfaces";
+import firebase from "firebase/compat/app";
 
 type RefColl = firebase.firestore.CollectionReference;
 type RefDoc = firebase.firestore.DocumentReference;

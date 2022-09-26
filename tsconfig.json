@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "baseUrl": "./",
-    "typeRoots": ["node_modules/@types"],
+    "typeRoots": [
+      "node_modules/@types"
+    ],
     "outDir": "dist/lib",
     "target": "es2015",
     "module": "es2015",
@@ -13,7 +15,16 @@
     "experimentalDecorators": true,
     "noImplicitUseStrict": true,
     "importHelpers": true,
-    "lib": ["dom", "es2018"]
+    "lib": [
+      "dom",
+      "es2018"
+    ]
   },
-  "exclude": ["**/*.spec.ts", "dist"]
+  "exclude": [
+    "**/*.spec.ts",
+    "dist"
+  ],
+  "types": [
+    "firebase"
+  ]
 }

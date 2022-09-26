@@ -5,6 +5,7 @@ import {
   LimitFetcher,
 } from "../interfaces";
 import { ActionFunction } from "./Actions";
+import firebase from "firebase/compat/app";
 
 export type QueryFn = (
   ref: firebase.firestore.CollectionReference
