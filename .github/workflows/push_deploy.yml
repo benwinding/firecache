@@ -4,6 +4,10 @@ on:
       - "master"
 
 name: Deploy package to Github Branch
+
+env:
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
 jobs:
   build:
     name: Build & Deploy
