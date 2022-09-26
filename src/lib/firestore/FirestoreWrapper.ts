@@ -8,7 +8,7 @@ import {
   IDocumentQueryBuilder,
 } from "../interfaces";
 import { QueryState } from "./QueryState";
-import * as firebase from "firebase/app";
+import firebase from "firebase/compat/app";
 
 export class FirestoreWrapper<
   EnumPathTemplatesCollections,
@@ -19,7 +19,7 @@ export class FirestoreWrapper<
     private app: firebase.app.App,
     private rootState: FirebaseClientStateManager<TState>,
     private options: FireStateOptions
-  ) {}
+  ) { }
 
   public FromCollection(
     collectionPathTemplate: EnumPathTemplatesCollections,

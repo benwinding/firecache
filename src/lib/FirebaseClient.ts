@@ -7,6 +7,7 @@ import { map } from "rxjs/operators";
 import { FirebaseClientStateObject } from "./interfaces";
 import { LevelLogger } from "./utils";
 import { FireStateOptions } from "./interfaces/FireStateOptions";
+import firebase from "firebase/compat/app";
 
 export class FirebaseClient<
   EnumPathTemplatesCollections,

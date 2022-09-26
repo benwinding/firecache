@@ -8,6 +8,7 @@ import {
   DocWithId,
 } from "../../interfaces";
 import { QueryState } from "../QueryState";
+import firebase from "firebase/compat/app";
 
 /* 
 
@@ -54,7 +55,7 @@ export function MakeFetcher<T extends DocWithId>(
       $nextId.next(res.nextId);
       return res.docs;
     },
-    destroy: () => $destroyed.next(),
+    destroy: () => $destroyed.next(null),
     hasNext: () => $nextId.pipe(map((id) => !!id)),
   };
   return fetcher;

@@ -1,8 +1,8 @@
 import { FirestoreWrapper } from "../firestore/FirestoreWrapper";
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import "firebase/firestore";
-import "firebase/storage";
+import firebase from "firebase/compat/app";
+import "firebase/compat/auth";
+import "firebase/compat/firestore";
+import "firebase/compat/storage";
 import { FirebaseClientStateManager } from "../FirebaseClientStateManager";
 import {
   GetApp,

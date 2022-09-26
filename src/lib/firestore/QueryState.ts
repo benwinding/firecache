@@ -20,6 +20,7 @@ import {
   MakeFirestoreLogger,
 } from "../utils/firestore-logger";
 import { parseDocGetAllRefs } from "../utils/docref-parser";
+import firebase from "firebase/compat/app";
 
 interface SubCollectionState {
   id: string;

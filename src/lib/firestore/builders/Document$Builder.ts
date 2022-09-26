@@ -11,13 +11,14 @@ import {
 } from "./DocumentQueryBuilders";
 import { DocumentCommandUpdate } from "./DocumentCommandBuilders";
 import { observableToPromise } from "../../utils";
+import firebase from "firebase/compat/app";
 
 export class DocumentQueryBuilder<
   TState extends FirebaseClientStateObject,
   Colls,
   Docs
 > implements IDocumentQueryBuilder<TState, Colls, Docs> {
-  constructor(private queryState: QueryState<TState>) {}
+  constructor(private queryState: QueryState<TState>) { }
 
   promise = {
     GetDoc: async <T>(): Promise<T> => {

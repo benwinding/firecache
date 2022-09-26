@@ -2,6 +2,7 @@ import { QueryState } from "../QueryState";
 import { chunkify, makeRandomId, observableToPromise } from "../../utils";
 import { FirebaseClientStateObject } from "../../interfaces";
 import { RunAfterCollection } from "../RunAfters";
+import firebase from "firebase/compat/app";
 
 export async function CollectionCommandUpdate<T>(
   q: QueryState<FirebaseClientStateObject>,
