@@ -7,7 +7,7 @@
   "author": "Ben Winding and Resvu Pty Ltd",
   "license": "MIT",
   "engines": {
-    "node": "^16"
+    "node": "^14"
   },
   "scripts": {
     "watch": "rimraf dist && yarn watch-both",
