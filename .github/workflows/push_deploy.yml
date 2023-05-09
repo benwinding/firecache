@@ -13,29 +13,38 @@ jobs:
     name: Build & Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v3.0.2
-      - name: Use Node.js 16.18
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      # Setup .npmrc file to publish to GitHub Packages
+      - uses: actions/setup-node@v3
         with:
-          node-version: 16.18
-      - name: Cache node_modules
-        id: cache-modules
-        uses: actions/cache@v1
-        with:
-          path: node_modules
-          key: ${{ runner.OS }}-build-${{ hashFiles('package.json') }}
-      - name: Install Dependencies
-        if: steps.cache-modules.outputs.cache-hit != 'true'
-        run: npm install
-      - name: Build Lib
-        run: npm run build
-      - name: Configure git to trust the workspace despite the different owner
-        run:
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - name: Deploy to GPR 🚀
-        uses: mikeal/merge-release@master
+          node-version: '16.18'
+          registry-url: 'https://npm.pkg.github.com'
+          # Defaults to the user or organization that owns the workflow file
+          scope: '@octocat'
+      - run: npm ci
+      - run: npm publish
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_REGISTRY_URL: https://npm.pkg.github.com/
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Checkout 🛎️
+      #   uses: actions/checkout@v2
+      # - name: Use Node.js 16.18
+      #   uses: actions/setup-node@v1
+      #   with:
+      #     node-version: 16.18
+      # - name: Cache node_modules
+      #   id: cache-modules
+      #   uses: actions/cache@v1
+      #   with:
+      #     path: node_modules
+      #     key: ${{ runner.OS }}-build-${{ hashFiles('package.json') }}
+      # - name: Install Dependencies
+      #   if: steps.cache-modules.outputs.cache-hit != 'true'
+      #   run: npm install
+      # - name: Build Lib
+      #   run: npm run build
+      # - name: Deploy to GPR 🚀
+      #   uses: mikeal/merge-release@master
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     NPM_REGISTRY_URL: https://npm.pkg.github.com/
