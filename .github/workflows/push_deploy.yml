@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - "**"
+      - "master"
 
 name: Deploy package to Github Branch
 
@@ -30,9 +30,9 @@ jobs:
         run: npm install
       - name: Build Lib
         run: npm run build
-      # - name: Deploy to GPR 🚀
-      #   uses: mikeal/merge-release@master
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     NPM_REGISTRY_URL: https://npm.pkg.github.com/
+      - name: Deploy to GPR 🚀
+        uses: mikeal/merge-release@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_REGISTRY_URL: https://npm.pkg.github.com/
