@@ -26,7 +26,7 @@ import {
   CollectionQueryGetManyIdsSnap
 } from "./CollectionQueryBuilders";
 import { MakeFetcher } from "./PageLimitFetcher";
-import firebase from "firebase/compat/app";
+import firebase from "firebase/app";
 
 export class CollectionQueryBuilder<
   TState extends FirebaseClientStateObject,

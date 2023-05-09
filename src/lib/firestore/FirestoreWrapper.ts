@@ -8,7 +8,7 @@ import {
   IDocumentQueryBuilder,
 } from "../interfaces";
 import { QueryState } from "./QueryState";
-import firebase from "firebase/compat/app";
+import firebase from "firebase/app";
 
 export class FirestoreWrapper<
   EnumPathTemplatesCollections,

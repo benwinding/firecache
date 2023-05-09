@@ -11,7 +11,7 @@ import {
 } from "./DocumentQueryBuilders";
 import { DocumentCommandUpdate } from "./DocumentCommandBuilders";
 import { observableToPromise } from "../../utils";
-import firebase from "firebase/compat/app";
+import firebase from "firebase/app";
 
 export class DocumentQueryBuilder<
   TState extends FirebaseClientStateObject,
