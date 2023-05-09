@@ -1,5 +1,5 @@
 import { IsRefDoc } from "./is-ref-doc";
-import firebase from "firebase/compat/app";
+import firebase from "firebase/app";
 export interface ParsedDocRef {
   fieldDotsPath: string;
   docRefPath: string;

@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 import { ParsedDocRef } from "./docref-parser";
-import firebase from "firebase/compat/app";
+import firebase from "firebase/app";
 
 export async function ResolveDocRefsToData(
   db: firebase.firestore.Firestore,

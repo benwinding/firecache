@@ -1,4 +1,4 @@
-import firebase from 'firebase/compat/app';
+import firebase from 'firebase/app';
 import { Observable, Observer, throwError } from 'rxjs';
 
 export function collectionSnap2Observable(

@@ -1,5 +1,5 @@
 import { FirestoreWrapper } from "../firestore/FirestoreWrapper";
-import firebase from "firebase/compat/app";
+import firebase from "firebase/app";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
 import "firebase/compat/storage";
