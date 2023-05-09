@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - "master"
+      - "**"
 
 name: Deploy package to Github Branch
 
@@ -30,6 +30,9 @@ jobs:
         run: npm install
       - name: Build Lib
         run: npm run build
+      - name: Configure git to trust the workspace despite the different owner
+        run:
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Deploy to GPR 🚀
         uses: mikeal/merge-release@master
         env:
